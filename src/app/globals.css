@@ -60,3 +60,12 @@ body {
     radial-gradient(45% 55% at 50% 80%, rgba(56, 189, 248, 0.2), transparent 70%);
   filter: blur(50px);
 }
+
+/* Warm variant — home / furniture mood */
+.aurora-warm {
+  background:
+    radial-gradient(40% 50% at 15% 15%, rgba(251, 191, 36, 0.28), transparent 70%),
+    radial-gradient(35% 45% at 85% 20%, rgba(244, 114, 182, 0.22), transparent 70%),
+    radial-gradient(50% 55% at 50% 90%, rgba(251, 146, 60, 0.2), transparent 70%);
+  filter: blur(60px);
+}
