@@ -2,32 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Item } from "@/lib/showroom";
+import { SHOWROOM_HEADER, STORAGE_PASSWORD, type Item } from "@/lib/showroom";
 
 export default function ItemCard({ item }: { item: Item }) {
   const router = useRouter();
   const [canDelete, setCanDelete] = useState(false);
 
   useEffect(() => {
-    setCanDelete(Boolean(localStorage.getItem("showroom-password")));
+    setCanDelete(Boolean(localStorage.getItem(STORAGE_PASSWORD)));
   }, []);
 
   async function remove(e: React.MouseEvent) {
     e.preventDefault();
     if (!confirm(`"${item.title}" 를 삭제할까요?`)) return;
-    const res = await fetch(`/api/show-room/items/${item.id}`, {
-      method: "DELETE",
-      headers: {
-        "x-showroom-password": localStorage.getItem("showroom-password") ?? "",
-      },
-    });
-    if (res.status === 401) {
-      localStorage.removeItem("showroom-password");
-      setCanDelete(false);
-      alert("비밀번호가 만료됐어요 — 추가 폼에서 다시 입력해주세요.");
-      return;
+    try {
+      const res = await fetch(`/api/show-room/items/${item.id}`, {
+        method: "DELETE",
+        headers: { [SHOWROOM_HEADER]: localStorage.getItem(STORAGE_PASSWORD) ?? "" },
+      });
+      if (res.status === 401) {
+        localStorage.removeItem(STORAGE_PASSWORD);
+        setCanDelete(false);
+        alert("비밀번호가 만료됐어요 — 추가 폼에서 다시 입력해주세요.");
+        return;
+      }
+      if (!res.ok) {
+        alert("삭제에 실패했어요 — 다시 시도해주세요.");
+        return;
+      }
+      router.refresh();
+    } catch {
+      alert("삭제에 실패했어요 — 다시 시도해주세요.");
     }
-    router.refresh();
   }
 
   return (

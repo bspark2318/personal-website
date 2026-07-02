@@ -21,6 +21,10 @@ export const ROOMS = [
   "기타",
 ];
 
+export const SHOWROOM_HEADER = "x-showroom-password";
+export const STORAGE_PASSWORD = "showroom-password";
+export const STORAGE_NAME = "showroom-name";
+
 export function getSql() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set — add it to .env.local");
@@ -30,5 +34,5 @@ export function getSql() {
 export function checkPassword(req: Request): boolean {
   const expected = process.env.SHOWROOM_PASSWORD;
   if (!expected) return false;
-  return req.headers.get("x-showroom-password") === expected;
+  return req.headers.get(SHOWROOM_HEADER) === expected;
 }

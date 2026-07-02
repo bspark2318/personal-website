@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ROOMS } from "@/lib/showroom";
+import { ROOMS, SHOWROOM_HEADER, STORAGE_NAME, STORAGE_PASSWORD } from "@/lib/showroom";
 
 const inputCls =
   "w-full rounded-xl border border-card-border bg-transparent px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted focus:border-card-border-hover";
@@ -22,8 +22,8 @@ export default function AddItemForm() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setNeedsPassword(!localStorage.getItem("showroom-password"));
-    setAddedBy(localStorage.getItem("showroom-name") ?? "");
+    setNeedsPassword(!localStorage.getItem(STORAGE_PASSWORD));
+    setAddedBy(localStorage.getItem(STORAGE_NAME) ?? "");
   }, []);
 
   function set(key: keyof typeof empty, value: string) {
@@ -31,38 +31,44 @@ export default function AddItemForm() {
   }
 
   function currentPassword() {
-    return localStorage.getItem("showroom-password") ?? password;
+    return localStorage.getItem(STORAGE_PASSWORD) ?? password;
   }
 
   function handleUnauthorized() {
-    localStorage.removeItem("showroom-password");
+    localStorage.removeItem(STORAGE_PASSWORD);
+    setPassword("");
     setNeedsPassword(true);
     setError("비밀번호가 틀렸어요.");
   }
 
   async function fetchDetails() {
     if (!fields.url) return;
-    setFetching(true);
     setError("");
-    const res = await fetch("/api/show-room/scrape", {
-      method: "POST",
-      headers: { "x-showroom-password": currentPassword() },
-      body: JSON.stringify({ url: fields.url }),
-    });
-    setFetching(false);
-    if (res.status === 401) return handleUnauthorized();
-    if (!res.ok) return setError("해당 링크를 읽을 수 없어요 — 직접 입력해주세요.");
-    localStorage.setItem("showroom-password", currentPassword());
-    setNeedsPassword(false);
-    const data = await res.json();
-    setFields((f) => ({
-      ...f,
-      title: f.title || data.title,
-      price: f.price || data.price,
-      imageUrl: f.imageUrl || data.image,
-    }));
-    if (!data.title && !data.image) {
-      setError("페이지에서 정보를 찾지 못했어요 — 직접 입력해주세요.");
+    setFetching(true);
+    try {
+      const res = await fetch("/api/show-room/scrape", {
+        method: "POST",
+        headers: { [SHOWROOM_HEADER]: currentPassword() },
+        body: JSON.stringify({ url: fields.url }),
+      });
+      if (res.status === 401) return handleUnauthorized();
+      if (!res.ok) return setError("해당 링크를 읽을 수 없어요 — 직접 입력해주세요.");
+      localStorage.setItem(STORAGE_PASSWORD, currentPassword());
+      setNeedsPassword(false);
+      const data = await res.json();
+      setFields((f) => ({
+        ...f,
+        title: f.title || data.title,
+        price: f.price || data.price,
+        imageUrl: f.imageUrl || data.image,
+      }));
+      if (!data.title && !data.image) {
+        setError("페이지에서 정보를 찾지 못했어요 — 직접 입력해주세요.");
+      }
+    } catch {
+      setError("연결에 실패했어요 — 다시 시도해주세요.");
+    } finally {
+      setFetching(false);
     }
   }
 
@@ -73,27 +79,32 @@ export default function AddItemForm() {
       return;
     }
     setSaving(true);
-    const res = await fetch("/api/show-room/items", {
-      method: "POST",
-      headers: { "x-showroom-password": currentPassword() },
-      body: JSON.stringify({
-        url: fields.url,
-        title: fields.title,
-        price: fields.price,
-        imageUrl: fields.imageUrl,
-        room: fields.room,
-        addedBy,
-      }),
-    });
-    setSaving(false);
-    if (res.status === 401) return handleUnauthorized();
-    if (!res.ok) return setError("저장에 실패했어요 — 다시 시도해주세요.");
-    localStorage.setItem("showroom-password", currentPassword());
-    localStorage.setItem("showroom-name", addedBy);
-    setNeedsPassword(false);
-    setFields(empty);
-    setOpen(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/show-room/items", {
+        method: "POST",
+        headers: { [SHOWROOM_HEADER]: currentPassword() },
+        body: JSON.stringify({
+          url: fields.url,
+          title: fields.title,
+          price: fields.price,
+          imageUrl: fields.imageUrl,
+          room: fields.room,
+          addedBy,
+        }),
+      });
+      if (res.status === 401) return handleUnauthorized();
+      if (!res.ok) return setError("저장에 실패했어요 — 다시 시도해주세요.");
+      localStorage.setItem(STORAGE_PASSWORD, currentPassword());
+      localStorage.setItem(STORAGE_NAME, addedBy);
+      setNeedsPassword(false);
+      setFields(empty);
+      setOpen(false);
+      router.refresh();
+    } catch {
+      setError("연결에 실패했어요 — 다시 시도해주세요.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

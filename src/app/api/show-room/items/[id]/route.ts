@@ -9,10 +9,10 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  const numId = Number(id);
-  if (!Number.isInteger(numId)) {
+  if (!/^\d+$/.test(id)) {
     return Response.json({ error: "invalid id" }, { status: 400 });
   }
+  const numId = Number(id);
 
   const sql = getSql();
   const rows = await sql`DELETE FROM showroom_items WHERE id = ${numId} RETURNING id`;
