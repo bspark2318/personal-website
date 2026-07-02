@@ -3,22 +3,10 @@ import Reveal from "@/components/Reveal";
 import AddItemForm from "@/components/showroom/AddItemForm";
 import ItemCard from "@/components/showroom/ItemCard";
 import RoomNav from "@/components/showroom/RoomNav";
-import { getSql, ROOMS, type Item } from "@/lib/showroom";
+import { getSql, groupByRoom, type Item } from "@/lib/showroom";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "둥지 트는 중" };
-
-function groupByRoom(items: Item[]): [string, Item[]][] {
-  const groups = new Map<string, Item[]>();
-  for (const item of items) {
-    const list = groups.get(item.room) ?? [];
-    list.push(item);
-    groups.set(item.room, list);
-  }
-  const known = ROOMS.filter((r) => groups.has(r));
-  const unknown = [...groups.keys()].filter((r) => !ROOMS.includes(r)).sort();
-  return [...known, ...unknown].map((r) => [r, groups.get(r)!]);
-}
 
 export default async function ShowRoom() {
   const sql = getSql();

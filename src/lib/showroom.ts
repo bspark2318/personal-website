@@ -31,6 +31,20 @@ export function getSql() {
   return neon(url);
 }
 
+// Group items by room: known ROOMS in canonical order first, then any
+// unknown rooms alphabetically. Empty rooms are omitted.
+export function groupByRoom(items: Item[]): [string, Item[]][] {
+  const groups = new Map<string, Item[]>();
+  for (const item of items) {
+    const list = groups.get(item.room) ?? [];
+    list.push(item);
+    groups.set(item.room, list);
+  }
+  const known = ROOMS.filter((r) => groups.has(r));
+  const unknown = [...groups.keys()].filter((r) => !ROOMS.includes(r)).sort();
+  return [...known, ...unknown].map((r) => [r, groups.get(r)!]);
+}
+
 export function checkPassword(req: Request): boolean {
   const expected = process.env.SHOWROOM_PASSWORD;
   if (!expected) return false;
