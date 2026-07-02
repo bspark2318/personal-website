@@ -12,8 +12,9 @@ export default function ItemCard({ item }: { item: Item }) {
     setCanDelete(Boolean(localStorage.getItem("showroom-password")));
   }, []);
 
-  async function remove() {
-    if (!confirm(`Remove "${item.title}"?`)) return;
+  async function remove(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!confirm(`"${item.title}" 를 삭제할까요?`)) return;
     const res = await fetch(`/api/show-room/items/${item.id}`, {
       method: "DELETE",
       headers: {
@@ -23,40 +24,52 @@ export default function ItemCard({ item }: { item: Item }) {
     if (res.status === 401) {
       localStorage.removeItem("showroom-password");
       setCanDelete(false);
-      alert("Password no longer valid — re-enter it in the add form.");
+      alert("비밀번호가 만료됐어요 — 추가 폼에서 다시 입력해주세요.");
       return;
     }
     router.refresh();
   }
 
   return (
-    <div className="group relative h-full">
+    <div className="group relative">
       <a
         href={item.url}
         target="_blank"
         rel="noreferrer"
-        className="block h-full rounded-3xl border border-card-border bg-gradient-to-b from-card-from to-transparent p-6 transition-colors duration-500 hover:border-card-border-hover"
+        className="block overflow-hidden rounded-3xl border border-card-border bg-gradient-to-b from-card-from to-transparent transition-all duration-500 hover:-translate-y-1 hover:border-card-border-hover"
       >
-        <div className="mb-6 aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-card-from to-transparent">
-          {item.image_url && (
+        <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-card-from to-transparent">
+          {item.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={item.image_url}
               alt={item.title}
               loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-xs text-muted">
+              이미지 없음
+            </div>
+          )}
+          {item.price && (
+            <span className="absolute bottom-3 left-3 rounded-full border border-card-border bg-nav-bg px-3 py-1 text-sm font-semibold backdrop-blur-xl">
+              {item.price}
+            </span>
           )}
         </div>
-        <h3 className="text-lg font-semibold tracking-tight">{item.title}</h3>
-        {item.price && <p className="mt-1 text-muted">{item.price}</p>}
-        <p className="mt-2 text-xs text-muted">added by {item.added_by}</p>
+        <div className="p-5">
+          <h3 className="line-clamp-2 text-base font-semibold leading-snug tracking-tight">
+            {item.title}
+          </h3>
+          <p className="mt-2 text-xs text-muted">{item.added_by} 추천</p>
+        </div>
       </a>
       {canDelete && (
         <button
           onClick={remove}
-          aria-label="Remove item"
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-card-border bg-nav-bg text-muted opacity-0 backdrop-blur-xl transition-opacity duration-300 hover:text-foreground group-hover:opacity-100"
+          aria-label="삭제"
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full border border-card-border bg-nav-bg text-muted opacity-0 backdrop-blur-xl transition-opacity duration-300 hover:text-foreground group-hover:opacity-100"
         >
           ×
         </button>

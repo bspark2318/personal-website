@@ -6,7 +6,7 @@ import ThemeToggle from "./ThemeToggle";
 const links = [
   { label: "Experiments", href: "/#experiments" },
   { label: "Now", href: "/#now" },
-  { label: "Show Room", href: "/show-room" },
+  { label: "둥지", href: "/show-room" },
 ];
 
 export default function Nav() {

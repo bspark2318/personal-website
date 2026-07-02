@@ -3,6 +3,18 @@ import { checkPassword } from "@/lib/showroom";
 const PRIVATE_HOST =
   /^(localhost|.*\.local|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|\[?::1\]?$)/i;
 
+function decode(s: string): string {
+  return s
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&nbsp;/g, " ")
+    .trim();
+}
+
 function meta(html: string, name: string): string {
   // matches both <meta property="x" content="y"> and <meta content="y" property="x">
   const re = new RegExp(
@@ -64,13 +76,15 @@ export async function POST(req: Request) {
     });
     const html = await res.text();
 
-    const title =
-      meta(html, "og:title") || (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "").trim();
+    const title = decode(
+      meta(html, "og:title") || (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "").trim()
+    );
     const image = meta(html, "og:image") || meta(html, "twitter:image");
     const amount = meta(html, "og:price:amount") || meta(html, "product:price:amount");
     const currency = meta(html, "og:price:currency") || meta(html, "product:price:currency");
-    const price =
-      (amount ? `${currency} ${amount}`.trim() : "") || meta(html, "price") || jsonLdPrice(html);
+    const price = decode(
+      (amount ? `${currency} ${amount}`.trim() : "") || meta(html, "price") || jsonLdPrice(html)
+    );
 
     return Response.json({ title, image, price });
   } catch {

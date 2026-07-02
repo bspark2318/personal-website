@@ -12,13 +12,13 @@ export type Item = {
 };
 
 export const ROOMS = [
-  "Living Room",
-  "Bedroom",
-  "Kitchen",
-  "Dining",
-  "Bathroom",
-  "Entry",
-  "Other",
+  "거실",
+  "침실",
+  "주방",
+  "식당",
+  "욕실",
+  "현관",
+  "기타",
 ];
 
 export function getSql() {
