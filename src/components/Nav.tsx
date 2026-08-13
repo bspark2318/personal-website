@@ -19,7 +19,13 @@ export default function Nav() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <a href="/" className="text-sm font-semibold tracking-tight">
-          ✳
+          <motion.span
+            className="inline-block"
+            animate={{ scale: [1, 1.4, 1] }}
+            transition={{ duration: 2, ease: "easeInOut", repeat: Infinity }}
+          >
+            ✳
+          </motion.span>
         </a>
         <div className="flex items-center gap-8 text-sm text-muted">
           {links.map((l) => (

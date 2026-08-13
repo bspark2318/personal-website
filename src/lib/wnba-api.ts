@@ -1,0 +1,85 @@
+// Thin ESPN fetch layer. All unofficial endpoints — isolate breakage here.
+
+import {
+  lastN,
+  parseGamelog,
+  parseGames,
+  teamTrend,
+  topStarters,
+  vsOpponent,
+  type Matchup,
+  type MatchupSide,
+  type Snapshot,
+  type TeamRef,
+} from "./wnba";
+
+const SITE = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba";
+const WEB = "https://site.web.api.espn.com/apis/common/v3/sports/basketball/wnba";
+
+async function getJson(url: string): Promise<unknown> {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`ESPN ${res.status}: ${url}`);
+  return res.json();
+}
+
+// date: YYYYMMDD (ET game day); omit for ESPN's "current" day
+export function fetchScoreboard(date?: string) {
+  return getJson(`${SITE}/scoreboard${date ? `?dates=${date}` : ""}`);
+}
+
+export function fetchByAthlete(season: number) {
+  return getJson(
+    `${WEB}/statistics/byathlete?region=us&lang=en&contentorigin=espn&limit=200&season=${season}&seasontype=2&isqualified=false&sort=general.avgMinutes:desc`
+  );
+}
+
+export function fetchGamelog(athleteId: string) {
+  return getJson(`${WEB}/athletes/${athleteId}/gamelog`);
+}
+
+export function fetchTeamSchedule(teamId: string) {
+  return getJson(`${SITE}/teams/${teamId}/schedule`);
+}
+
+// Fetch everything for today's games and assemble the day's snapshot.
+export async function buildSnapshot(): Promise<Snapshot> {
+  const date = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+  }).format(new Date()); // YYYY-MM-DD, ET game day
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const scoreboard = (await fetchScoreboard(date.replaceAll("-", ""))) as any;
+  const games = parseGames(scoreboard);
+  if (games.length === 0) return { date, matchups: [] };
+
+  const season: number =
+    scoreboard?.leagues?.[0]?.season?.year ?? new Date().getFullYear();
+  const byathlete = await fetchByAthlete(season);
+
+  const side = async (team: TeamRef, opponent: TeamRef): Promise<MatchupSide> => {
+    const schedule = await fetchTeamSchedule(team.id);
+    const starters = await Promise.all(
+      topStarters(byathlete, team.id).map(async (s) => {
+        const lines = parseGamelog(await fetchGamelog(s.id));
+        return {
+          playerId: s.id,
+          name: s.name,
+          avgMinutes: s.avgMinutes,
+          last10: lastN(lines),
+          vsOpponent: vsOpponent(lines, opponent.id),
+        };
+      })
+    );
+    return { team, starters, trend: teamTrend(schedule, team.id) };
+  };
+
+  const matchups: Matchup[] = [];
+  for (const game of games) {
+    matchups.push({
+      game,
+      home: await side(game.home, game.away),
+      away: await side(game.away, game.home),
+    });
+  }
+  return { date, matchups };
+}
