@@ -15,28 +15,28 @@
 - [x] **T03** [P] — Pure transforms + tests: last-10 slice, vs-opponent filter, team trends math, top-5-by-minutes starters. (FR-002/003/004/006, AC2)
   - Files: `src/lib/wnba.ts`, `src/lib/wnba.test.ts`
   - Verify: `npm run test` — transform tests pass against fixtures. ✓ (30 tests green)
-- [ ] **T04** — Neon table + read/write layer. Create `wnba_snapshots(date pk, data jsonb, created_at)`.
+- [x] **T04** — Neon table + read/write layer. Create `wnba_snapshots(date pk, data jsonb, created_at)`.
   - Files: `src/lib/wnba-db.ts`
   - Verify: script writes a fixture snapshot, reads it back identical.
-- [ ] **T05** — Snapshot route: fetch ESPN → transform → upsert Neon; secured for cron. (FR-007)
+- [x] **T05** — Snapshot route: fetch ESPN → transform → upsert Neon; secured for cron. (FR-007)
   - Files: `src/app/api/wnba/snapshot/route.ts`
   - Verify: `curl -X POST /api/wnba/snapshot` on dev → row in Neon with today's date.
-- [ ] **T06** — Vercel cron config, daily pre-game (ET morning).
+- [x] **T06** — Vercel cron config, daily pre-game (ET morning).
   - Files: `vercel.json`
   - Verify: `vercel.json` schedule valid; deploy shows cron registered.
-- [ ] **T07** — `/wnba` page: read snapshot (build on demand if missing), game pill picker, loading/empty/error states. (FR-001/005, AC1, AC3)
+- [x] **T07** — `/wnba` page: read snapshot (build on demand if missing), game pill picker, loading/empty/error states. (FR-001/005, AC1, AC3)
   - Files: `src/app/wnba/page.tsx`, `src/components/wnba/NoGames.tsx`
   - Verify: game day → matchup pills + tipoffs render; mock empty scoreboard → "No games today".
-- [ ] **T08** — Matchup detail: starter columns + player cards (L10 avgs, sparkline, vs-opp line, expand to full log). (FR-002/003, AC2)
+- [x] **T08** — Matchup detail: starter columns + player cards (L10 avgs, sparkline, vs-opp line, expand to full log). (FR-002/003, AC2)
   - Files: `src/components/wnba/MatchupCard.tsx`, `src/components/wnba/PlayerLogTable.tsx`
   - Verify: card shows 10 rows on expand; vs-opp line matches fixture data.
-- [ ] **T09** [P] — Team trends strip (W/L dots, avg for/against, margin, combined total). (FR-004/006, AC2)
+- [x] **T09** [P] — Team trends strip (W/L dots, avg for/against, margin, combined total). (FR-004/006, AC2)
   - Files: `src/components/wnba/TeamTrends.tsx`
   - Verify: rendered numbers match hand-computed values from fixtures.
-- [ ] **T10** — Nav link + polish: framer-motion transitions, mobile layout, dark mode.
+- [x] **T10** — Nav link + polish: framer-motion transitions, mobile layout, dark mode.
   - Files: `src/components/Nav.tsx`, wnba components
   - Verify: `/wnba` reachable from nav; mobile viewport stacks columns; `npm run lint` passes.
-- [ ] **T11** — Accuracy spot-check + gates. (AC4)
+- [x] **T11** — Accuracy spot-check + gates. (AC4)
   - Files: —
   - Verify: 3 players' rendered L10 numbers match ESPN.com; `npm run test` + `npm run lint` green.
 
