@@ -7,6 +7,7 @@ const links = [
   { label: "Experiments", href: "/#experiments" },
   { label: "Now", href: "/#now" },
   { label: "둥지", href: "/show-room" },
+  { label: "WNBA", href: "/wnba" },
 ];
 
 export default function Nav() {
