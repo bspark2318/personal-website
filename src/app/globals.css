@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Site theme is toggled via a .dark class (ThemeToggle), not the OS setting —
+   align Tailwind's dark: variant with that. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Light (default) — true Apple */
 :root {
   --background: #fbfbfd;
