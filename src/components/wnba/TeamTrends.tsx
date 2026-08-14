@@ -1,4 +1,5 @@
 import type { Matchup } from "@/lib/wnba";
+import type { KalshiTotal } from "@/lib/kalshi";
 
 function Dots({ results }: { results: ("W" | "L")[] }) {
   // most recent first in data; show oldest→newest
@@ -47,7 +48,13 @@ function Side({ m, side }: { m: Matchup; side: "home" | "away" }) {
   );
 }
 
-export default function TeamTrends({ matchup }: { matchup: Matchup }) {
+export default function TeamTrends({
+  matchup,
+  kalshiTotal,
+}: {
+  matchup: Matchup;
+  kalshiTotal?: KalshiTotal;
+}) {
   const combined = Math.round((matchup.away.trend.avgFor + matchup.home.trend.avgFor) * 10) / 10;
   return (
     <div className="rounded-2xl border border-card-border p-4">
@@ -57,6 +64,12 @@ export default function TeamTrends({ matchup }: { matchup: Matchup }) {
         <div className="text-center">
           <p className="text-xs text-muted">implied total</p>
           <p className="text-lg font-semibold">{combined}</p>
+          {kalshiTotal && (
+            <p className="mt-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+              Kalshi O{kalshiTotal.threshold}
+              {kalshiTotal.yesAsk != null ? ` · yes ${kalshiTotal.yesAsk}¢` : ""}
+            </p>
+          )}
         </div>
         <Side m={matchup} side="home" />
       </div>

@@ -16,7 +16,7 @@ Comparing the board's stats to Kalshi's lines means flipping between tabs. Show 
 
 ## Functional requirements
 
-- **FR-001:** MUST fetch Kalshi WNBA player-points markets live on page load; stats remain the daily snapshot. (Probed: only points ladders exist — no reb/ast or game-total markets; winner markets out of scope.)
+- **FR-001:** MUST fetch Kalshi WNBA player-points markets live on page load; stats remain the daily snapshot. (Probed: player pts/reb/ast/threes ladders + game totals all exist; markets open during the day. Winner/spread/quarter markets out of scope.)
 - **FR-002:** MUST show only the LOWEST rung of each player's ladder (e.g. `15+ · yes 78¢`) with her L10 avg beside it, rendered at the BOTTOM of the expanded player card (collapsed card unchanged).
 - **FR-004:** MUST NOT recommend bets — no "+EV"/"take this" labels; differentials are neutral numbers.
 - **FR-005:** Unmatched player or absent market → show nothing for it; Kalshi API failure → board renders unchanged (lines are additive).

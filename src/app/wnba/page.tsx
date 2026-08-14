@@ -55,10 +55,7 @@ export default async function WnbaPage() {
           ) : snapshot.matchups.length === 0 ? (
             <NoGames />
           ) : (
-            <MatchupBoard
-              snapshot={snapshot}
-              kalshiLines={kalshiLines ? Object.fromEntries(kalshiLines) : null}
-            />
+            <MatchupBoard snapshot={snapshot} kalshi={kalshiLines} />
           )}
         </Reveal>
       </section>

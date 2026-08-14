@@ -8,7 +8,19 @@ export type KalshiLine = {
   ticker: string;
 };
 
-export type KalshiPlayerLines = { pts?: KalshiLine; threes?: KalshiLine };
+export type KalshiPlayerLines = {
+  pts?: KalshiLine;
+  threes?: KalshiLine;
+  reb?: KalshiLine;
+  ast?: KalshiLine;
+};
+
+export type KalshiTotal = {
+  title: string; // "Los Angeles vs New York: Total"
+  threshold: number; // lowest Over rung, e.g. 173.5
+  yesBid: number | null;
+  yesAsk: number | null;
+};
 
 const eventsUrl = (series: string) =>
   `https://api.elections.kalshi.com/trade-api/v2/events?limit=50&status=open&series_ticker=${series}&with_nested_markets=true`;
@@ -61,15 +73,56 @@ async function fetchSeries(series: string): Promise<Map<string, KalshiLine> | nu
   }
 }
 
-// Kalshi's WNBA player catalog: points + threes ladders.
-export async function fetchKalshiLines(): Promise<Map<string, KalshiPlayerLines> | null> {
-  const [pts, threes] = await Promise.all([
+// game-total events → lowest Over rung per game title
+export function parseTotals(data: any): KalshiTotal[] {
+  const totals: KalshiTotal[] = [];
+  for (const e of data?.events ?? []) {
+    let best: KalshiTotal | null = null;
+    for (const m of e.markets ?? []) {
+      if (m.status !== "active" || m.floor_strike == null) continue;
+      if (!best || m.floor_strike < best.threshold) {
+        best = {
+          title: e.title ?? "",
+          threshold: m.floor_strike,
+          yesBid: m.yes_bid ?? null,
+          yesAsk: m.yes_ask ?? null,
+        };
+      }
+    }
+    if (best) totals.push(best);
+  }
+  return totals;
+}
+
+export type KalshiData = {
+  players: Record<string, KalshiPlayerLines>; // key = normalized name
+  totals: KalshiTotal[];
+};
+
+// Kalshi's WNBA per-game catalog: player pts/threes/reb/ast ladders + game totals.
+export async function fetchKalshiLines(): Promise<KalshiData | null> {
+  const [pts, threes, reb, ast, totalsRaw] = await Promise.all([
     fetchSeries("KXWNBAPTS"),
     fetchSeries("KXWNBA3PT"),
+    fetchSeries("KXWNBAREB"),
+    fetchSeries("KXWNBAAST"),
+    (async () => {
+      try {
+        const res = await fetch(eventsUrl("KXWNBATOTAL"), { cache: "no-store" });
+        return res.ok ? parseTotals(await res.json()) : [];
+      } catch {
+        return [];
+      }
+    })(),
   ]);
-  if (!pts && !threes) return null;
-  const out = new Map<string, KalshiPlayerLines>();
-  for (const [k, v] of pts ?? []) out.set(k, { pts: v });
-  for (const [k, v] of threes ?? []) out.set(k, { ...out.get(k), threes: v });
-  return out;
+  if (!pts && !threes && !reb && !ast) return null;
+  const players: Record<string, KalshiPlayerLines> = {};
+  const merge = (map: Map<string, KalshiLine> | null, key: keyof KalshiPlayerLines) => {
+    for (const [k, v] of map ?? []) players[k] = { ...players[k], [key]: v };
+  };
+  merge(pts, "pts");
+  merge(threes, "threes");
+  merge(reb, "reb");
+  merge(ast, "ast");
+  return { players, totals: totalsRaw };
 }

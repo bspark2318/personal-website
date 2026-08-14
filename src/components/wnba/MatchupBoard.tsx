@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { avg, pairStarters, type PlayerLog, type Snapshot } from "@/lib/wnba";
-import { normalizeName, type KalshiPlayerLines } from "@/lib/kalshi";
+import { normalizeName, type KalshiData, type KalshiTotal } from "@/lib/kalshi";
 import PlayerLogTable from "./PlayerLogTable";
 import TeamTrends from "./TeamTrends";
 
@@ -33,17 +33,35 @@ function tipoff(iso: string) {
   });
 }
 
+// "New York Liberty" → "new york"; match a totals title naming both cities
+function totalForMatchup(
+  totals: KalshiTotal[] | undefined,
+  away: string,
+  home: string
+): KalshiTotal | undefined {
+  const city = (dn: string) => dn.toLowerCase().split(" ").slice(0, -1).join(" ");
+  return totals?.find((t) => {
+    const title = t.title.toLowerCase();
+    return title.includes(city(away)) && title.includes(city(home));
+  });
+}
+
 export default function MatchupBoard({
   snapshot,
-  kalshiLines,
+  kalshi,
 }: {
   snapshot: Snapshot;
-  kalshiLines: Record<string, KalshiPlayerLines> | null;
+  kalshi: KalshiData | null;
 }) {
-  const lineFor = (p: PlayerLog) => kalshiLines?.[normalizeName(p.name)];
+  const lineFor = (p: PlayerLog) => kalshi?.players[normalizeName(p.name)];
   const [selected, setSelected] = useState(0);
   const [side, setSide] = useState<"away" | "home">("away");
   const matchup = snapshot.matchups[selected];
+  const total = totalForMatchup(
+    kalshi?.totals,
+    matchup.away.team.displayName,
+    matchup.home.team.displayName
+  );
   const pairs = pairStarters(matchup.away.starters, matchup.home.starters);
   const badges = new Map([
     ...leaderBadges(matchup.away.starters),
@@ -86,7 +104,7 @@ export default function MatchupBoard({
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="mb-6">
-            <TeamTrends matchup={matchup} />
+            <TeamTrends matchup={matchup} kalshiTotal={total} />
           </div>
 
           <p className="mb-3 text-center text-[11px] text-muted">
