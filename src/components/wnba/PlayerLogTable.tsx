@@ -17,7 +17,7 @@ function Sparkline({ log }: { log: PlayerLog }) {
   return (
     <svg
       viewBox={`0 0 ${w} ${h}`}
-      className="h-8 w-[120px] text-foreground"
+      className="h-8 w-full max-w-[140px] text-foreground"
       role="img"
       aria-label={`Points, last ${pts.length} games`}
     >
@@ -39,21 +39,24 @@ export default function PlayerLogTable({ player }: { player: PlayerLog }) {
     <div className="rounded-2xl border border-card-border bg-[image:linear-gradient(var(--card-from),transparent)] p-4 transition-colors hover:border-card-border-hover">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between gap-3 text-left"
+        className="flex w-full flex-col gap-1.5 text-left"
         aria-expanded={open}
       >
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">{player.name}</p>
-          <p className="mt-0.5 text-xs text-muted">
-            L10 · {avg(player.last10, "pts")} pts · {avg(player.last10, "reb")} reb ·{" "}
-            {avg(player.last10, "ast")} ast
-          </p>
-          <p className="mt-0.5 text-xs text-muted">
-            {vs.length > 0
-              ? `vs opp: ${vs.slice(0, 5).map((l) => l.pts).join(", ")} pts`
-              : "no games vs opp"}
-          </p>
+        <div className="flex w-full min-w-0 items-baseline gap-1.5">
+          <p className="min-w-0 truncate text-sm font-semibold">{player.name}</p>
+          <span className="shrink-0 rounded bg-card-from px-1 text-[10px] text-muted">
+            {player.pos || "—"}
+          </span>
         </div>
+        <p className="text-xs text-muted">
+          L10 · {avg(player.last10, "pts")}p · {avg(player.last10, "reb")}r ·{" "}
+          {avg(player.last10, "ast")}a
+        </p>
+        <p className="text-xs text-muted">
+          {vs.length > 0
+            ? `vs opp: ${vs.slice(0, 5).map((l) => l.pts).join(", ")} pts`
+            : "no games vs opp"}
+        </p>
         <Sparkline log={player} />
       </button>
 

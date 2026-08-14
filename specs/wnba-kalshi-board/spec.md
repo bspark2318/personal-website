@@ -17,7 +17,7 @@ Researching WNBA player props on Kalshi means bouncing across stats sites. Need 
 ## Functional requirements
 
 - **FR-001:** MUST list today's WNBA games (matchups + tip-off times).
-- **FR-002:** MUST show, per matchup, each starter's game log for their last 10 games (points, rebounds, assists at minimum).
+- **FR-002:** MUST show, per matchup, each starter's game log for their last 10 games (points, rebounds, assists at minimum), displayed as player-vs-player rows paired by position (G→C).
 - **FR-003:** MUST show starter performance vs today's specific opponent (head-to-head history).
 - **FR-004:** MUST show team-level trends (recent W/L form, scoring totals, margins).
 - **FR-005:** MUST show a "no games today" message when none are scheduled.

@@ -64,6 +64,7 @@ export async function buildSnapshot(): Promise<Snapshot> {
         return {
           playerId: s.id,
           name: s.name,
+          pos: s.pos,
           avgMinutes: s.avgMinutes,
           last10: lastN(lines),
           vsOpponent: vsOpponent(lines, opponent.id),

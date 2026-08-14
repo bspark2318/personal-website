@@ -6,6 +6,7 @@ import schedule from "./__fixtures__/schedule.json";
 import {
   avg,
   lastN,
+  pairStarters,
   parseGamelog,
   parseGames,
   teamTrend,
@@ -93,6 +94,28 @@ describe("teamTrend", () => {
     expect(t.avgFor).toBeGreaterThan(0);
     expect(t.avgAgainst).toBeGreaterThan(0);
     expect(t.avgMargin).toBeCloseTo(t.avgFor - t.avgAgainst, 1);
+  });
+});
+
+describe("pairStarters", () => {
+  const mk = (name: string, pos: string, avgMinutes: number) =>
+    ({ playerId: name, name, pos, avgMinutes, last10: [], vsOpponent: [] });
+
+  it("pairs by position rank G→C, minutes tiebreak", () => {
+    const away = [mk("aC", "C", 30), mk("aG1", "G", 35), mk("aF", "F", 32), mk("aG2", "G", 28), mk("aGF", "G/F", 33)];
+    const home = [mk("hG1", "G", 34), mk("hG2", "G", 30), mk("hF1", "F", 33), mk("hF2", "F", 29), mk("hC", "C", 31)];
+    const pairs = pairStarters(away, home);
+    expect(pairs.map(([a, h]) => [a.name, h.name])).toEqual([
+      ["aG1", "hG1"],
+      ["aG2", "hG2"],
+      ["aGF", "hF1"],
+      ["aF", "hF2"],
+      ["aC", "hC"],
+    ]);
+  });
+
+  it("uneven lists → pairs up to the shorter side", () => {
+    expect(pairStarters([mk("a", "G", 30)], [])).toEqual([]);
   });
 });
 

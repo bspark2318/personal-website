@@ -30,6 +30,7 @@ export type GameLine = {
 export type PlayerLog = {
   playerId: string;
   name: string;
+  pos: string; // G / F / C / hybrids like G/F
   avgMinutes: number;
   last10: GameLine[];
   vsOpponent: GameLine[];
@@ -91,7 +92,7 @@ export function topStarters(
   byathlete: any,
   teamId: string,
   n = 5
-): { id: string; name: string; avgMinutes: number }[] {
+): { id: string; name: string; pos: string; avgMinutes: number }[] {
   const catNames: string[] =
     byathlete?.categories?.find((c: any) => c.name === "general")?.names ?? [];
   const minIdx = catNames.indexOf("avgMinutes");
@@ -102,6 +103,7 @@ export function topStarters(
       return {
         id: String(a.athlete.id),
         name: a.athlete.displayName,
+        pos: a.athlete.position?.abbreviation ?? "",
         avgMinutes: minIdx >= 0 ? general?.values?.[minIdx] ?? 0 : 0,
       };
     });
@@ -185,6 +187,25 @@ export function teamTrend(schedule: any, teamId: string, n = 10): TeamTrend {
     avgAgainst: round1(sumAgainst / games),
     avgMargin: round1((sumFor - sumAgainst) / games),
   };
+}
+
+// Zip two starter lists into positional pairs: guards vs guards, bigs vs bigs.
+// Sort key: position rank (G→C), minutes as tiebreak — approximate by design.
+const POS_RANK: Record<string, number> = { G: 0, "G/F": 1, F: 2, "F/C": 3, C: 4 };
+
+export function pairStarters(
+  away: PlayerLog[],
+  home: PlayerLog[]
+): [PlayerLog, PlayerLog][] {
+  const byPos = (list: PlayerLog[]) =>
+    [...list].sort(
+      (a, b) =>
+        (POS_RANK[a.pos] ?? 2) - (POS_RANK[b.pos] ?? 2) ||
+        b.avgMinutes - a.avgMinutes
+    );
+  const a = byPos(away);
+  const h = byPos(home);
+  return a.slice(0, Math.min(a.length, h.length)).map((p, i) => [p, h[i]]);
 }
 
 export function avg(lines: GameLine[], key: "pts" | "reb" | "ast" | "min"): number {
