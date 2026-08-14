@@ -55,9 +55,11 @@ function PtsBars({ log, scaleMax }: { log: PlayerLog; scaleMax: number }) {
 export default function PlayerLogTable({
   player,
   scaleMax,
+  badges,
 }: {
   player: PlayerLog;
   scaleMax?: number;
+  badges?: string[]; // team-leader tags: PTS / REB / AST
 }) {
   const [open, setOpen] = useState(false);
   const vs = player.vsOpponent;
@@ -76,6 +78,19 @@ export default function PlayerLogTable({
             {player.pos || "—"}
           </span>
         </div>
+        {badges && badges.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {badges.map((b) => (
+              <span
+                key={b}
+                className="rounded-full border border-card-border px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-foreground"
+                title={`Team's best ${b.toLowerCase()} over last 10`}
+              >
+                ★ {b}
+              </span>
+            ))}
+          </div>
+        )}
         <p className="text-xs text-muted">
           L10 · {avg(player.last10, "pts")}p · {avg(player.last10, "reb")}r ·{" "}
           {avg(player.last10, "ast")}a

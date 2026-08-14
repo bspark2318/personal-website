@@ -2,9 +2,26 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { pairStarters, type Snapshot } from "@/lib/wnba";
+import { avg, pairStarters, type PlayerLog, type Snapshot } from "@/lib/wnba";
 import PlayerLogTable from "./PlayerLogTable";
 import TeamTrends from "./TeamTrends";
+
+// team-leader badges by L10 average: PTS / REB / AST
+function leaderBadges(starters: PlayerLog[]): Map<string, string[]> {
+  const badges = new Map<string, string[]>();
+  for (const stat of ["pts", "reb", "ast"] as const) {
+    const best = starters.reduce((a, b) =>
+      avg(b.last10, stat) > avg(a.last10, stat) ? b : a
+    );
+    if (avg(best.last10, stat) > 0) {
+      badges.set(best.playerId, [
+        ...(badges.get(best.playerId) ?? []),
+        stat.toUpperCase(),
+      ]);
+    }
+  }
+  return badges;
+}
 
 function tipoff(iso: string) {
   return new Date(iso).toLocaleTimeString("en-US", {
@@ -19,6 +36,10 @@ export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
   const [selected, setSelected] = useState(0);
   const matchup = snapshot.matchups[selected];
   const pairs = pairStarters(matchup.away.starters, matchup.home.starters);
+  const badges = new Map([
+    ...leaderBadges(matchup.away.starters),
+    ...leaderBadges(matchup.home.starters),
+  ]);
 
   return (
     <div>
@@ -76,8 +97,8 @@ export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
               );
               return (
                 <div key={a.playerId} className="grid grid-cols-2 items-start gap-2 sm:gap-3">
-                  <PlayerLogTable player={a} scaleMax={scaleMax} />
-                  <PlayerLogTable player={h} scaleMax={scaleMax} />
+                  <PlayerLogTable player={a} scaleMax={scaleMax} badges={badges.get(a.playerId)} />
+                  <PlayerLogTable player={h} scaleMax={scaleMax} badges={badges.get(h.playerId)} />
                 </div>
               );
             })}
