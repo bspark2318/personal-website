@@ -104,6 +104,13 @@ export default function PlayerLogTable({
             </span>
           )}
         </div>
+        {(player.height || player.weight || player.age) && (
+          <p className="text-xs text-muted">
+            {[player.height, player.weight, player.age && `${player.age}y`]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        )}
         <p className="text-xs text-muted">
           L10 · {avg(player.last10, "pts")}p · {avg(player.last10, "reb")}r ·{" "}
           {avg(player.last10, "ast")}a

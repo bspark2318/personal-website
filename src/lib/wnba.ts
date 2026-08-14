@@ -37,6 +37,9 @@ export type PlayerLog = {
   name: string;
   pos: string; // G / F / C / hybrids like G/F
   avgMinutes: number;
+  height?: string; // 6' 2"
+  weight?: string; // 194 lbs
+  age?: number;
   last10: GameLine[];
   vsOpponent: GameLine[];
   flags?: Flag[];

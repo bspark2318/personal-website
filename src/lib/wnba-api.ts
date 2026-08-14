@@ -44,14 +44,25 @@ export function fetchTeamSchedule(teamId: string) {
   return getJson(`${SITE}/teams/${teamId}/schedule`);
 }
 
-// athleteId → injury status ("Out", "Day-To-Day", …) from the roster feed
-export async function fetchInjuries(teamId: string): Promise<Map<string, string>> {
+export type RosterInfo = {
+  injury?: string; // "Out", "Day-To-Day", …
+  height?: string; // 6' 2"
+  weight?: string; // 194 lbs
+  age?: number;
+};
+
+// athleteId → injury + physical profile from the roster feed
+export async function fetchRosterInfo(teamId: string): Promise<Map<string, RosterInfo>> {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const roster = (await getJson(`${SITE}/teams/${teamId}/roster`)) as any;
-  const map = new Map<string, string>();
+  const map = new Map<string, RosterInfo>();
   for (const a of roster?.athletes ?? []) {
-    const status = a.injuries?.[0]?.status;
-    if (status) map.set(String(a.id), status);
+    map.set(String(a.id), {
+      injury: a.injuries?.[0]?.status,
+      height: a.displayHeight,
+      weight: a.displayWeight,
+      age: a.age,
+    });
   }
   return map;
 }
@@ -76,9 +87,9 @@ export async function buildSnapshot(): Promise<Snapshot> {
     opponent: TeamRef,
     gameDate: string
   ): Promise<MatchupSide> => {
-    const [schedule, injuries] = await Promise.all([
+    const [schedule, roster] = await Promise.all([
       fetchTeamSchedule(team.id),
-      fetchInjuries(team.id).catch(() => new Map<string, string>()),
+      fetchRosterInfo(team.id).catch(() => new Map<string, RosterInfo>()),
     ]);
     const trend = teamTrend(schedule, team.id, gameDate);
     const starters = await Promise.all(
@@ -92,15 +103,19 @@ export async function buildSnapshot(): Promise<Snapshot> {
         const lines = [...parseGamelog(cur), ...parseGamelog(prev)]
           .filter((l) => !seen.has(l.eventId) && (seen.add(l.eventId), true))
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        const info = roster.get(s.id);
         const player = {
           playerId: s.id,
           name: s.name,
           pos: s.pos,
           avgMinutes: s.avgMinutes,
+          height: info?.height,
+          weight: info?.weight,
+          age: info?.age,
           last10: lastN(lines),
           vsOpponent: vsOpponent(lines, opponent.id),
         };
-        return { ...player, flags: computeFlags(player, trend, injuries.get(s.id)) };
+        return { ...player, flags: computeFlags(player, trend, info?.injury) };
       })
     );
     return { team, starters, trend };
