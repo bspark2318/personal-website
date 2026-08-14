@@ -52,6 +52,12 @@ function PtsBars({ log, scaleMax }: { log: PlayerLog; scaleMax: number }) {
   );
 }
 
+const BADGE_STYLES: Record<string, string> = {
+  PTS: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+  REB: "bg-sky-500/15 text-sky-700 dark:text-sky-400",
+  AST: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
+};
+
 export default function PlayerLogTable({
   player,
   scaleMax,
@@ -72,25 +78,25 @@ export default function PlayerLogTable({
         className="flex w-full flex-col gap-1.5 text-left focus:outline-none focus-visible:rounded-lg focus-visible:ring-2 focus-visible:ring-card-border-hover"
         aria-expanded={open}
       >
-        <div className="flex w-full min-w-0 items-baseline gap-1.5">
+        <div className="flex w-full min-w-0 items-center gap-1.5">
           <p className="min-w-0 truncate text-sm font-semibold">{player.name}</p>
           <span className="shrink-0 rounded bg-card-from px-1 text-[10px] text-muted">
             {player.pos || "—"}
           </span>
+          {badges && badges.length > 0 && (
+            <span className="ml-auto flex shrink-0 gap-1">
+              {badges.map((b) => (
+                <span
+                  key={b}
+                  className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold tracking-wide ${BADGE_STYLES[b] ?? ""}`}
+                  title={`Team's best ${b.toLowerCase()} over last 10`}
+                >
+                  ★ {b}
+                </span>
+              ))}
+            </span>
+          )}
         </div>
-        {badges && badges.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {badges.map((b) => (
-              <span
-                key={b}
-                className="rounded-full border border-card-border px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-foreground"
-                title={`Team's best ${b.toLowerCase()} over last 10`}
-              >
-                ★ {b}
-              </span>
-            ))}
-          </div>
-        )}
         <p className="text-xs text-muted">
           L10 · {avg(player.last10, "pts")}p · {avg(player.last10, "reb")}r ·{" "}
           {avg(player.last10, "ast")}a
