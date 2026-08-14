@@ -5,6 +5,7 @@ import gamelog from "./__fixtures__/gamelog.json";
 import schedule from "./__fixtures__/schedule.json";
 import {
   avg,
+  computeFlags,
   lastN,
   pairStarters,
   parseGamelog,
@@ -35,8 +36,8 @@ describe("parseGames", () => {
 describe("topStarters", () => {
   it("returns top 5 by avg minutes, descending", () => {
     const teamId = String(
-      (byathlete as { athletes: { athlete: { teamId: number } }[] }).athletes[0]
-        .athlete.teamId
+      (byathlete as unknown as { athletes: { athlete: { teamId: number } }[] })
+        .athletes[0].athlete.teamId
     );
     const starters = topStarters(byathlete, teamId);
     expect(starters).toHaveLength(5);
@@ -131,6 +132,49 @@ describe("pairStarters", () => {
 
   it("uneven lists → pairs up to the shorter side", () => {
     expect(pairStarters([mk("a", "G", 30)], [])).toEqual([]);
+  });
+});
+
+describe("computeFlags", () => {
+  const line = (pts: number, min: number, i: number) =>
+    ({ eventId: `e${i}`, date: `2026-08-0${(i % 9) + 1}`, opponentId: "1", opponentAbbr: "X", result: "W", min, pts, reb: 0, ast: 0 }) as const;
+  const logs = (games: [number, number][]) =>
+    games.map(([pts, min], i) => line(pts, min, i));
+  const rested = { restDays: 3 };
+
+  it("heavy load: L3 min ≥ season avg + 4", () => {
+    const p = { last10: logs([[10, 36], [10, 36], [10, 36], [10, 28], [10, 28]]), avgMinutes: 30 };
+    const f = computeFlags(p, rested);
+    expect(f.some((x) => x.type === "fatigue" && x.reason.includes("36"))).toBe(true);
+  });
+
+  it("B2B flags regardless of minutes", () => {
+    const p = { last10: logs([[10, 20], [10, 20], [10, 20]]), avgMinutes: 20 };
+    expect(computeFlags(p, { restDays: 1 }).some((x) => x.reason.includes("B2B"))).toBe(true);
+  });
+
+  it("minutes climbing without heavy load", () => {
+    const p = { last10: logs([[10, 33], [10, 33], [10, 33], [10, 25], [10, 25], [10, 25], [10, 25], [10, 25], [10, 25], [10, 25]]), avgMinutes: 33 };
+    const f = computeFlags(p, rested);
+    expect(f.some((x) => x.reason.includes("climbing"))).toBe(true);
+  });
+
+  it("hot and cold streaks around L10 avg", () => {
+    const hot = { last10: logs([[20, 30], [20, 30], [20, 30], [10, 30], [10, 30], [10, 30], [10, 30], [10, 30], [10, 30], [10, 30]]), avgMinutes: 30 };
+    expect(computeFlags(hot, rested).some((x) => x.type === "hot")).toBe(true);
+    const cold = { last10: logs([[5, 30], [5, 30], [5, 30], [15, 30], [15, 30], [15, 30], [15, 30], [15, 30], [15, 30], [15, 30]]), avgMinutes: 30 };
+    expect(computeFlags(cold, rested).some((x) => x.type === "cold")).toBe(true);
+  });
+
+  it("skips load/streak flags under 3 games; injury still passes through", () => {
+    const p = { last10: logs([[30, 40], [30, 40]]), avgMinutes: 20 };
+    const f = computeFlags(p, rested, "Out");
+    expect(f).toEqual([{ type: "injury", reason: "Out (ESPN)" }]);
+  });
+
+  it("no flags for a rested, normal player", () => {
+    const p = { last10: logs(Array.from({ length: 10 }, () => [12, 28] as [number, number])), avgMinutes: 28 };
+    expect(computeFlags(p, rested)).toEqual([]);
   });
 });
 

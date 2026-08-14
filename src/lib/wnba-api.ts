@@ -1,6 +1,7 @@
 // Thin ESPN fetch layer. All unofficial endpoints — isolate breakage here.
 
 import {
+  computeFlags,
   lastN,
   parseGamelog,
   parseGames,
@@ -43,6 +44,18 @@ export function fetchTeamSchedule(teamId: string) {
   return getJson(`${SITE}/teams/${teamId}/schedule`);
 }
 
+// athleteId → injury status ("Out", "Day-To-Day", …) from the roster feed
+export async function fetchInjuries(teamId: string): Promise<Map<string, string>> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const roster = (await getJson(`${SITE}/teams/${teamId}/roster`)) as any;
+  const map = new Map<string, string>();
+  for (const a of roster?.athletes ?? []) {
+    const status = a.injuries?.[0]?.status;
+    if (status) map.set(String(a.id), status);
+  }
+  return map;
+}
+
 // Fetch everything for today's games and assemble the day's snapshot.
 export async function buildSnapshot(): Promise<Snapshot> {
   const date = new Intl.DateTimeFormat("en-CA", {
@@ -63,7 +76,11 @@ export async function buildSnapshot(): Promise<Snapshot> {
     opponent: TeamRef,
     gameDate: string
   ): Promise<MatchupSide> => {
-    const schedule = await fetchTeamSchedule(team.id);
+    const [schedule, injuries] = await Promise.all([
+      fetchTeamSchedule(team.id),
+      fetchInjuries(team.id).catch(() => new Map<string, string>()),
+    ]);
+    const trend = teamTrend(schedule, team.id, gameDate);
     const starters = await Promise.all(
       topStarters(byathlete, team.id).map(async (s) => {
         // current + previous season, merged, for deeper head-to-head history
@@ -75,7 +92,7 @@ export async function buildSnapshot(): Promise<Snapshot> {
         const lines = [...parseGamelog(cur), ...parseGamelog(prev)]
           .filter((l) => !seen.has(l.eventId) && (seen.add(l.eventId), true))
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        return {
+        const player = {
           playerId: s.id,
           name: s.name,
           pos: s.pos,
@@ -83,9 +100,10 @@ export async function buildSnapshot(): Promise<Snapshot> {
           last10: lastN(lines),
           vsOpponent: vsOpponent(lines, opponent.id),
         };
+        return { ...player, flags: computeFlags(player, trend, injuries.get(s.id)) };
       })
     );
-    return { team, starters, trend: teamTrend(schedule, team.id, gameDate) };
+    return { team, starters, trend };
   };
 
   const matchups: Matchup[] = [];

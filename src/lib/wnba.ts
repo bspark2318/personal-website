@@ -27,6 +27,11 @@ export type GameLine = {
   ast: number;
 };
 
+export type Flag = {
+  type: "fatigue" | "hot" | "cold" | "injury";
+  reason: string;
+};
+
 export type PlayerLog = {
   playerId: string;
   name: string;
@@ -34,6 +39,7 @@ export type PlayerLog = {
   avgMinutes: number;
   last10: GameLine[];
   vsOpponent: GameLine[];
+  flags?: Flag[];
 };
 
 export type TeamTrend = {
@@ -236,4 +242,58 @@ export function pairStarters(
 export function avg(lines: GameLine[], key: "pts" | "reb" | "ast" | "min"): number {
   if (lines.length === 0) return 0;
   return Math.round((lines.reduce((s, l) => s + l[key], 0) / lines.length) * 10) / 10;
+}
+
+export const THRESHOLDS = {
+  heavyLoadDelta: 4, // L3 min ≥ season avg + this
+  climbDelta: 3, // L3 min ≥ L10 min avg + this
+  hotMult: 1.25,
+  coldMult: 0.75,
+  minPtsBase: 8, // streak flags only for players averaging ≥ this
+  b2bRest: 1,
+  minGames: 3, // skip load/streak flags below this many recent games
+};
+
+// Pre-game condition flags for one starter. injuryStatus comes from the roster feed.
+export function computeFlags(
+  player: Pick<PlayerLog, "last10" | "avgMinutes">,
+  trend: Pick<TeamTrend, "restDays">,
+  injuryStatus?: string
+): Flag[] {
+  const T = THRESHOLDS;
+  const flags: Flag[] = [];
+  const l3 = player.last10.slice(0, 3);
+
+  if (injuryStatus) {
+    flags.push({ type: "injury", reason: `${injuryStatus} (ESPN)` });
+  }
+
+  if (trend.restDays !== null && trend.restDays <= T.b2bRest) {
+    flags.push({ type: "fatigue", reason: "B2B — playing on ≤1 day rest" });
+  }
+
+  if (player.last10.length >= T.minGames) {
+    const l3min = avg(l3, "min");
+    const l10min = avg(player.last10, "min");
+    if (player.avgMinutes > 0 && l3min >= player.avgMinutes + T.heavyLoadDelta) {
+      flags.push({
+        type: "fatigue",
+        reason: `${l3min} min L3 vs ${Math.round(player.avgMinutes * 10) / 10} season`,
+      });
+    } else if (l3min >= l10min + T.climbDelta) {
+      flags.push({ type: "fatigue", reason: `minutes climbing — ${l3min} L3 vs ${l10min} L10` });
+    }
+
+    const l3pts = avg(l3, "pts");
+    const l10pts = avg(player.last10, "pts");
+    if (l10pts >= T.minPtsBase) {
+      if (l3pts >= l10pts * T.hotMult) {
+        flags.push({ type: "hot", reason: `${l3pts} pts L3 vs ${l10pts} L10` });
+      } else if (l3pts <= l10pts * T.coldMult) {
+        flags.push({ type: "cold", reason: `${l3pts} pts L3 vs ${l10pts} L10` });
+      }
+    }
+  }
+
+  return flags;
 }

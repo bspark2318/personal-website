@@ -2,7 +2,14 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { avg, type PlayerLog } from "@/lib/wnba";
+import { avg, type Flag, type PlayerLog } from "@/lib/wnba";
+
+const FLAG_STYLES: Record<Flag["type"], { icon: string; label: string; cls: string }> = {
+  injury: { icon: "✚", label: "Injury", cls: "text-red-600 dark:text-red-400" },
+  fatigue: { icon: "◔", label: "Fatigue", cls: "text-amber-700 dark:text-amber-400" },
+  hot: { icon: "▲", label: "Hot", cls: "text-emerald-700 dark:text-emerald-400" },
+  cold: { icon: "▼", label: "Cold", cls: "text-sky-700 dark:text-sky-400" },
+};
 
 // Last-10 pts as bars (oldest→newest) with a dashed line at the L10 average.
 // scaleMax is shared across the matchup pair so the two charts are comparable.
@@ -106,6 +113,18 @@ export default function PlayerLogTable({
             ? `vs opp (last ${Math.min(vs.length, 3)}) · ${avg(vs.slice(0, 3), "pts")}p · ${avg(vs.slice(0, 3), "reb")}r · ${avg(vs.slice(0, 3), "ast")}a`
             : "no games vs opp"}
         </p>
+        {player.flags && player.flags.length > 0 && (
+          <div className="flex flex-col gap-0.5">
+            {player.flags.map((f, i) => {
+              const s = FLAG_STYLES[f.type];
+              return (
+                <p key={i} className={`text-xs ${s.cls}`}>
+                  <span aria-hidden>{s.icon}</span> {s.label} — {f.reason}
+                </p>
+              );
+            })}
+          </div>
+        )}
         <PtsBars log={player} scaleMax={max} />
       </button>
 
