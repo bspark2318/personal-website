@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import events from "./__fixtures__/kalshi-events.json";
+import threes from "./__fixtures__/kalshi-threes.json";
 import { normalizeName, parseLines } from "./kalshi";
 
 describe("normalizeName", () => {
@@ -23,6 +24,12 @@ describe("parseLines", () => {
     expect(gray?.threshold).toBe(15); // fixture rungs: 15/20/25
     const reese = lines.get("angel reese");
     expect(reese?.threshold).toBe(10);
+  });
+
+  it("parses threes ladders too", () => {
+    const t = parseLines(threes);
+    expect(t.size).toBeGreaterThan(0);
+    for (const line of t.values()) expect(line.threshold).toBeGreaterThan(0);
   });
 
   it("empty/garbage input → empty map", () => {

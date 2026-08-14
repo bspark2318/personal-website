@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { avg, type Flag, type PlayerLog } from "@/lib/wnba";
-import type { KalshiLine } from "@/lib/kalshi";
+import type { KalshiPlayerLines } from "@/lib/kalshi";
 
 const FLAG_STYLES: Record<Flag["type"], { icon: string; label: string; cls: string }> = {
   injury: { icon: "✚", label: "Injury", cls: "text-red-600 dark:text-red-400" },
@@ -75,7 +75,7 @@ export default function PlayerLogTable({
   player: PlayerLog;
   scaleMax?: number;
   badges?: string[]; // team-leader tags: PTS / REB / AST
-  kalshi?: KalshiLine;
+  kalshi?: KalshiPlayerLines;
 }) {
   const [open, setOpen] = useState(false);
   const vs = player.vsOpponent;
@@ -183,22 +183,45 @@ export default function PlayerLogTable({
               </tbody>
             </table>
             </div>
-            {kalshi && (
-              <div className="mt-3 flex items-center justify-between rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 dark:border-emerald-400/40 dark:bg-emerald-400/10">
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                  Kalshi
-                </span>
-                <span className="text-sm tabular-nums">
-                  <span className="font-semibold text-emerald-800 dark:text-emerald-200">
-                    {kalshi.threshold}+ pts
-                  </span>
-                  <span className="mx-1.5 text-muted">·</span>
-                  <span className="font-semibold">
-                    yes {kalshi.yesAsk != null ? `${kalshi.yesAsk}¢` : "—"}
-                  </span>
-                  <span className="mx-1.5 text-muted">·</span>
-                  L10 {avg(player.last10, "pts")}
-                </span>
+            {kalshi && (kalshi.pts || kalshi.threes) && (
+              <div className="mt-3 flex flex-col gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 dark:border-emerald-400/40 dark:bg-emerald-400/10">
+                {kalshi.pts && (
+                  <div className="flex items-center justify-between text-sm tabular-nums">
+                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                      Kalshi PTS
+                    </span>
+                    <span>
+                      <span className="font-semibold text-emerald-800 dark:text-emerald-200">
+                        {kalshi.pts.threshold}+
+                      </span>
+                      <span className="mx-1.5 text-muted">·</span>
+                      <span className="font-semibold">
+                        yes {kalshi.pts.yesAsk != null ? `${kalshi.pts.yesAsk}¢` : "—"}
+                      </span>
+                      <span className="mx-1.5 text-muted">·</span>
+                      L10 {avg(player.last10, "pts")}
+                    </span>
+                  </div>
+                )}
+                {kalshi.threes && (
+                  <div className="flex items-center justify-between text-sm tabular-nums">
+                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                      Kalshi 3PT
+                    </span>
+                    <span>
+                      <span className="font-semibold text-emerald-800 dark:text-emerald-200">
+                        {kalshi.threes.threshold}+
+                      </span>
+                      <span className="mx-1.5 text-muted">·</span>
+                      <span className="font-semibold">
+                        yes{" "}
+                        {kalshi.threes.yesAsk != null ? `${kalshi.threes.yesAsk}¢` : "—"}
+                      </span>
+                      <span className="mx-1.5 text-muted">·</span>
+                      L10 {avg(player.last10, "tpm")}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </motion.div>

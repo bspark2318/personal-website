@@ -8,8 +8,10 @@ export type KalshiLine = {
   ticker: string;
 };
 
-const EVENTS_URL =
-  "https://api.elections.kalshi.com/trade-api/v2/events?limit=50&status=open&series_ticker=KXWNBAPTS&with_nested_markets=true";
+export type KalshiPlayerLines = { pts?: KalshiLine; threes?: KalshiLine };
+
+const eventsUrl = (series: string) =>
+  `https://api.elections.kalshi.com/trade-api/v2/events?limit=50&status=open&series_ticker=${series}&with_nested_markets=true`;
 
 // "A'ja Wilson" → "aja wilson"; strips accents, punctuation, extra space
 export function normalizeName(name: string): string {
@@ -49,12 +51,25 @@ export function parseLines(data: any): Map<string, KalshiLine> {
   return lines;
 }
 
-export async function fetchKalshiLines(): Promise<Map<string, KalshiLine> | null> {
+async function fetchSeries(series: string): Promise<Map<string, KalshiLine> | null> {
   try {
-    const res = await fetch(EVENTS_URL, { cache: "no-store" });
+    const res = await fetch(eventsUrl(series), { cache: "no-store" });
     if (!res.ok) return null;
     return parseLines(await res.json());
   } catch {
     return null;
   }
+}
+
+// Kalshi's WNBA player catalog: points + threes ladders.
+export async function fetchKalshiLines(): Promise<Map<string, KalshiPlayerLines> | null> {
+  const [pts, threes] = await Promise.all([
+    fetchSeries("KXWNBAPTS"),
+    fetchSeries("KXWNBA3PT"),
+  ]);
+  if (!pts && !threes) return null;
+  const out = new Map<string, KalshiPlayerLines>();
+  for (const [k, v] of pts ?? []) out.set(k, { pts: v });
+  for (const [k, v] of threes ?? []) out.set(k, { ...out.get(k), threes: v });
+  return out;
 }

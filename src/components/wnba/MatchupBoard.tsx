@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { avg, pairStarters, type PlayerLog, type Snapshot } from "@/lib/wnba";
-import { normalizeName, type KalshiLine } from "@/lib/kalshi";
+import { normalizeName, type KalshiPlayerLines } from "@/lib/kalshi";
 import PlayerLogTable from "./PlayerLogTable";
 import TeamTrends from "./TeamTrends";
 
@@ -38,7 +38,7 @@ export default function MatchupBoard({
   kalshiLines,
 }: {
   snapshot: Snapshot;
-  kalshiLines: Record<string, KalshiLine> | null;
+  kalshiLines: Record<string, KalshiPlayerLines> | null;
 }) {
   const lineFor = (p: PlayerLog) => kalshiLines?.[normalizeName(p.name)];
   const [selected, setSelected] = useState(0);

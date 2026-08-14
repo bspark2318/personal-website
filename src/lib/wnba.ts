@@ -25,6 +25,7 @@ export type GameLine = {
   pts: number;
   reb: number;
   ast: number;
+  tpm?: number; // three-pointers made
 };
 
 export type Flag = {
@@ -130,6 +131,7 @@ export function parseGamelog(gamelog: any): GameLine[] {
     pts: labels.indexOf("PTS"),
     reb: labels.indexOf("REB"),
     ast: labels.indexOf("AST"),
+    tp: labels.indexOf("3PT"), // "2-4" made-attempted
   };
   const meta: Record<string, any> = gamelog?.events ?? {};
   const lines = new Map<string, GameLine>();
@@ -150,6 +152,8 @@ export function parseGamelog(gamelog: any): GameLine[] {
           pts: num(idx.pts),
           reb: num(idx.reb),
           ast: num(idx.ast),
+          tpm:
+            idx.tp >= 0 ? Number(String(ev.stats[idx.tp]).split("-")[0]) || 0 : 0,
         });
       }
     }
@@ -251,9 +255,14 @@ export function pairStarters(
   return a.slice(0, Math.min(a.length, h.length)).map((p, i) => [p, h[i]]);
 }
 
-export function avg(lines: GameLine[], key: "pts" | "reb" | "ast" | "min"): number {
+export function avg(
+  lines: GameLine[],
+  key: "pts" | "reb" | "ast" | "min" | "tpm"
+): number {
   if (lines.length === 0) return 0;
-  return Math.round((lines.reduce((s, l) => s + l[key], 0) / lines.length) * 10) / 10;
+  return (
+    Math.round((lines.reduce((s, l) => s + (l[key] ?? 0), 0) / lines.length) * 10) / 10
+  );
 }
 
 export const THRESHOLDS = {
