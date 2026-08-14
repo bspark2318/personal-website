@@ -53,9 +53,9 @@ function PtsBars({ log, scaleMax }: { log: PlayerLog; scaleMax: number }) {
 }
 
 const BADGE_STYLES: Record<string, string> = {
-  PTS: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
-  REB: "bg-sky-500/15 text-sky-700 dark:text-sky-400",
-  AST: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
+  PTS: "bg-amber-500/25 text-amber-900 dark:bg-amber-400/25 dark:text-amber-200",
+  REB: "bg-sky-500/25 text-sky-900 dark:bg-sky-400/25 dark:text-sky-200",
+  AST: "bg-violet-500/25 text-violet-900 dark:bg-violet-400/25 dark:text-violet-200",
 };
 
 export default function PlayerLogTable({
@@ -88,7 +88,7 @@ export default function PlayerLogTable({
               {badges.map((b) => (
                 <span
                   key={b}
-                  className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold tracking-wide ${BADGE_STYLES[b] ?? ""}`}
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wide ${BADGE_STYLES[b] ?? ""}`}
                   title={`Team's best ${b.toLowerCase()} over last 10`}
                 >
                   ★ {b}
