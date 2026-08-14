@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { avg, type Flag, type PlayerLog } from "@/lib/wnba";
+import { avg, hitRate, type Flag, type PlayerLog } from "@/lib/wnba";
 import type { KalshiPlayerLines } from "@/lib/kalshi";
 
 const FLAG_STYLES: Record<Flag["type"], { icon: string; label: string; cls: string }> = {
@@ -185,33 +185,41 @@ export default function PlayerLogTable({
             </div>
             {kalshi && (
               (() => {
-                const rows = [
-                  { label: "PTS", line: kalshi.pts, l10: avg(player.last10, "pts") },
-                  { label: "REB", line: kalshi.reb, l10: avg(player.last10, "reb") },
-                  { label: "AST", line: kalshi.ast, l10: avg(player.last10, "ast") },
-                  { label: "3PT", line: kalshi.threes, l10: avg(player.last10, "tpm") },
-                ].filter((r) => r.line);
+                const stat = { PTS: "pts", REB: "reb", AST: "ast", "3PT": "tpm" } as const;
+                const rows = (["PTS", "REB", "AST", "3PT"] as const)
+                  .map((label) => {
+                    const line = {
+                      PTS: kalshi.pts, REB: kalshi.reb, AST: kalshi.ast, "3PT": kalshi.threes,
+                    }[label];
+                    if (!line) return null;
+                    return { label, line, rate: hitRate(player.last10, stat[label], line.threshold) };
+                  })
+                  .filter(Boolean);
                 if (rows.length === 0) return null;
+                const price = (l: { yesBid: number | null; yesAsk: number | null; last: number | null }) =>
+                  l.yesBid != null && l.yesAsk != null
+                    ? `${l.yesBid}–${l.yesAsk}¢`
+                    : l.last != null
+                      ? `last ${l.last}¢`
+                      : "—";
                 return (
                   <div className="mt-3 flex flex-col gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 dark:border-emerald-400/40 dark:bg-emerald-400/10">
                     {rows.map((r) => (
                       <div
-                        key={r.label}
+                        key={r!.label}
                         className="flex items-center justify-between text-sm tabular-nums"
                       >
                         <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                          Kalshi {r.label}
+                          {r!.label}
                         </span>
                         <span>
                           <span className="font-semibold text-emerald-800 dark:text-emerald-200">
-                            {r.line!.threshold}+
+                            {r!.line.threshold}+
                           </span>
                           <span className="mx-1.5 text-muted">·</span>
-                          <span className="font-semibold">
-                            yes {r.line!.yesAsk != null ? `${r.line!.yesAsk}¢` : "—"}
-                          </span>
+                          <span className="font-semibold">yes {price(r!.line)}</span>
                           <span className="mx-1.5 text-muted">·</span>
-                          L10 {r.l10}
+                          hit {r!.rate.hits}/{r!.rate.n}
                         </span>
                       </div>
                     ))}

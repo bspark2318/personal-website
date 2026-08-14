@@ -5,8 +5,15 @@ export type KalshiLine = {
   threshold: number; // lowest rung, e.g. 15 (floor_strike 14.5)
   yesBid: number | null; // cents
   yesAsk: number | null;
+  last: number | null;
   ticker: string;
 };
+
+// Kalshi moved prices to "*_dollars" string fields; legacy cent ints are null.
+function cents(dollars: unknown): number | null {
+  const n = Number(dollars);
+  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) : null;
+}
 
 export type KalshiPlayerLines = {
   pts?: KalshiLine;
@@ -20,6 +27,7 @@ export type KalshiTotal = {
   threshold: number; // lowest Over rung, e.g. 173.5
   yesBid: number | null;
   yesAsk: number | null;
+  last: number | null;
 };
 
 const eventsUrl = (series: string) =>
@@ -53,8 +61,9 @@ export function parseLines(data: any): Map<string, KalshiLine> {
         lines.set(key, {
           player,
           threshold,
-          yesBid: m.yes_bid ?? null,
-          yesAsk: m.yes_ask ?? null,
+          yesBid: cents(m.yes_bid_dollars),
+          yesAsk: cents(m.yes_ask_dollars),
+          last: cents(m.last_price_dollars),
           ticker: m.ticker,
         });
       }
@@ -84,8 +93,9 @@ export function parseTotals(data: any): KalshiTotal[] {
         best = {
           title: e.title ?? "",
           threshold: m.floor_strike,
-          yesBid: m.yes_bid ?? null,
-          yesAsk: m.yes_ask ?? null,
+          yesBid: cents(m.yes_bid_dollars),
+          yesAsk: cents(m.yes_ask_dollars),
+          last: cents(m.last_price_dollars),
         };
       }
     }

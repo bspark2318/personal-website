@@ -67,7 +67,11 @@ export default function TeamTrends({
           {kalshiTotal && (
             <p className="mt-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
               Kalshi O{kalshiTotal.threshold}
-              {kalshiTotal.yesAsk != null ? ` · yes ${kalshiTotal.yesAsk}¢` : ""}
+              {kalshiTotal.yesBid != null && kalshiTotal.yesAsk != null
+                ? ` · ${kalshiTotal.yesBid}–${kalshiTotal.yesAsk}¢`
+                : kalshiTotal.last != null
+                  ? ` · last ${kalshiTotal.last}¢`
+                  : ""}
             </p>
           )}
         </div>

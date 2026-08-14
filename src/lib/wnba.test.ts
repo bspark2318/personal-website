@@ -7,6 +7,7 @@ import {
   avg,
   computeFlags,
   excludeOut,
+  hitRate,
   lastN,
   pairStarters,
   parseGamelog,
@@ -195,5 +196,15 @@ describe("avg", () => {
       ({ pts, reb: 0, ast: 0, min: 0 }) as Parameters<typeof avg>[0][number];
     expect(avg([mk(10), mk(21)], "pts")).toBe(15.5);
     expect(avg([], "pts")).toBe(0);
+  });
+});
+
+describe("hitRate", () => {
+  it("counts games clearing the threshold", () => {
+    const mk = (pts: number, i: number) =>
+      ({ eventId: `h${i}`, date: "2026-08-01", opponentId: "1", opponentAbbr: "X", result: "W" as const, min: 30, pts, reb: 0, ast: 0 });
+    const lines = [22, 18, 25, 9, 20].map(mk);
+    expect(hitRate(lines, "pts", 20)).toEqual({ hits: 3, n: 5 });
+    expect(hitRate([], "pts", 20)).toEqual({ hits: 0, n: 0 });
   });
 });

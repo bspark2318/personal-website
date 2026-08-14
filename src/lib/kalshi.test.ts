@@ -19,11 +19,29 @@ describe("parseLines", () => {
     for (const key of lines.keys()) expect(key).toBe(normalizeName(key));
   });
 
-  it("keeps only the lowest rung per player", () => {
-    const gray = lines.get("allisha gray");
-    expect(gray?.threshold).toBe(15); // fixture rungs: 15/20/25
-    const reese = lines.get("angel reese");
-    expect(reese?.threshold).toBe(10);
+  it("keeps only the lowest rung per player, with dollar prices as cents", () => {
+    // derive expectation from the fixture itself (contents shift day to day)
+    const fx = events as unknown as {
+      events: { markets: { yes_sub_title: string; status: string }[] }[];
+    };
+    const rungs = new Map<string, number>();
+    for (const e of fx.events)
+      for (const m of e.markets) {
+        const match = /^(.+?):\s*(\d+)\+$/.exec(m.yes_sub_title ?? "");
+        if (!match || m.status !== "active") continue;
+        const key = normalizeName(match[1]);
+        rungs.set(key, Math.min(rungs.get(key) ?? Infinity, Number(match[2])));
+      }
+    expect(rungs.size).toBeGreaterThan(0);
+    for (const [key, minRung] of rungs) {
+      expect(lines.get(key)?.threshold).toBe(minRung);
+    }
+    const priced = [...lines.values()].filter((l) => l.yesAsk != null);
+    expect(priced.length).toBeGreaterThan(0);
+    for (const l of priced) {
+      expect(l.yesAsk).toBeGreaterThan(0);
+      expect(l.yesAsk).toBeLessThanOrEqual(100);
+    }
   });
 
   it("parses threes ladders too", () => {

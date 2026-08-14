@@ -265,6 +265,17 @@ export function avg(
   );
 }
 
+// How often a stat cleared a threshold recently: {hits, n} over available games.
+export function hitRate(
+  lines: GameLine[],
+  key: "pts" | "reb" | "ast" | "tpm",
+  threshold: number
+): { hits: number; n: number } {
+  const n = lines.length;
+  const hits = lines.filter((l) => (l[key] ?? 0) >= threshold).length;
+  return { hits, n };
+}
+
 export const THRESHOLDS = {
   heavyLoadDelta: 4, // L3 min ≥ season avg + this
   climbDelta: 3, // L3 min ≥ L10 min avg + this
