@@ -17,6 +17,7 @@ function tipoff(iso: string) {
 
 export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
   const [selected, setSelected] = useState(0);
+  const [side, setSide] = useState<"away" | "home">("away");
   const matchup = snapshot.matchups[selected];
 
   return (
@@ -54,11 +55,40 @@ export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="mb-6 flex flex-col gap-6 sm:flex-row">
-            <MatchupCard side={matchup.away} />
-            <MatchupCard side={matchup.home} />
+          <div className="mb-6">
+            <TeamTrends matchup={matchup} />
           </div>
-          <TeamTrends matchup={matchup} />
+
+          {/* mobile: one team at a time via segmented control; sm+: both columns */}
+          <div className="mb-4 grid grid-cols-2 rounded-full border border-card-border p-1 text-sm sm:hidden">
+            {(["away", "home"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setSide(s)}
+                className={`relative rounded-full py-2.5 font-medium transition-colors ${
+                  side === s ? "text-background" : "text-muted"
+                }`}
+              >
+                {side === s && (
+                  <motion.span
+                    layoutId="side"
+                    className="absolute inset-0 rounded-full bg-foreground"
+                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                )}
+                <span className="relative">{matchup[s].team.abbreviation}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-6 sm:flex-row">
+            <div className={`${side === "away" ? "" : "hidden"} flex-1 sm:block`}>
+              <MatchupCard side={matchup.away} />
+            </div>
+            <div className={`${side === "home" ? "" : "hidden"} flex-1 sm:block`}>
+              <MatchupCard side={matchup.home} />
+            </div>
+          </div>
         </motion.div>
       </AnimatePresence>
     </div>

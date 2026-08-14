@@ -66,7 +66,8 @@ export default function PlayerLogTable({ player }: { player: PlayerLog }) {
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <table className="mt-3 w-full text-xs">
+            <div className="overflow-x-auto">
+            <table className="mt-3 w-full min-w-[320px] text-xs">
               <thead className="text-muted">
                 <tr className="text-left">
                   <th className="py-1 pr-2 font-normal">Date</th>
@@ -98,6 +99,7 @@ export default function PlayerLogTable({ player }: { player: PlayerLog }) {
                 ))}
               </tbody>
             </table>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

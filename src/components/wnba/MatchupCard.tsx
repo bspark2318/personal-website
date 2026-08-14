@@ -3,7 +3,7 @@ import PlayerLogTable from "./PlayerLogTable";
 
 export default function MatchupCard({ side }: { side: MatchupSide }) {
   return (
-    <div className="flex-1">
+    <div>
       <div className="mb-3 flex items-center gap-2">
         {side.team.logo && (
           // eslint-disable-next-line @next/next/no-img-element
