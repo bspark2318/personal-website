@@ -2,6 +2,7 @@
 
 import {
   computeFlags,
+  excludeOut,
   lastN,
   parseGamelog,
   parseGames,
@@ -92,8 +93,12 @@ export async function buildSnapshot(): Promise<Snapshot> {
       fetchRosterInfo(team.id).catch(() => new Map<string, RosterInfo>()),
     ]);
     const trend = teamTrend(schedule, team.id, gameDate);
+    const pool = excludeOut(
+      topStarters(byathlete, team.id, 10),
+      (id) => roster.get(id)?.injury
+    );
     const starters = await Promise.all(
-      topStarters(byathlete, team.id).map(async (s) => {
+      pool.map(async (s) => {
         // current + previous season, merged, for deeper head-to-head history
         const [cur, prev] = await Promise.all([
           fetchGamelog(s.id),

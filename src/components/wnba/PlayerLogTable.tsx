@@ -104,21 +104,9 @@ export default function PlayerLogTable({
             </span>
           )}
         </div>
-        {(player.height || player.weight || player.age) && (
-          <p className="text-xs text-muted">
-            {[player.height, player.weight, player.age && `${player.age}y`]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-        )}
         <p className="text-xs text-muted">
           L10 · {avg(player.last10, "pts")}p · {avg(player.last10, "reb")}r ·{" "}
           {avg(player.last10, "ast")}a
-        </p>
-        <p className="text-xs text-muted">
-          {vs.length > 0
-            ? `vs opp (last ${Math.min(vs.length, 3)}) · ${avg(vs.slice(0, 3), "pts")}p · ${avg(vs.slice(0, 3), "reb")}r · ${avg(vs.slice(0, 3), "ast")}a`
-            : "no games vs opp"}
         </p>
         {player.flags && player.flags.length > 0 && (
           <div className="flex flex-col gap-0.5">
@@ -144,6 +132,20 @@ export default function PlayerLogTable({
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
+            <div className="mt-3 flex flex-col gap-0.5 text-xs text-muted">
+              {(player.height || player.weight || player.age) && (
+                <p>
+                  {[player.height, player.weight, player.age && `${player.age}y`]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              )}
+              <p>
+                {vs.length > 0
+                  ? `vs opp (last ${Math.min(vs.length, 3)}) · ${avg(vs.slice(0, 3), "pts")}p · ${avg(vs.slice(0, 3), "reb")}r · ${avg(vs.slice(0, 3), "ast")}a`
+                  : "no games vs opp"}
+              </p>
+            </div>
             <div className="overflow-x-auto">
             <table className="mt-3 w-full text-[11px] sm:text-xs">
               <thead className="text-muted">

@@ -6,6 +6,7 @@ import schedule from "./__fixtures__/schedule.json";
 import {
   avg,
   computeFlags,
+  excludeOut,
   lastN,
   pairStarters,
   parseGamelog,
@@ -132,6 +133,16 @@ describe("pairStarters", () => {
 
   it("uneven lists → pairs up to the shorter side", () => {
     expect(pairStarters([mk("a", "G", 30)], [])).toEqual([]);
+  });
+});
+
+describe("excludeOut", () => {
+  it("drops Out players and promotes next, keeping 5", () => {
+    const pool = ["a", "b", "c", "d", "e", "f", "g"].map((id) => ({ id }));
+    const out = new Map([["b", "Out"], ["x", "Day-To-Day"]]);
+    expect(excludeOut(pool, (id) => out.get(id)).map((p) => p.id)).toEqual([
+      "a", "c", "d", "e", "f",
+    ]);
   });
 });
 

@@ -223,6 +223,15 @@ export function teamTrend(
   };
 }
 
+// Drop players ruled Out, promote next by minutes, keep n.
+export function excludeOut<T extends { id: string }>(
+  pool: T[],
+  injuryOf: (id: string) => string | undefined,
+  n = 5
+): T[] {
+  return pool.filter((p) => injuryOf(p.id)?.toLowerCase() !== "out").slice(0, n);
+}
+
 // Zip two starter lists into positional pairs: guards vs guards, bigs vs bigs.
 // Sort key: position rank (G→C), minutes as tiebreak — approximate by design.
 const POS_RANK: Record<string, number> = { G: 0, "G/F": 1, F: 2, "F/C": 3, C: 4 };
