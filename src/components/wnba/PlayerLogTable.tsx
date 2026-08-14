@@ -82,7 +82,7 @@ export default function PlayerLogTable({
         </p>
         <p className="text-xs text-muted">
           {vs.length > 0
-            ? `vs opp: ${vs.slice(0, 5).map((l) => l.pts).join(", ")} pts`
+            ? `vs opp (last ${Math.min(vs.length, 3)}) · ${avg(vs.slice(0, 3), "pts")}p · ${avg(vs.slice(0, 3), "reb")}r · ${avg(vs.slice(0, 3), "ast")}a`
             : "no games vs opp"}
         </p>
         <PtsBars log={player} scaleMax={max} />
