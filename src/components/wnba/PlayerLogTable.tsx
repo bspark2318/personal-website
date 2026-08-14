@@ -4,36 +4,64 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { avg, type PlayerLog } from "@/lib/wnba";
 
-// Chronological left→right pts sparkline; 2px line, hover titles per point.
-function Sparkline({ log }: { log: PlayerLog }) {
-  const pts = [...log.last10].reverse();
-  if (pts.length < 2) return null;
-  const w = 120;
-  const h = 32;
-  const max = Math.max(...pts.map((l) => l.pts), 1);
-  const x = (i: number) => (i / (pts.length - 1)) * (w - 8) + 4;
-  const y = (v: number) => h - 4 - (v / max) * (h - 8);
-  const d = pts.map((l, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(l.pts)}`).join(" ");
+// Last-10 pts as bars (oldest→newest) with a dashed line at the L10 average.
+// scaleMax is shared across the matchup pair so the two charts are comparable.
+function PtsBars({ log, scaleMax }: { log: PlayerLog; scaleMax: number }) {
+  const games = [...log.last10].reverse();
+  if (games.length === 0) return null;
+  const w = 140;
+  const h = 44;
+  const pad = 2;
+  const mean = avg(log.last10, "pts");
+  const slot = (w - pad * 2) / 10; // fixed 10 slots so bar width is constant
+  const bw = slot - 2; // 2px gap between bars
+  const y = (v: number) => h - (v / scaleMax) * (h - 10); // top 10px for headroom
   return (
     <svg
       viewBox={`0 0 ${w} ${h}`}
-      className="h-8 w-full max-w-[140px] text-foreground"
+      className="h-11 w-full max-w-[160px] text-foreground"
       role="img"
-      aria-label={`Points, last ${pts.length} games`}
+      aria-label={`Points per game, last ${games.length}; average ${mean}`}
     >
-      <path d={d} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      {pts.map((l, i) => (
-        <circle key={l.eventId} cx={x(i)} cy={y(l.pts)} r="4" fill="transparent">
-          <title>{`${l.pts} pts · ${l.opponentAbbr}`}</title>
-        </circle>
+      {games.map((l, i) => (
+        <g key={l.eventId}>
+          <rect
+            x={pad + i * slot}
+            y={y(l.pts)}
+            width={bw}
+            height={Math.max(h - y(l.pts), 1)}
+            rx="1.5"
+            fill="currentColor"
+            opacity="0.55"
+          />
+          <rect x={pad + i * slot} y={0} width={slot} height={h} fill="transparent">
+            <title>{`${l.pts} pts · ${l.opponentAbbr}`}</title>
+          </rect>
+        </g>
       ))}
+      <line
+        x1={pad}
+        x2={w - pad}
+        y1={y(mean)}
+        y2={y(mean)}
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeDasharray="3 3"
+      />
     </svg>
   );
 }
 
-export default function PlayerLogTable({ player }: { player: PlayerLog }) {
+export default function PlayerLogTable({
+  player,
+  scaleMax,
+}: {
+  player: PlayerLog;
+  scaleMax?: number;
+}) {
   const [open, setOpen] = useState(false);
   const vs = player.vsOpponent;
+  const max = scaleMax ?? Math.max(...player.last10.map((l) => l.pts), 1);
 
   return (
     <div className="rounded-2xl border border-card-border bg-[image:linear-gradient(var(--card-from),transparent)] p-4 transition-colors hover:border-card-border-hover">
@@ -57,7 +85,7 @@ export default function PlayerLogTable({ player }: { player: PlayerLog }) {
             ? `vs opp: ${vs.slice(0, 5).map((l) => l.pts).join(", ")} pts`
             : "no games vs opp"}
         </p>
-        <Sparkline log={player} />
+        <PtsBars log={player} scaleMax={max} />
       </button>
 
       <AnimatePresence initial={false}>

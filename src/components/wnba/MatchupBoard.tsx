@@ -68,12 +68,19 @@ export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
             projected starters (by minutes), paired by position
           </p>
           <div className="flex flex-col gap-3">
-            {pairs.map(([a, h]) => (
-              <div key={a.playerId} className="grid grid-cols-2 items-start gap-2 sm:gap-3">
-                <PlayerLogTable player={a} />
-                <PlayerLogTable player={h} />
-              </div>
-            ))}
+            {pairs.map(([a, h]) => {
+              const scaleMax = Math.max(
+                ...a.last10.map((l) => l.pts),
+                ...h.last10.map((l) => l.pts),
+                1
+              );
+              return (
+                <div key={a.playerId} className="grid grid-cols-2 items-start gap-2 sm:gap-3">
+                  <PlayerLogTable player={a} scaleMax={scaleMax} />
+                  <PlayerLogTable player={h} scaleMax={scaleMax} />
+                </div>
+              );
+            })}
           </div>
         </motion.div>
       </AnimatePresence>
