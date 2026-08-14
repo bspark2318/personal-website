@@ -4,6 +4,7 @@ import MatchupBoard from "@/components/wnba/MatchupBoard";
 import NoGames from "@/components/wnba/NoGames";
 import { buildSnapshot } from "@/lib/wnba-api";
 import { readSnapshot, writeSnapshot } from "@/lib/wnba-db";
+import { fetchKalshiLines } from "@/lib/kalshi";
 import type { Snapshot } from "@/lib/wnba";
 
 export const dynamic = "force-dynamic";
@@ -24,11 +25,12 @@ async function getSnapshot(): Promise<Snapshot> {
 export default async function WnbaPage() {
   let snapshot: Snapshot | null = null;
   let failed = false;
-  try {
-    snapshot = await getSnapshot();
-  } catch {
-    failed = true;
-  }
+  const [snapResult, kalshiLines] = await Promise.all([
+    getSnapshot().catch(() => null),
+    fetchKalshiLines(),
+  ]);
+  if (snapResult) snapshot = snapResult;
+  else failed = true;
 
   return (
     <main>
@@ -53,7 +55,10 @@ export default async function WnbaPage() {
           ) : snapshot.matchups.length === 0 ? (
             <NoGames />
           ) : (
-            <MatchupBoard snapshot={snapshot} />
+            <MatchupBoard
+              snapshot={snapshot}
+              kalshiLines={kalshiLines ? Object.fromEntries(kalshiLines) : null}
+            />
           )}
         </Reveal>
       </section>

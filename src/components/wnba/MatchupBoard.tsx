@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { avg, pairStarters, type PlayerLog, type Snapshot } from "@/lib/wnba";
+import { normalizeName, type KalshiLine } from "@/lib/kalshi";
 import PlayerLogTable from "./PlayerLogTable";
 import TeamTrends from "./TeamTrends";
 
@@ -32,7 +33,14 @@ function tipoff(iso: string) {
   });
 }
 
-export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
+export default function MatchupBoard({
+  snapshot,
+  kalshiLines,
+}: {
+  snapshot: Snapshot;
+  kalshiLines: Record<string, KalshiLine> | null;
+}) {
+  const lineFor = (p: PlayerLog) => kalshiLines?.[normalizeName(p.name)];
   const [selected, setSelected] = useState(0);
   const [side, setSide] = useState<"away" | "home">("away");
   const matchup = snapshot.matchups[selected];
@@ -111,7 +119,12 @@ export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
               {pairs.map(([a, h]) => {
                 const p = side === "away" ? a : h;
                 return (
-                  <PlayerLogTable key={p.playerId} player={p} badges={badges.get(p.playerId)} />
+                  <PlayerLogTable
+                    key={p.playerId}
+                    player={p}
+                    badges={badges.get(p.playerId)}
+                    kalshi={lineFor(p)}
+                  />
                 );
               })}
             </div>
@@ -132,8 +145,8 @@ export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
                 );
                 return (
                   <div key={a.playerId} className="grid grid-cols-2 items-start gap-3">
-                    <PlayerLogTable player={a} scaleMax={scaleMax} badges={badges.get(a.playerId)} />
-                    <PlayerLogTable player={h} scaleMax={scaleMax} badges={badges.get(h.playerId)} />
+                    <PlayerLogTable player={a} scaleMax={scaleMax} badges={badges.get(a.playerId)} kalshi={lineFor(a)} />
+                    <PlayerLogTable player={h} scaleMax={scaleMax} badges={badges.get(h.playerId)} kalshi={lineFor(h)} />
                   </div>
                 );
               })}

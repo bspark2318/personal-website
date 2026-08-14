@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { avg, type Flag, type PlayerLog } from "@/lib/wnba";
+import type { KalshiLine } from "@/lib/kalshi";
 
 const FLAG_STYLES: Record<Flag["type"], { icon: string; label: string; cls: string }> = {
   injury: { icon: "✚", label: "Injury", cls: "text-red-600 dark:text-red-400" },
@@ -69,10 +70,12 @@ export default function PlayerLogTable({
   player,
   scaleMax,
   badges,
+  kalshi,
 }: {
   player: PlayerLog;
   scaleMax?: number;
   badges?: string[]; // team-leader tags: PTS / REB / AST
+  kalshi?: KalshiLine;
 }) {
   const [open, setOpen] = useState(false);
   const vs = player.vsOpponent;
@@ -180,6 +183,13 @@ export default function PlayerLogTable({
               </tbody>
             </table>
             </div>
+            {kalshi && (
+              <p className="mt-3 border-t border-card-border pt-2 text-xs text-muted">
+                Kalshi {kalshi.threshold}+ · yes{" "}
+                {kalshi.yesAsk != null ? `${kalshi.yesAsk}¢` : "—"} · L10{" "}
+                {avg(player.last10, "pts")} pts
+              </p>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
