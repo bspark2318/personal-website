@@ -33,8 +33,10 @@ export function fetchByAthlete(season: number) {
   );
 }
 
-export function fetchGamelog(athleteId: string) {
-  return getJson(`${WEB}/athletes/${athleteId}/gamelog`);
+export function fetchGamelog(athleteId: string, season?: number) {
+  return getJson(
+    `${WEB}/athletes/${athleteId}/gamelog${season ? `?season=${season}` : ""}`
+  );
 }
 
 export function fetchTeamSchedule(teamId: string) {
@@ -60,7 +62,15 @@ export async function buildSnapshot(): Promise<Snapshot> {
     const schedule = await fetchTeamSchedule(team.id);
     const starters = await Promise.all(
       topStarters(byathlete, team.id).map(async (s) => {
-        const lines = parseGamelog(await fetchGamelog(s.id));
+        // current + previous season, merged, for deeper head-to-head history
+        const [cur, prev] = await Promise.all([
+          fetchGamelog(s.id),
+          fetchGamelog(s.id, season - 1).catch(() => null),
+        ]);
+        const seen = new Set<string>();
+        const lines = [...parseGamelog(cur), ...parseGamelog(prev)]
+          .filter((l) => !seen.has(l.eventId) && (seen.add(l.eventId), true))
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         return {
           playerId: s.id,
           name: s.name,

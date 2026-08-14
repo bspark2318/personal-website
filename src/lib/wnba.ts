@@ -123,6 +123,7 @@ export function parseGamelog(gamelog: any): GameLine[] {
   const meta: Record<string, any> = gamelog?.events ?? {};
   const lines = new Map<string, GameLine>();
   for (const st of gamelog?.seasonTypes ?? []) {
+    if (/preseason/i.test(st.displayName ?? "")) continue;
     for (const cat of st.categories ?? []) {
       for (const ev of cat.events ?? []) {
         const m = meta[ev.eventId];
