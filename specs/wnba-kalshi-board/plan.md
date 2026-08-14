@@ -29,7 +29,7 @@ Page never calls ESPN. Missing snapshot → on-demand build once, then serve fro
 **Layout: game tabs + detail** (one game at a time).
 
 - **Top:** horizontal pill picker of today's games (`NYL @ LVA · 7:00`); first game selected by default. Animated selection (framer-motion), swipe/scroll on mobile.
-- **Detail:** mobile-first — team trends strip on top, then five player-vs-player rows: starters sorted G→C per team and zipped into positional pairs (away | home mini-cards side by side). Pairing is approximate (minutes-proxy starters, hybrid positions).
+- **Detail:** trends strip on top. Mobile: away/home segmented tabs, one team's five full-width starter cards at a time (position order). sm+: five player-vs-player rows, starters zipped into positional pairs (away | home). Pairing is approximate (minutes-proxy starters, hybrid positions).
 - **Player card:** name, L10 averages (pts/reb/ast), pts sparkline for last 10, vs-opponent line ("vs LVA: 24, 19, 27"). Tap → expands to full 10-row log table.
 - **Bottom strip:** team trends side-by-side — last-5 W/L dots, avg for/against, avg margin, implied combined total.
 - **States:** skeleton while loading; "No games today" empty state; error card if snapshot missing/failed.
