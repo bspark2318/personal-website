@@ -32,6 +32,17 @@ function Side({ m, side }: { m: Matchup; side: "home" | "away" }) {
         {trend.avgMargin > 0 ? "+" : ""}
         {trend.avgMargin} margin
       </p>
+      {trend.restDays !== null && (
+        <p className="text-xs text-muted">
+          {trend.restDays <= 1 ? (
+            <span className="font-medium text-red-600 dark:text-red-400">
+              B2B · {trend.gamesLast7} in 7d
+            </span>
+          ) : (
+            `${trend.restDays}d rest · ${trend.gamesLast7} in 7d`
+          )}
+        </p>
+      )}
     </div>
   );
 }

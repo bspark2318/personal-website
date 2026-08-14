@@ -94,6 +94,21 @@ describe("teamTrend", () => {
     expect(t.avgFor).toBeGreaterThan(0);
     expect(t.avgAgainst).toBeGreaterThan(0);
     expect(t.avgMargin).toBeCloseTo(t.avgFor - t.avgAgainst, 1);
+    expect(t.restDays).toBeNull(); // no gameDate given
+  });
+
+  it("computes rest days and 7-day density from a tipoff date", () => {
+    const events = (schedule as { events: { competitions: { date: string }[] }[] })
+      .events;
+    const lastDate = events
+      .map((e) => e.competitions[0])
+      .filter((c) => (c as { status?: { type?: { completed?: boolean } } }).status?.type?.completed)
+      .map((c) => new Date(c.date).getTime())
+      .sort((a, b) => b - a)[0];
+    const tip = new Date(lastDate + 2 * 86_400_000).toISOString();
+    const t = teamTrend(schedule, "8", tip);
+    expect(t.restDays).toBe(2);
+    expect(t.gamesLast7).toBeGreaterThan(0);
   });
 });
 

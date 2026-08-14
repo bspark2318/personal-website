@@ -42,6 +42,8 @@ export type TeamTrend = {
   avgFor: number;
   avgAgainst: number;
   avgMargin: number;
+  restDays: number | null; // full days between last game and tipoff; null if unknown
+  gamesLast7: number; // completed games in the 7 days before tipoff
 };
 
 export type MatchupSide = {
@@ -156,16 +158,36 @@ export function vsOpponent(lines: GameLine[], opponentId: string): GameLine[] {
   return lines.filter((l) => l.opponentId === opponentId);
 }
 
-// team schedule JSON → trend over last `n` completed games
-export function teamTrend(schedule: any, teamId: string, n = 10): TeamTrend {
-  const completed = (schedule?.events ?? [])
+// team schedule JSON → trend over last `n` completed games.
+// gameDate (tipoff ISO) enables rest-day / schedule-density stats.
+export function teamTrend(
+  schedule: any,
+  teamId: string,
+  gameDate?: string,
+  n = 10
+): TeamTrend {
+  const allCompleted = (schedule?.events ?? [])
     .map((e: any) => e.competitions?.[0])
     .filter((c: any) => c?.status?.type?.completed)
+    .filter(
+      (c: any) => !gameDate || new Date(c.date) < new Date(gameDate)
+    )
     .sort(
       (a: any, b: any) =>
         new Date(b.date).getTime() - new Date(a.date).getTime()
-    )
-    .slice(0, n);
+    );
+  const completed = allCompleted.slice(0, n);
+
+  const DAY = 86_400_000;
+  const tip = gameDate ? new Date(gameDate).getTime() : null;
+  const lastGame = allCompleted[0] ? new Date(allCompleted[0].date).getTime() : null;
+  const restDays =
+    tip !== null && lastGame !== null ? Math.floor((tip - lastGame) / DAY) : null;
+  const gamesLast7 =
+    tip === null
+      ? 0
+      : allCompleted.filter((c: any) => tip - new Date(c.date).getTime() <= 7 * DAY)
+          .length;
 
   let sumFor = 0;
   let sumAgainst = 0;
@@ -187,6 +209,8 @@ export function teamTrend(schedule: any, teamId: string, n = 10): TeamTrend {
     avgFor: round1(sumFor / games),
     avgAgainst: round1(sumAgainst / games),
     avgMargin: round1((sumFor - sumAgainst) / games),
+    restDays,
+    gamesLast7,
   };
 }
 

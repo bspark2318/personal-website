@@ -58,7 +58,11 @@ export async function buildSnapshot(): Promise<Snapshot> {
     scoreboard?.leagues?.[0]?.season?.year ?? new Date().getFullYear();
   const byathlete = await fetchByAthlete(season);
 
-  const side = async (team: TeamRef, opponent: TeamRef): Promise<MatchupSide> => {
+  const side = async (
+    team: TeamRef,
+    opponent: TeamRef,
+    gameDate: string
+  ): Promise<MatchupSide> => {
     const schedule = await fetchTeamSchedule(team.id);
     const starters = await Promise.all(
       topStarters(byathlete, team.id).map(async (s) => {
@@ -81,15 +85,15 @@ export async function buildSnapshot(): Promise<Snapshot> {
         };
       })
     );
-    return { team, starters, trend: teamTrend(schedule, team.id) };
+    return { team, starters, trend: teamTrend(schedule, team.id, gameDate) };
   };
 
   const matchups: Matchup[] = [];
   for (const game of games) {
     matchups.push({
       game,
-      home: await side(game.home, game.away),
-      away: await side(game.away, game.home),
+      home: await side(game.home, game.away, game.date),
+      away: await side(game.away, game.home, game.date),
     });
   }
   return { date, matchups };
