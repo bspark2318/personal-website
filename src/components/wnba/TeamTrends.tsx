@@ -8,10 +8,10 @@ function Dots({ results }: { results: ("W" | "L")[] }) {
       {seq.map((r, i) => (
         <span
           key={i}
-          className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-semibold ${
+          className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
             r === "W"
-              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-              : "bg-red-500/15 text-red-600 dark:text-red-400"
+              ? "bg-emerald-500/30 text-emerald-800 ring-1 ring-emerald-500/40 dark:bg-emerald-400/25 dark:text-emerald-200 dark:ring-emerald-400/40"
+              : "bg-red-500/30 text-red-800 ring-1 ring-red-500/40 dark:bg-red-400/25 dark:text-red-200 dark:ring-red-400/40"
           }`}
         >
           {r}
