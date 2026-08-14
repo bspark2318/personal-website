@@ -184,11 +184,18 @@ export default function PlayerLogTable({
             </table>
             </div>
             {kalshi && (
-              <p className="mt-3 border-t border-card-border pt-2 text-xs text-muted">
-                Kalshi {kalshi.threshold}+ · yes{" "}
-                {kalshi.yesAsk != null ? `${kalshi.yesAsk}¢` : "—"} · L10{" "}
-                {avg(player.last10, "pts")} pts
-              </p>
+              <div className="mt-3 flex items-center justify-between rounded-xl border border-card-border bg-card-from px-3 py-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+                  Kalshi
+                </span>
+                <span className="text-sm font-semibold">
+                  {kalshi.threshold}+ pts
+                  <span className="mx-2 text-muted">·</span>
+                  yes {kalshi.yesAsk != null ? `${kalshi.yesAsk}¢` : "—"}
+                  <span className="mx-2 text-muted">·</span>
+                  L10 {avg(player.last10, "pts")}
+                </span>
+              </div>
             )}
           </motion.div>
         )}
