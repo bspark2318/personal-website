@@ -69,7 +69,7 @@ export default function MatchupBoard({ snapshot }: { snapshot: Snapshot }) {
           </p>
           <div className="flex flex-col gap-3">
             {pairs.map(([a, h]) => (
-              <div key={a.playerId} className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div key={a.playerId} className="grid grid-cols-2 items-start gap-2 sm:gap-3">
                 <PlayerLogTable player={a} />
                 <PlayerLogTable player={h} />
               </div>

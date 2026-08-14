@@ -39,7 +39,7 @@ export default function PlayerLogTable({ player }: { player: PlayerLog }) {
     <div className="rounded-2xl border border-card-border bg-[image:linear-gradient(var(--card-from),transparent)] p-4 transition-colors hover:border-card-border-hover">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full flex-col gap-1.5 text-left"
+        className="flex w-full flex-col gap-1.5 text-left focus:outline-none focus-visible:rounded-lg focus-visible:ring-2 focus-visible:ring-card-border-hover"
         aria-expanded={open}
       >
         <div className="flex w-full min-w-0 items-baseline gap-1.5">
