@@ -72,14 +72,17 @@ export default function PlayerLogTable({
   const max = scaleMax ?? Math.max(...player.last10.map((l) => l.pts), 1);
 
   return (
-    <div className="rounded-2xl border border-card-border bg-[image:linear-gradient(var(--card-from),transparent)] p-4 transition-colors hover:border-card-border-hover">
+    <div className="rounded-2xl border border-card-border bg-[image:linear-gradient(var(--card-from),transparent)] p-3 transition-colors hover:border-card-border-hover sm:p-4">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full flex-col gap-1.5 text-left focus:outline-none focus-visible:rounded-lg focus-visible:ring-2 focus-visible:ring-card-border-hover"
         aria-expanded={open}
       >
         <div className="flex w-full min-w-0 items-center gap-1.5">
-          <p className="min-w-0 truncate text-sm font-semibold">{player.name}</p>
+          <p className="min-w-0 truncate text-sm font-semibold">
+            <span className="sm:hidden">{player.name.split(" ").slice(-1)[0]}</span>
+            <span className="hidden sm:inline">{player.name}</span>
+          </p>
           <span className="shrink-0 rounded bg-card-from px-1 text-[10px] text-muted">
             {player.pos || "—"}
           </span>
@@ -119,33 +122,33 @@ export default function PlayerLogTable({
             className="overflow-hidden"
           >
             <div className="overflow-x-auto">
-            <table className="mt-3 w-full min-w-[320px] text-xs">
+            <table className="mt-3 w-full text-[11px] sm:text-xs">
               <thead className="text-muted">
                 <tr className="text-left">
-                  <th className="py-1 pr-2 font-normal">Date</th>
-                  <th className="py-1 pr-2 font-normal">Opp</th>
-                  <th className="py-1 pr-2 font-normal">Res</th>
-                  <th className="py-1 pr-2 text-right font-normal">MIN</th>
-                  <th className="py-1 pr-2 text-right font-normal">PTS</th>
-                  <th className="py-1 pr-2 text-right font-normal">REB</th>
+                  <th className="py-1 pr-1.5 font-normal sm:pr-2">Date</th>
+                  <th className="py-1 pr-1.5 font-normal sm:pr-2">Opp</th>
+                  <th className="hidden py-1 pr-2 font-normal sm:table-cell">Res</th>
+                  <th className="hidden py-1 pr-2 text-right font-normal sm:table-cell">MIN</th>
+                  <th className="py-1 pr-1.5 text-right font-normal sm:pr-2">PTS</th>
+                  <th className="py-1 pr-1.5 text-right font-normal sm:pr-2">REB</th>
                   <th className="py-1 text-right font-normal">AST</th>
                 </tr>
               </thead>
               <tbody>
                 {player.last10.map((l) => (
                   <tr key={l.eventId} className="border-t border-card-border">
-                    <td className="py-1 pr-2 text-muted">
+                    <td className="py-1 pr-1.5 text-muted sm:pr-2">
                       {new Date(l.date).toLocaleDateString("en-US", {
-                        month: "short",
+                        month: "numeric",
                         day: "numeric",
                         timeZone: "America/New_York",
                       })}
                     </td>
-                    <td className="py-1 pr-2">{l.opponentAbbr}</td>
-                    <td className="py-1 pr-2">{l.result}</td>
-                    <td className="py-1 pr-2 text-right">{l.min}</td>
-                    <td className="py-1 pr-2 text-right font-medium">{l.pts}</td>
-                    <td className="py-1 pr-2 text-right">{l.reb}</td>
+                    <td className="py-1 pr-1.5 sm:pr-2">{l.opponentAbbr}</td>
+                    <td className="hidden py-1 pr-2 sm:table-cell">{l.result}</td>
+                    <td className="hidden py-1 pr-2 text-right sm:table-cell">{l.min}</td>
+                    <td className="py-1 pr-1.5 text-right font-medium sm:pr-2">{l.pts}</td>
+                    <td className="py-1 pr-1.5 text-right sm:pr-2">{l.reb}</td>
                     <td className="py-1 text-right">{l.ast}</td>
                   </tr>
                 ))}
