@@ -193,9 +193,18 @@ export function teamTrend(
 
   const DAY = 86_400_000;
   const tip = gameDate ? new Date(gameDate).getTime() : null;
-  const lastGame = allCompleted[0] ? new Date(allCompleted[0].date).getTime() : null;
+  // Calendar days (ET) between games — raw timestamp math misclassifies B2Bs
+  // when tip times differ (Sat 7pm → Sun 3pm is a B2B, not "0.8 days").
+  const etDay = (iso: string) =>
+    new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(
+      new Date(iso)
+    );
   const restDays =
-    tip !== null && lastGame !== null ? Math.floor((tip - lastGame) / DAY) : null;
+    gameDate && allCompleted[0]
+      ? Math.round(
+          (Date.parse(etDay(gameDate)) - Date.parse(etDay(allCompleted[0].date))) / DAY
+        )
+      : null;
   const gamesLast7 =
     tip === null
       ? 0
@@ -277,8 +286,8 @@ export function hitRate(
 }
 
 export const THRESHOLDS = {
-  heavyLoadDelta: 4, // L3 min ≥ season avg + this
-  climbDelta: 3, // L3 min ≥ L10 min avg + this
+  spikeSigma: 2, // last game's min ≥ this many σ above the prior games' avg
+  spikeFloor: 4, // …but never flag a bump smaller than this many minutes
   hotMult: 1.25,
   coldMult: 0.75,
   minPtsBase: 8, // streak flags only for players averaging ≥ this
@@ -301,21 +310,27 @@ export function computeFlags(
   }
 
   if (trend.restDays !== null && trend.restDays <= T.b2bRest) {
-    flags.push({ type: "fatigue", reason: "B2B — playing on ≤1 day rest" });
+    flags.push({ type: "fatigue", reason: "B2B — played yesterday" });
+  }
+
+  // Workload spike: last game's minutes ≥ spikeSigma σ above the prior games'
+  // avg. spikeFloor keeps ultra-consistent players (σ≈0) from flagging on noise.
+  const [latest, ...priorGames] = player.last10;
+  if (latest && priorGames.length >= 5) {
+    const mins = priorGames.map((g) => g.min);
+    const mean = mins.reduce((s, m) => s + m, 0) / mins.length;
+    const sd = Math.sqrt(
+      mins.reduce((s, m) => s + (m - mean) ** 2, 0) / mins.length
+    );
+    if (latest.min >= mean + Math.max(T.spikeSigma * sd, T.spikeFloor)) {
+      flags.push({
+        type: "fatigue",
+        reason: `${latest.min} min last game vs ${Math.round(mean * 10) / 10} avg`,
+      });
+    }
   }
 
   if (player.last10.length >= T.minGames) {
-    const l3min = avg(l3, "min");
-    const l10min = avg(player.last10, "min");
-    if (player.avgMinutes > 0 && l3min >= player.avgMinutes + T.heavyLoadDelta) {
-      flags.push({
-        type: "fatigue",
-        reason: `${l3min} min L3 vs ${Math.round(player.avgMinutes * 10) / 10} season`,
-      });
-    } else if (l3min >= l10min + T.climbDelta) {
-      flags.push({ type: "fatigue", reason: `minutes climbing — ${l3min} L3 vs ${l10min} L10` });
-    }
-
     const l3pts = avg(l3, "pts");
     const l10pts = avg(player.last10, "pts");
     if (l10pts >= T.minPtsBase) {

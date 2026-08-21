@@ -2,7 +2,7 @@ import Nav from "@/components/Nav";
 import Reveal from "@/components/Reveal";
 import MatchupBoard from "@/components/wnba/MatchupBoard";
 import NoGames from "@/components/wnba/NoGames";
-import { buildSnapshot } from "@/lib/wnba-api";
+import { buildSnapshot, refreshInjuries } from "@/lib/wnba-api";
 import { readSnapshot, writeSnapshot } from "@/lib/wnba-db";
 import { fetchKalshiLines } from "@/lib/kalshi";
 import type { Snapshot } from "@/lib/wnba";
@@ -16,7 +16,8 @@ async function getSnapshot(): Promise<Snapshot> {
     timeZone: "America/New_York",
   }).format(new Date());
   const existing = await readSnapshot(date);
-  if (existing) return existing;
+  // Injury pills go stale fast — overlay fresh roster status on the cached build.
+  if (existing) return refreshInjuries(existing).catch(() => existing);
   const snapshot = await buildSnapshot();
   await writeSnapshot(snapshot);
   return snapshot;

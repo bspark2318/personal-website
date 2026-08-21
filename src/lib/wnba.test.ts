@@ -154,10 +154,17 @@ describe("computeFlags", () => {
     games.map(([pts, min], i) => line(pts, min, i));
   const rested = { restDays: 3 };
 
-  it("heavy load: L3 min ≥ season avg + 4", () => {
-    const p = { last10: logs([[10, 36], [10, 36], [10, 36], [10, 28], [10, 28]]), avgMinutes: 30 };
+  it("minutes spike: last game ≥ 2σ above prior avg", () => {
+    const p = { last10: logs([[10, 40], ...Array.from({ length: 9 }, () => [10, 28] as [number, number])]), avgMinutes: 29 };
     const f = computeFlags(p, rested);
-    expect(f.some((x) => x.type === "fatigue" && x.reason.includes("36"))).toBe(true);
+    expect(f.some((x) => x.type === "fatigue" && x.reason.includes("40"))).toBe(true);
+  });
+
+  it("high but within-noise minutes don't flag", () => {
+    // prior avg 30, σ = 6 → threshold 42; 38 is inside normal variance
+    const prior = Array.from({ length: 8 }, (_, i) => [10, i % 2 ? 24 : 36] as [number, number]);
+    const p = { last10: logs([[10, 38], ...prior]), avgMinutes: 30 };
+    expect(computeFlags(p, rested).some((x) => x.type === "fatigue")).toBe(false);
   });
 
   it("B2B flags regardless of minutes", () => {
@@ -165,10 +172,9 @@ describe("computeFlags", () => {
     expect(computeFlags(p, { restDays: 1 }).some((x) => x.reason.includes("B2B"))).toBe(true);
   });
 
-  it("minutes climbing without heavy load", () => {
-    const p = { last10: logs([[10, 33], [10, 33], [10, 33], [10, 25], [10, 25], [10, 25], [10, 25], [10, 25], [10, 25], [10, 25]]), avgMinutes: 33 };
-    const f = computeFlags(p, rested);
-    expect(f.some((x) => x.reason.includes("climbing"))).toBe(true);
+  it("stable heavy minutes after a role change are not fatigue", () => {
+    const p = { last10: logs(Array.from({ length: 10 }, () => [10, 33] as [number, number])), avgMinutes: 25 };
+    expect(computeFlags(p, rested).some((x) => x.type === "fatigue")).toBe(false);
   });
 
   it("hot and cold streaks around L10 avg", () => {

@@ -52,6 +52,20 @@ export type RosterInfo = {
   age?: number;
 };
 
+// Latest injury entry wins; entries older than a week are treated as resolved.
+const INJURY_STALE_MS = 7 * 86_400_000;
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+function currentInjury(injuries: any[]): string | undefined {
+  const latest = (injuries ?? [])
+    .filter((i) => i?.status)
+    .sort((a, b) => (Date.parse(b?.date ?? "") || 0) - (Date.parse(a?.date ?? "") || 0))[0];
+  if (!latest) return undefined;
+  const ts = Date.parse(latest.date ?? "");
+  if (ts && Date.now() - ts > INJURY_STALE_MS) return undefined;
+  return latest.status;
+}
+
 // athleteId → injury + physical profile from the roster feed
 export async function fetchRosterInfo(teamId: string): Promise<Map<string, RosterInfo>> {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -59,13 +73,49 @@ export async function fetchRosterInfo(teamId: string): Promise<Map<string, Roste
   const map = new Map<string, RosterInfo>();
   for (const a of roster?.athletes ?? []) {
     map.set(String(a.id), {
-      injury: a.injuries?.[0]?.status,
+      injury: currentInjury(a.injuries),
       height: a.displayHeight,
       weight: a.displayWeight,
       age: a.age,
     });
   }
   return map;
+}
+
+// Overlay fresh injury pills onto a cached snapshot at read time — the rest of
+// the snapshot (gamelogs, trends) stays as built by the cron.
+export async function refreshInjuries(snapshot: Snapshot): Promise<Snapshot> {
+  const teamIds = new Set(
+    snapshot.matchups.flatMap((m) => [m.home.team.id, m.away.team.id])
+  );
+  const rosters = new Map(
+    await Promise.all(
+      [...teamIds].map(async (id) =>
+        [id, await fetchRosterInfo(id).catch(() => null)] as const
+      )
+    )
+  );
+  const withFresh = (side: MatchupSide): MatchupSide => {
+    const roster = rosters.get(side.team.id);
+    if (!roster) return side; // fetch failed — keep snapshot-time pills
+    return {
+      ...side,
+      starters: side.starters.map((p) => {
+        const injury = roster.get(p.playerId)?.injury;
+        const flags = p.flags?.filter((f) => f.type !== "injury") ?? [];
+        if (injury) flags.unshift({ type: "injury", reason: `${injury} (ESPN)` });
+        return { ...p, flags };
+      }),
+    };
+  };
+  return {
+    ...snapshot,
+    matchups: snapshot.matchups.map((m) => ({
+      ...m,
+      home: withFresh(m.home),
+      away: withFresh(m.away),
+    })),
+  };
 }
 
 // Fetch everything for today's games and assemble the day's snapshot.
