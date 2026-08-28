@@ -18,7 +18,7 @@ export default function OverviewTab({ trip }: { trip: Trip }) {
       </section>
       {trip.conditions.length > 0 && (
         <section>
-          <h2 className="display mb-4 text-xl font-semibold">Late October, Miami</h2>
+          <h2 className="display mb-4 text-xl font-semibold">Mid–late October, Miami</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {trip.conditions.map((c) => (
               <div

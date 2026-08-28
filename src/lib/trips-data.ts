@@ -142,11 +142,11 @@ const miami2026: Trip = {
     "Backyard fire pit pregames at our own house, 5 min from everything.",
   ],
   conditions: [
-    { label: "Day high", value: "85°F", sub: "sun hits different" },
-    { label: "Night low", value: "75°F", sub: "shorts at 3 AM, fine" },
-    { label: "Ocean", value: "83°F", sub: "bathwater — no wetsuit" },
-    { label: "Rain", value: "~30%", sub: "brief PM shower, moves on" },
-    { label: "Sunset", value: "6:40 PM", sub: "golden hour on the water" },
+    { label: "Day high", value: "84–87°F", sub: "sun hits different" },
+    { label: "Night low", value: "73–77°F", sub: "shorts at 3 AM, fine" },
+    { label: "Ocean", value: "83–84°F", sub: "bathwater — no wetsuit" },
+    { label: "Rain", value: "30–40%", sub: "brief PM shower, moves on" },
+    { label: "Sunset", value: "~6:45 PM", sub: "golden hour on the water" },
     { label: "Hurricane risk", value: "Low", sub: "past Sep 10 peak; check NHC week-of" },
   ],
   food: [
