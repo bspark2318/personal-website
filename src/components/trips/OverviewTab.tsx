@@ -6,7 +6,7 @@ export default function OverviewTab({ trip }: { trip: Trip }) {
   return (
     <div className="space-y-10">
       <section>
-        <h2 className="display mb-4 text-xl font-semibold">Why this trip</h2>
+        <h2 className="display mb-4 text-xl font-semibold">The highlights</h2>
         <ul className="space-y-2.5">
           {trip.intro.map((line) => (
             <li key={line} className="flex gap-2.5 text-[15px] leading-relaxed">

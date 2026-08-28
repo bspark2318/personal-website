@@ -133,13 +133,13 @@ const miami2026: Trip = {
   crew: MIAMI_CREW,
   passcodeEnvKey: "TRIP_PASSWORD_MIAMI_2026",
   intro: [
-    "8 people · 3 nights · Airbnb in Buena Vista, next to the Design District — backyard + fire pit as pregame HQ.",
-    "Late October = tail end of rainy season. Highs ~85°F, ocean 83°F — swimmable, past the worst humidity.",
-    "Shoulder-season pricing: hotels, boats, and restaurants cheaper than winter high season.",
-    "Stone crab season opened Oct 15 — we're eating claws.",
-    "Sailfish season starting + fall mullet run = prime fishing window.",
-    "Sat Oct 24 is Halloween Saturday — Wynwood becomes Miami's biggest street costume party.",
-    "Getting around: 2 rental cars for the weekend (Everglades, beach, Oleta) + Ubers for club nights (~$10–20/ride); 10–15 min to South Beach, 12 min to MIA.",
+    "A private boat anchored at Haulover Sandbar — cooler full, 83°F water, skyline on the ride home.",
+    "Halloween Saturday in Wynwood — thousands in costume, Miami's biggest street party of the fall.",
+    "Stone crab claws at Joe's — the season literally just opened for us.",
+    "Biking past wild alligators sunning on the path in the Everglades.",
+    "Sunrise on the Club Space Terrace, if you make it.",
+    "Kayaking mangrove tunnels with a real shot at manatees.",
+    "Backyard fire pit pregames at our own house, 5 min from everything.",
   ],
   food: [
     {
