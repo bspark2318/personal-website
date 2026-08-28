@@ -2,23 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { fullName, type CrewMember } from "@/lib/trips";
-
-// Both names must match a crew member (case-insensitive). Duplicate first
-// names are fine — the last name disambiguates. Returns the full-name key.
-export function matchCrew(
-  first: string,
-  last: string,
-  crew: CrewMember[]
-): string | null {
-  const qFirst = first.trim().toLowerCase();
-  const qLast = last.trim().toLowerCase();
-  if (!qFirst || !qLast) return null;
-  const member = crew.find(
-    (m) => m.first.toLowerCase() === qFirst && m.last.toLowerCase() === qLast
-  );
-  return member ? fullName(member) : null;
-}
+import { matchCrew, type CrewMember } from "@/lib/trips";
 
 export default function NameGate({
   tripTitle,

@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   estimateCost,
+  firstNameOf,
+  matchCrew,
   shapeState,
   toCelsiusLabel,
   type CostItem,
+  type CrewMember,
   type DatePrefRow,
   type RsvpRow,
   type VoteRow,
@@ -58,6 +61,48 @@ describe("toCelsiusLabel", () => {
     expect(toCelsiusLabel("84–87°F")).toBe("29–31°C");
     expect(toCelsiusLabel("30–40%")).toBe("30–40%");
     expect(toCelsiusLabel("~6:45 PM")).toBe("~6:45 PM");
+  });
+});
+
+describe("matchCrew", () => {
+  const crew: CrewMember[] = [
+    { first: "BumSu", last: "Park" },
+    { first: "Mike", last: "Smith" },
+    { first: "Mike", last: "Jones" },
+  ];
+
+  it("exact match returns the full-name key", () => {
+    expect(matchCrew("BumSu", "Park", crew)).toBe("BumSu Park");
+  });
+
+  it("is case-insensitive and trims whitespace", () => {
+    expect(matchCrew("  bumsu ", " PARK ", crew)).toBe("BumSu Park");
+  });
+
+  it("empty first or last name never matches", () => {
+    expect(matchCrew("", "Park", crew)).toBeNull();
+    expect(matchCrew("BumSu", "   ", crew)).toBeNull();
+  });
+
+  it("right first + wrong last is rejected", () => {
+    expect(matchCrew("BumSu", "Kim", crew)).toBeNull();
+  });
+
+  it("duplicate first names disambiguate by last name", () => {
+    expect(matchCrew("Mike", "Jones", crew)).toBe("Mike Jones");
+    expect(matchCrew("Mike", "Smith", crew)).toBe("Mike Smith");
+  });
+});
+
+describe("firstNameOf", () => {
+  const crew: CrewMember[] = [{ first: "BumSu", last: "Park" }];
+
+  it("maps a full-name key to the first name", () => {
+    expect(firstNameOf("BumSu Park", crew)).toBe("BumSu");
+  });
+
+  it("falls back to the key when not in the crew", () => {
+    expect(firstNameOf("Old Key", crew)).toBe("Old Key");
   });
 });
 

@@ -89,9 +89,25 @@ export interface CrewMember {
 
 export const fullName = (m: CrewMember) => `${m.first} ${m.last}`;
 
-/** Display name for a stored full-name key; falls back to the key itself. */
+/** First name for a stored full-name key; falls back to the key itself. */
 export function firstNameOf(name: string, crew: CrewMember[]): string {
   return crew.find((m) => fullName(m) === name)?.first ?? name;
+}
+
+// Both names must match a crew member (case-insensitive). Duplicate first
+// names are fine — the last name disambiguates. Returns the full-name key.
+export function matchCrew(
+  first: string,
+  last: string,
+  crew: CrewMember[]
+): string | null {
+  const qFirst = first.trim().toLowerCase();
+  const qLast = last.trim().toLowerCase();
+  if (!qFirst || !qLast) return null;
+  const member = crew.find(
+    (m) => m.first.toLowerCase() === qFirst && m.last.toLowerCase() === qLast
+  );
+  return member ? fullName(member) : null;
 }
 
 export interface Trip {

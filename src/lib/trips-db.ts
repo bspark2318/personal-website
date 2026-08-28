@@ -13,7 +13,18 @@ function getSql() {
   return neon(url);
 }
 
-export async function ensureTables() {
+// DDL runs at most once per process; the endpoints are unauthenticated, so
+// per-request CREATE TABLE round-trips would be free cost amplification.
+let tablesReady: Promise<void> | null = null;
+
+export function ensureTables(): Promise<void> {
+  return (tablesReady ??= createTables().catch((e) => {
+    tablesReady = null;
+    throw e;
+  }));
+}
+
+async function createTables() {
   const sql = getSql();
   await sql`
     CREATE TABLE IF NOT EXISTS trip_rsvps (
