@@ -7,10 +7,12 @@ import ActivitiesTab from "@/components/trips/ActivitiesTab";
 import CostEstimator from "@/components/trips/CostEstimator";
 import FoodTab from "@/components/trips/FoodTab";
 import NightlifeTab from "@/components/trips/NightlifeTab";
+import NameGate from "@/components/trips/NameGate";
 import OverviewTab from "@/components/trips/OverviewTab";
 import TabBar from "@/components/trips/TabBar";
 import RsvpPanel from "@/components/trips/RsvpPanel";
 import {
+  fullName,
   storageNameKey,
   type RsvpStatus,
   type TripState,
@@ -27,8 +29,6 @@ const TABS = [
   { id: "rsvp", label: "RSVP" },
 ];
 
-type Phase = "loading" | "open";
-
 export default function TripPage({
   params,
 }: {
@@ -37,61 +37,86 @@ export default function TripPage({
   const { slug } = use(params);
   const trip = TRIPS[slug];
 
-  const [phase, setPhase] = useState<Phase>("loading");
+  const [phase, setPhase] = useState<"loading" | "gated" | "open">("loading");
   const [myName, setMyName] = useState<string | null>(null);
   const [state, setState] = useState<TripState | null>(null);
   const [dbDown, setDbDown] = useState(false);
   const [tab, setTab] = useState("overview");
 
-  // Passcode gate is disabled (see checkTripPassword in trips-db.ts); requests
-  // carry no auth header. Re-add TRIP_HEADER here when the gate comes back.
   const loadState = useCallback(
     async (name: string | null) => {
       const me = name ? `?me=${encodeURIComponent(name)}` : "";
-      let res: Response;
       try {
-        res = await fetch(`/api/trips/${slug}/state${me}`);
-      } catch {
-        setDbDown(true);
-        setPhase("open");
-        return;
-      }
-      if (res.ok) {
+        const res = await fetch(`/api/trips/${slug}/state${me}`);
+        if (!res.ok) throw new Error("state fetch failed");
         setState(await res.json());
         setDbDown(false);
-      } else {
+      } catch {
         setDbDown(true);
       }
-      setPhase("open");
     },
     [slug]
   );
 
   useEffect(() => {
     if (!trip) return;
-    queueMicrotask(() => {
-      const name = localStorage.getItem(storageNameKey(slug));
-      if (name) setMyName(name);
+    const name = localStorage.getItem(storageNameKey(slug));
+    if (name && trip.crew.some((m) => fullName(m) === name)) {
+      setMyName(name);
+      setPhase("open");
       void loadState(name);
-    });
+    } else {
+      setPhase("gated");
+    }
   }, [slug, trip, loadState]);
 
   if (!trip) notFound();
 
-  const pickName = (name: string) => {
-    setMyName(name);
+  const unlock = (name: string) => {
     localStorage.setItem(storageNameKey(slug), name);
+    setMyName(name);
+    setPhase("open");
     void loadState(name);
   };
 
   const sendRsvp = async (status: RsvpStatus) => {
     if (!myName || !state) return;
     const prev = state;
-    setState({ ...state, me: { rsvp: status, votes: state.me?.votes ?? {} } });
+    setState({
+      ...state,
+      me: {
+        rsvp: status,
+        votes: state.me?.votes ?? {},
+        dates: state.me?.dates ?? [],
+      },
+    });
     const res = await fetch(`/api/trips/${slug}/rsvp`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ name: myName, status }),
+    });
+    if (!res.ok) setState(prev);
+    else void loadState(myName);
+  };
+
+  const sendDatePref = async (optionId: string, works: boolean) => {
+    if (!myName || !state) return;
+    const prev = state;
+    const dates = new Set(state.me?.dates ?? []);
+    if (works) dates.add(optionId);
+    else dates.delete(optionId);
+    setState({
+      ...state,
+      me: {
+        rsvp: state.me?.rsvp ?? null,
+        votes: state.me?.votes ?? {},
+        dates: [...dates],
+      },
+    });
+    const res = await fetch(`/api/trips/${slug}/date-pref`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: myName, optionId, works }),
     });
     if (!res.ok) setState(prev);
     else void loadState(myName);
@@ -103,7 +128,14 @@ export default function TripPage({
     const meVotes = { ...(state.me?.votes ?? {}) };
     if (vote === null) delete meVotes[activityId];
     else meVotes[activityId] = vote;
-    setState({ ...state, me: { rsvp: state.me?.rsvp ?? null, votes: meVotes } });
+    setState({
+      ...state,
+      me: {
+        rsvp: state.me?.rsvp ?? null,
+        votes: meVotes,
+        dates: state.me?.dates ?? [],
+      },
+    });
     const res = await fetch(`/api/trips/${slug}/vote`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -121,26 +153,22 @@ export default function TripPage({
     );
   }
 
+  if (phase === "gated") {
+    return (
+      <div className="trip-light min-h-screen">
+        <NameGate tripTitle={trip.title} crew={trip.crew} onUnlock={unlock} />
+      </div>
+    );
+  }
+
   return (
     <div className="trip-light min-h-screen">
       <main className="mx-auto max-w-2xl px-5 pb-16 pt-10">
       <header className="mb-6">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-muted">
-              {trip.dates} · {trip.location}
-            </p>
-            <h1 className="display mt-2 text-4xl font-semibold">{trip.title}</h1>
-          </div>
-          {myName && (
-            <button
-              onClick={() => setTab("rsvp")}
-              className="mt-1 shrink-0 rounded-full border border-card-border px-3 py-1.5 text-sm text-muted hover:border-card-border-hover"
-            >
-              {myName}
-            </button>
-          )}
-        </div>
+        <p className="text-xs uppercase tracking-[0.3em] text-muted">
+          {trip.dates} · {trip.location}
+        </p>
+        <h1 className="display mt-2 text-4xl font-semibold">{trip.title}</h1>
         {dbDown && (
           <p className="mt-3 rounded-lg border border-card-border px-3 py-2 text-sm text-muted">
             RSVPs and votes are offline right now — the plan below still stands.
@@ -173,11 +201,12 @@ export default function TripPage({
           {tab === "rsvp" && (
             <RsvpPanel
               crew={trip.crew}
+              dateOptions={trip.dateOptions}
               myName={myName}
-              onPickName={pickName}
               state={state}
               canRsvp={Boolean(myName) && !dbDown}
               onRsvp={sendRsvp}
+              onDatePref={sendDatePref}
             />
           )}
         </motion.div>
@@ -186,4 +215,3 @@ export default function TripPage({
     </div>
   );
 }
-

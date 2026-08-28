@@ -1,15 +1,15 @@
-import type { Activity, CostItem, Trip } from "./trips";
+import type { Activity, CostItem, CrewMember, Trip } from "./trips";
 
-// TODO(bspark): replace placeholder crew names with the real 8.
-const MIAMI_CREW = [
-  "Shai",
-  "Guest 2",
-  "Guest 3",
-  "Guest 4",
-  "Guest 5",
-  "Guest 6",
-  "Guest 7",
-  "Guest 8",
+// TODO(bspark): replace remaining placeholder crew with the real names.
+const MIAMI_CREW: CrewMember[] = [
+  { first: "BumSu", last: "Park" },
+  { first: "Guest 2", last: "Two" },
+  { first: "Guest 3", last: "Three" },
+  { first: "Guest 4", last: "Four" },
+  { first: "Guest 5", last: "Five" },
+  { first: "Guest 6", last: "Six" },
+  { first: "Guest 7", last: "Seven" },
+  { first: "Guest 8", last: "Eight" },
 ];
 
 const MIAMI_ACTIVITIES: Activity[] = [
@@ -148,39 +148,64 @@ const MIAMI_COSTS: CostItem[] = [
 const miami2026: Trip = {
   slug: "miami-2026",
   title: "Miami Crew Trip",
-  dates: "Oct 22–25, 2026",
+  dates: "Oct 2026 · weekend TBD",
   location: "Miami — hood TBD",
   crew: MIAMI_CREW,
-  passcodeEnvKey: "TRIP_PASSWORD_MIAMI_2026",
+  dateOptions: [
+    { id: "oct-8", label: "Oct 8–11 (Thu–Sun)" },
+    { id: "oct-15", label: "Oct 15–18 (Thu–Sun)" },
+    { id: "oct-22", label: "Oct 22–25 (Thu–Sun)" },
+  ],
   intro: [
-    "A private boat anchored at Haulover Sandbar — cooler full, 83°F water, skyline on the ride home.",
-    "One proper send-it Saturday — Wynwood bar crawl or big-room night at LIV.",
-    "Stone crab claws at Joe's — the season literally just opened for us.",
-    "Biking past wild alligators sunning on the path in the Everglades.",
-    "Sunrise on the Club Space Terrace, if you make it.",
-    "Kayaking mangrove tunnels with a real shot at manatees.",
-    "Backyard fire pit pregames at our own house, 5 min from everything.",
+    {
+      text: "**Private party boat** — anchored at **Haulover Sandbar**, 4 hours, BYOB, **83°F water**, **snorkeling** off the boat, skyline ride back.",
+      photo: { src: "/trips/hl-boat.jpg", credit: "James Willamor, CC BY-SA 2.0" },
+    },
+    {
+      text: "**Nightlife at every speed** — Wynwood bar crawl, **LIV**, **E11EVEN**, or the **Club Space Terrace** till sunrise.",
+      photo: { src: "/trips/hl-night.jpg", credit: "Ines Hegedus-Garcia, CC BY 2.0" },
+    },
+    {
+      text: "**Everglades National Park** — bike the loop, **alligators** on the path.",
+      photo: { src: "/trips/everglades-gator.jpg", credit: "Gatorfan252525, CC BY-SA 4.0" },
+    },
+    {
+      text: "Kayak the **mangrove tunnels**; **manatee** sightings possible.",
+      photo: { src: "/trips/hl-kayak.jpg", credit: "NARA, public domain" },
+    },
+    {
+      text: "**Deep-sea fishing** option — late October runs **sailfish, mahi, kingfish**.",
+      photo: { src: "/trips/hl-fishing.jpg", credit: "Florida Memory, public domain" },
+    },
+    {
+      text: "**Joe's Stone Crab** — 100 years old, season opens right before we land.",
+      photo: { src: "/trips/hl-joes.jpg", credit: "FoodOfMiami, public domain" },
+    },
+    {
+      text: "House has a **backyard fire pit** and is **centrally located**.",
+      photo: { src: "/trips/hl-firepit.jpg", credit: "Kurt Kaiser, CC0" },
+    },
   ],
   conditions: [
-    { label: "Ocean", value: "83–84°F", sub: "bathwater — no wetsuit", span: "big" },
-    { label: "Day high", value: "84–87°F", sub: "sun hits different" },
-    { label: "Night low", value: "73–77°F", sub: "shorts at 3 AM, fine" },
-    { label: "Sunset", value: "~6:45 PM", sub: "golden hour on the water", span: "wide" },
-    { label: "Rain", value: "30–40%", sub: "brief PM shower, moves on" },
-    { label: "UV", value: "High", sub: "sunscreen, non-negotiable" },
-    { label: "Hurricane risk", value: "Low", sub: "past Sep 10 peak; check NHC week-of", span: "wide" },
+    { label: "Ocean", value: "83–84°F", sub: "warm enough to swim", span: "big" },
+    { label: "Day high", value: "84–87°F", sub: "strong sun" },
+    { label: "Night low", value: "73–77°F", sub: "warm overnight" },
+    { label: "Sunset", value: "~6:45 PM", sub: "boat back before dark", span: "wide" },
+    { label: "Rain", value: "30–40%", sub: "short afternoon showers" },
+    { label: "UV", value: "High", sub: "bring sunscreen" },
+    { label: "Hurricane risk", value: "Low", sub: "past seasonal peak; check NHC week-of", span: "wide" },
   ],
   neighborhoods: [
     {
       id: "buena-vista",
       name: "Buena Vista",
       emoji: "🏡",
-      tagline: "The chill HQ",
+      tagline: "Residential home base",
       bullets: [
-        "Quiet residential pocket with actual houses — backyard, fire pit, room to pregame loud-ish.",
-        "Wynwood 5–7 min, South Beach 10–15 via I-195, MIA 12 min. Uber to everything.",
-        "Cheapest way to get a whole house for 8.",
-        "Safety: calm residential blocks, but it thins out toward the NW edges at night — Uber door-to-door after dark, fine on foot by day.",
+        "**Quiet residential** area with **full houses** — backyard and fire pit likely.",
+        "**Wynwood 5–7 min**, **South Beach 10–15** via I-195, **MIA 12 min**. Uber to everything.",
+        "**Cheapest** way to get a **whole house for 8**.",
+        "**Safety:** calm residential blocks; NW edges empty out at night — **Uber door-to-door after dark**, fine on foot by day.",
       ],
       mapsQuery: "Buena Vista, Miami, FL",
     },
@@ -188,12 +213,12 @@ const miami2026: Trip = {
       id: "wynwood",
       name: "Wynwood",
       emoji: "🎨",
-      tagline: "Sleep inside the party",
+      tagline: "Walkable nightlife",
       bullets: [
-        "Bars, murals, and street food at the front door — walk home at 3 AM, no Ubers.",
-        "Loudest of the three; more lofts/condos than houses, backyard unlikely.",
-        "Best if the group's priority is going out over hanging in.",
-        "Safety: packed and fine while the bars run; edges go quiet/industrial after close — stay in the active blocks, phones in front pockets.",
+        "**Bars, murals, and street food** within walking distance — **no Ubers needed** at night.",
+        "**Loudest** of the three; more lofts/condos than houses, **backyard unlikely**.",
+        "Best fit if **going out** matters more than hanging at the house.",
+        "**Safety:** busy while bars are open; edges turn quiet and industrial after close — **stay in the active blocks**.",
       ],
       mapsQuery: "Wynwood, Miami, FL",
     },
@@ -201,14 +226,87 @@ const miami2026: Trip = {
       id: "design-district",
       name: "Design District",
       emoji: "🛍️",
-      tagline: "The polished one",
+      tagline: "Quiet and upscale",
       bullets: [
-        "Luxury shopping blocks, free ICA museum, Mandolin's garden a corner away.",
-        "Dead quiet at night — you go to the party, it never comes to you.",
-        "Sits right between Buena Vista and Wynwood; same Uber math everywhere.",
-        "Safety: the safest of the three — private security and cameras everywhere; streets are just empty at night, not sketchy.",
+        "**Luxury retail** blocks, **free ICA museum**, Mandolin a block away.",
+        "**Quiet at night**; nightlife requires travel.",
+        "**Between Buena Vista and Wynwood**; similar Uber times everywhere.",
+        "**Safety:** safest of the three — **private security and cameras**; streets are empty at night, not unsafe.",
       ],
       mapsQuery: "Miami Design District, Miami, FL",
+    },
+  ],
+  parks: [
+    {
+      id: "everglades",
+      name: "Everglades",
+      emoji: "🐊",
+      tagline: "National park",
+      bullets: [
+        "**Shark Valley**: **15-mile paved loop** — bike rentals and a tram on site.",
+        "**Alligators** on and beside the path; keep 15 ft.",
+        "**Observation tower** at the loop's halfway point; **airboat tours** on the drive back.",
+        "**~50 min drive** west on Tamiami Trail.",
+      ],
+      mapsQuery: "Shark Valley Visitor Center, Everglades National Park, FL",
+      photos: [
+        { src: "/trips/everglades-gator.jpg", credit: "Gatorfan252525, CC BY-SA 4.0" },
+        { src: "/trips/everglades-tower.jpg", credit: "DaSpader, CC BY-SA 3.0" },
+        { src: "/trips/everglades-airboat.jpg", credit: "chensiyuan, CC BY-SA 4.0" },
+      ],
+    },
+    {
+      id: "south-beach",
+      name: "South Beach",
+      emoji: "🌴",
+      tagline: "The party beach",
+      bullets: [
+        "**Lummus Park stretch** (5th–15th St) — the crowded, social one.",
+        "**Ocean Drive** art deco strip runs alongside; **83°F water**.",
+        "Default filler between plans — post-boat, pre-dinner.",
+        "**10–15 min** from the house.",
+      ],
+      mapsQuery: "Lummus Park Beach, Miami Beach, FL",
+      photos: [
+        { src: "/trips/southbeach-beach.jpg", credit: "M McBey, CC BY 2.0" },
+        { src: "/trips/southbeach-lifeguard.jpg", credit: "Matt Kieffer, CC BY-SA 2.0" },
+        { src: "/trips/southbeach-oceandrive.jpg", credit: "Jorge Láscar, CC BY 2.0" },
+      ],
+    },
+    {
+      id: "biscayne",
+      name: "Biscayne",
+      emoji: "🤿",
+      tagline: "National park",
+      bullets: [
+        "**Mostly underwater** — coral reefs, wrecks, keys.",
+        "**Snorkel/boat tours** from the Homestead visitor center; book ahead.",
+        "**Boca Chita Key lighthouse** and **Stiltsville** by boat.",
+        "**~1 hr drive** south.",
+      ],
+      mapsQuery: "Biscayne National Park, Homestead, FL",
+      photos: [
+        { src: "/trips/biscayne-snorkel.jpg", credit: "NPS, public domain" },
+        { src: "/trips/biscayne-bocachita.jpg", credit: "NPS, public domain" },
+        { src: "/trips/biscayne-stiltsville.jpg", credit: "Pallowick, CC BY-SA 4.0" },
+      ],
+    },
+    {
+      id: "keys",
+      name: "Florida Keys",
+      emoji: "🌉",
+      tagline: "Day trip south",
+      bullets: [
+        "**Key Largo ~1.5 hr**, **Islamorada ~2 hr** — realistic as a **full-day** trip.",
+        "**John Pennekamp Coral Reef SP**: glass-bottom boat + snorkel tours to **Christ of the Abyss**.",
+        "**Seven Mile Bridge** further down if the drive stretches.",
+      ],
+      mapsQuery: "Key Largo, FL",
+      photos: [
+        { src: "/trips/keys-bridge.jpg", credit: "Brian W. Schaller, FAL" },
+        { src: "/trips/keys-pennekamp.jpg", credit: "Serge Melki, CC BY 2.0" },
+        { src: "/trips/keys-islamorada.jpg", credit: "Sharon Hahn Darlin, CC BY 2.0" },
+      ],
     },
   ],
   food: [
@@ -268,20 +366,12 @@ const miami2026: Trip = {
   },
   info: [
     {
-      title: "Pack right",
-      bullets: [
-        "Swimwear ×2, collared shirt + real shoes for clubs, sunscreen, dramamine for the boat, portable speaker.",
-        "House rules: exterior cameras exist; 8-guest cap is hard.",
-        "Safety: tourist-normal zones; Uber door-to-door at night; phones in front pockets on Ocean Drive at 3 AM.",
-      ],
-    },
-    {
       title: "Wildlife",
       bullets: [
-        "Alligators: guaranteed at Shark Valley — often on the bike path. Keep 15 ft, don't feed.",
-        "Manatees: late Oct is the start of season — Oleta kayak is the best shot; peak reliability is Dec–Feb.",
-        "Birds: fall migration peaking — bring binoculars Friday.",
-        "Marine: 83°F water; turtles, rays, nurse sharks if we snorkel.",
+        "**Alligators:** common at **Shark Valley**, often on the bike path. **Keep 15 ft**; don't feed.",
+        "**Manatees:** season starts **late October** — **Oleta kayak** is the best option; peak is Dec–Feb.",
+        "**Birds:** fall migration peaks in October — **binoculars** worth bringing.",
+        "**Marine:** **83°F water**; turtles, rays, nurse sharks possible while snorkeling.",
       ],
     },
   ],

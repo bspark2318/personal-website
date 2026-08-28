@@ -66,6 +66,12 @@ export function toCelsiusLabel(value: string): string {
     });
 }
 
+/** A photo with an attribution string, used by highlights and parks. */
+export interface CreditedPhoto {
+  src: string;
+  credit: string;
+}
+
 export interface Neighborhood {
   id: string;
   name: string;
@@ -76,9 +82,59 @@ export interface Neighborhood {
   mapsQuery: string;
 }
 
+export interface Park {
+  id: string;
+  name: string;
+  emoji: string;
+  tagline: string;
+  bullets: string[];
+  mapsQuery: string;
+  photos: CreditedPhoto[];
+}
+
 export interface InfoSection {
   title: string;
   bullets: string[];
+}
+
+export interface IntroHighlight {
+  text: string;
+  photo: CreditedPhoto;
+}
+
+export interface DateOption {
+  id: string;
+  label: string;
+}
+
+// Gate: first name identifies, last name is the password.
+// Full name is the identity key in the DB and API payloads.
+export interface CrewMember {
+  first: string;
+  last: string;
+}
+
+export const fullName = (m: CrewMember) => `${m.first} ${m.last}`;
+
+/** First name for a stored full-name key; falls back to the key itself. */
+export function firstNameOf(name: string, crew: CrewMember[]): string {
+  return crew.find((m) => fullName(m) === name)?.first ?? name;
+}
+
+// Both names must match a crew member (case-insensitive). Duplicate first
+// names are fine — the last name disambiguates. Returns the full-name key.
+export function matchCrew(
+  first: string,
+  last: string,
+  crew: CrewMember[]
+): string | null {
+  const qFirst = first.trim().toLowerCase();
+  const qLast = last.trim().toLowerCase();
+  if (!qFirst || !qLast) return null;
+  const member = crew.find(
+    (m) => m.first.toLowerCase() === qFirst && m.last.toLowerCase() === qLast
+  );
+  return member ? fullName(member) : null;
 }
 
 export interface Trip {
@@ -86,11 +142,13 @@ export interface Trip {
   title: string;
   dates: string;
   location: string;
-  crew: string[];
-  passcodeEnvKey: string;
-  intro: string[];
+  crew: CrewMember[];
+  /** Candidate date ranges; crew marks which ones work for them. */
+  dateOptions: DateOption[];
+  intro: IntroHighlight[];
   conditions: ConditionStat[];
   neighborhoods: Neighborhood[];
+  parks: Park[];
   food: { group: string; spots: FoodSpot[] }[];
   nightlife: { venues: Venue[]; rules: string[] };
   info: InfoSection[];
@@ -172,12 +230,23 @@ export interface VoteRow {
   vote: VoteValue;
 }
 
+export interface DatePrefRow {
+  optionId: string;
+  name: string;
+}
+
 export interface TripState {
   ins: string[];
   outCount: number;
   maybeCount: number;
   votes: Record<string, { up: number; down: number }>;
-  me: { rsvp: RsvpStatus | null; votes: Record<string, VoteValue> } | null;
+  /** optionId → names it works for. */
+  datePrefs: Record<string, string[]>;
+  me: {
+    rsvp: RsvpStatus | null;
+    votes: Record<string, VoteValue>;
+    dates: string[];
+  } | null;
 }
 
 // Anonymity contract (FR-006): only "in" RSVPs are named; everything else
@@ -185,6 +254,7 @@ export interface TripState {
 export function shapeState(
   rsvps: RsvpRow[],
   votes: VoteRow[],
+  datePrefs: DatePrefRow[],
   me: string | null
 ): TripState {
   const tallies: TripState["votes"] = {};
@@ -192,11 +262,16 @@ export function shapeState(
     const t = (tallies[v.activityId] ??= { up: 0, down: 0 });
     t[v.vote === "up" ? "up" : "down"] += 1;
   }
+  const prefs: TripState["datePrefs"] = {};
+  for (const p of datePrefs) {
+    (prefs[p.optionId] ??= []).push(p.name);
+  }
   return {
     ins: rsvps.filter((r) => r.status === "in").map((r) => r.name),
     outCount: rsvps.filter((r) => r.status === "out").length,
     maybeCount: rsvps.filter((r) => r.status === "maybe").length,
     votes: tallies,
+    datePrefs: prefs,
     me:
       me === null
         ? null
@@ -205,10 +280,9 @@ export function shapeState(
             votes: Object.fromEntries(
               votes.filter((v) => v.name === me).map((v) => [v.activityId, v.vote])
             ),
+            dates: datePrefs.filter((p) => p.name === me).map((p) => p.optionId),
           },
   };
 }
 
-export const TRIP_HEADER = "x-trip-password";
-export const storagePasscodeKey = (slug: string) => `trip-${slug}-passcode`;
 export const storageNameKey = (slug: string) => `trip-${slug}-name`;
