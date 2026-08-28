@@ -1,8 +1,11 @@
 "use client";
 
-import type { Trip } from "@/lib/trips";
+import { useState } from "react";
+import { toCelsiusLabel, type Trip } from "@/lib/trips";
 
 export default function OverviewTab({ trip }: { trip: Trip }) {
+  const [celsius, setCelsius] = useState(false);
+  const hasTemps = trip.conditions.some((c) => c.value.includes("°F"));
   return (
     <div className="space-y-10">
       <section>
@@ -18,7 +21,26 @@ export default function OverviewTab({ trip }: { trip: Trip }) {
       </section>
       {trip.conditions.length > 0 && (
         <section>
-          <h2 className="display mb-4 text-xl font-semibold">Mid–late October, Miami</h2>
+          <div className="mb-4 flex items-baseline justify-between gap-3">
+            <h2 className="display text-xl font-semibold">Mid–late October, Miami</h2>
+            {hasTemps && (
+              <div className="flex overflow-hidden rounded-full border border-card-border text-xs font-medium">
+                {(["F", "C"] as const).map((u) => (
+                  <button
+                    key={u}
+                    onClick={() => setCelsius(u === "C")}
+                    className={`px-2.5 py-1 ${
+                      (u === "C") === celsius
+                        ? "bg-foreground text-background"
+                        : "text-muted"
+                    }`}
+                  >
+                    °{u}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {trip.conditions.map((c) => (
               <div
@@ -29,7 +51,7 @@ export default function OverviewTab({ trip }: { trip: Trip }) {
                   {c.label}
                 </p>
                 <p className="display mt-1 text-2xl font-semibold tabular-nums">
-                  {c.value}
+                  {celsius ? toCelsiusLabel(c.value) : c.value}
                 </p>
                 {c.sub && <p className="mt-1 text-xs text-muted">{c.sub}</p>}
               </div>

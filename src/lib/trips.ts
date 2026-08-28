@@ -47,6 +47,16 @@ export interface ConditionStat {
   sub?: string;
 }
 
+// "84–87°F" → "29–31°C"; strings without °F pass through untouched.
+export function toCelsiusLabel(value: string): string {
+  if (!value.includes("°F")) return value;
+  return value
+    .replace(/(\d+)(–(\d+))?°F/, (_, a, _b, c) => {
+      const conv = (f: string) => Math.round(((Number(f) - 32) * 5) / 9);
+      return c ? `${conv(a)}–${conv(c)}°C` : `${conv(a)}°C`;
+    });
+}
+
 export interface InfoSection {
   title: string;
   bullets: string[];

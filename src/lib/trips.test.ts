@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   estimateCost,
   shapeState,
+  toCelsiusLabel,
   type CostItem,
   type RsvpRow,
   type VoteRow,
@@ -47,6 +48,15 @@ describe("estimateCost", () => {
       { id: "villa", label: "Villa", amount: 1000, kind: "fixed-split" },
     ];
     expect(estimateCost(items, 2, []).perPerson).toBe(500);
+  });
+});
+
+describe("toCelsiusLabel", () => {
+  it("converts single temps and ranges, passes through non-temps", () => {
+    expect(toCelsiusLabel("83°F")).toBe("28°C");
+    expect(toCelsiusLabel("84–87°F")).toBe("29–31°C");
+    expect(toCelsiusLabel("30–40%")).toBe("30–40%");
+    expect(toCelsiusLabel("~6:45 PM")).toBe("~6:45 PM");
   });
 });
 
