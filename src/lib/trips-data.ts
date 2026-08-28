@@ -215,6 +215,15 @@ const miami2026: Trip = {
   },
   info: [
     {
+      title: "The neighborhood — Buena Vista",
+      bullets: [
+        "Quiet residential pocket right next to the Design District — tree-lined streets, our own backyard + fire pit as pregame HQ.",
+        "Walkable: Design District (2 min) with the free ICA museum and the Fly's Eye Dome; Mandolin Aegean Bistro is a garden dinner a few blocks away.",
+        "Wynwood's bars and murals are 5–7 min away; South Beach 10–15 via I-195; MIA 12 min.",
+        "It's residential — Ubers run everywhere at night (~$10–20), and the backyard stays neighbor-friendly after midnight.",
+      ],
+    },
+    {
       title: "Pack right",
       bullets: [
         "Swimwear ×2, collared shirt + real shoes for clubs, sunscreen, dramamine for the boat, portable speaker.",
