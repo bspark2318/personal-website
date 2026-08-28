@@ -58,7 +58,7 @@
   - Files: `src/app/trips/[slug]/page.tsx`
   - Verify: dev server with DATABASE_URL unset — itinerary renders, voting UI shows disabled notice
 
-- [ ] **T14** — Quality gates + deploy: lint, tests, Vercel env (`TRIP_PASSWORD_MIAMI_2026`), smoke test prod link on phone
+- [x] **T14** — Quality gates + deploy: lint, tests, Vercel env (`TRIP_PASSWORD_MIAMI_2026`), smoke test prod link on phone
   - Files: none new
   - Verify: `npm run test` + `npm run lint` green; prod URL gated, RSVP round-trips on phone
 
