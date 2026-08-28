@@ -32,15 +32,15 @@ describe("estimateCost", () => {
     expect(food6.perPerson).toBe(food8.perPerson);
   });
 
-  it("toggling both club nights off drops the total by exactly those lines", () => {
+  it("toggling Saturday night off drops the total by exactly that line; Fri club stays fixed", () => {
     const on = estimateCost(miami.costItems, 8, []);
     const off = estimateCost(miami.costItems, 8, ["club-fri", "club-sat"]);
-    const clubTotal = on.lines
-      .filter((l) => l.id.startsWith("club-"))
-      .reduce((sum, l) => sum + l.perPerson, 0);
-    expect(clubTotal).toBeGreaterThan(0);
-    expect(off.perPerson).toBeCloseTo(on.perPerson - clubTotal, 5);
-    expect(off.lines.find((l) => l.id.startsWith("club-"))).toBeUndefined();
+    const satLine = on.lines.find((l) => l.id === "club-sat")!;
+    expect(satLine.perPerson).toBeGreaterThan(0);
+    expect(off.perPerson).toBeCloseTo(on.perPerson - satLine.perPerson, 5);
+    expect(off.lines.find((l) => l.id === "club-sat")).toBeUndefined();
+    // club-fri has no linked activity anymore — it can't be toggled off
+    expect(off.lines.find((l) => l.id === "club-fri")).toBeDefined();
   });
 
   it("splits fixed costs by headcount with no floor", () => {

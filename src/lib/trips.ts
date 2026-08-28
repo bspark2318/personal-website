@@ -11,6 +11,12 @@ export interface Activity {
   emoji?: string;
   /** Loose timing hint, e.g. "Sat morning" — not a schedule. */
   when?: string;
+  /** Short logistics chips, e.g. "4 hrs", "~$145/pp". */
+  facts?: string[];
+  /** Ticket route line, e.g. "MIA · Biscayne Bay". */
+  route?: string;
+  /** Ticket stub price, e.g. "$145". */
+  price?: string;
   blurb: string;
   details: string[];
   votable: boolean;

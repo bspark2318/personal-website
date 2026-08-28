@@ -1,8 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import VoteButton from "@/components/trips/VoteButton";
 import type { Activity, TripState, VoteValue } from "@/lib/trips";
+
+const URL_RE = /\b((?:https?:\/\/)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|net|gov)(?:\/[^\s,;)]*)?)/gi;
+const BOLD_RE = /\*\*([^*]+)\*\*/g;
+
+/** Renders **bold** spans and turns bare domains into links. */
+function rich(text: string) {
+  const parts: ReactNode[] = [];
+  let key = 0;
+  const pushLinkified = (seg: string) => {
+    let last = 0;
+    for (const m of seg.matchAll(URL_RE)) {
+      const raw = m[1];
+      if (m.index > last) parts.push(seg.slice(last, m.index));
+      parts.push(
+        <a
+          key={key++}
+          href={raw.startsWith("http") ? raw : `https://${raw}`}
+          target="_blank"
+          rel="noreferrer"
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          {raw}
+        </a>
+      );
+      last = m.index + raw.length;
+    }
+    parts.push(seg.slice(last));
+  };
+  let last = 0;
+  for (const m of text.matchAll(BOLD_RE)) {
+    if (m.index > last) pushLinkified(text.slice(last, m.index));
+    parts.push(
+      <strong key={key++} className="font-semibold">
+        {m[1]}
+      </strong>
+    );
+    last = m.index + m[0].length;
+  }
+  pushLinkified(text.slice(last));
+  return parts;
+}
+
+const notch =
+  "absolute -right-[7px] z-10 h-3.5 w-3.5 rounded-full border border-card-border bg-background";
 
 export default function ActivityCard({
   activity,
@@ -18,46 +62,75 @@ export default function ActivityCard({
   const [open, setOpen] = useState(false);
 
   return (
-    <section className="rounded-2xl border border-card-border p-5">
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 className="display text-xl font-semibold">
-          {activity.emoji && <span className="mr-2">{activity.emoji}</span>}
-          {activity.title}
-        </h2>
-        {activity.when && (
-          <span className="shrink-0 text-xs uppercase tracking-[0.15em] text-muted">
-            {activity.when}
-          </span>
-        )}
+    <section className="drop-shadow-sm">
+      <div
+        className="grid cursor-pointer grid-cols-[1fr_124px]"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <div
+          className={`relative border border-r-0 border-card-border bg-white p-4 pl-5 ${
+            open ? "rounded-tl-xl border-b-0" : "rounded-l-xl"
+          }`}
+        >
+          <span className={`${notch} -top-2`} />
+          {!open && <span className={`${notch} -bottom-2`} />}
+          {activity.route && (
+            <p className="text-[11px] uppercase tracking-[0.16em] text-muted">
+              {activity.route}
+            </p>
+          )}
+          <h2 className="display mt-0.5 text-[17px] font-semibold">
+            {activity.emoji && <span className="mr-1.5">{activity.emoji}</span>}
+            {activity.title}
+          </h2>
+          {activity.facts && activity.facts.length > 0 && (
+            <p className="mt-0.5 text-[13px] text-muted">
+              {activity.facts.join(" · ")}
+            </p>
+          )}
+        </div>
+        <div
+          className={`flex flex-col items-center justify-center gap-1 border border-card-border bg-white p-2 text-center [border-left-style:dashed] [border-left-width:1.5px] ${
+            open ? "rounded-tr-xl border-b-0" : "rounded-r-xl"
+          }`}
+        >
+          {activity.when && (
+            <p className="text-[11px] uppercase tracking-[0.1em] text-muted">
+              {activity.when}
+            </p>
+          )}
+          {activity.price && (
+            <p className="text-base font-semibold">{activity.price}</p>
+          )}
+          {activity.votable && (
+            <div onClick={(e) => e.stopPropagation()}>
+              <VoteButton
+                activityId={activity.id}
+                state={state}
+                canVote={canVote}
+                onVote={onVote}
+              />
+            </div>
+          )}
+          <p className="text-[11px] text-muted">
+            details {open ? "▴" : "▾"}
+          </p>
+        </div>
       </div>
-      <p className="mt-2 text-[15px] leading-relaxed">{activity.blurb}</p>
-      {activity.details.length > 0 && (
-        <>
-          <button
-            onClick={() => setOpen((o) => !o)}
-            className="mt-2 text-sm text-muted underline-offset-2 hover:underline"
-          >
-            {open ? "Less" : "Details"}
-          </button>
-          {open && (
+      {open && (
+        <div className="rounded-b-xl border border-card-border bg-white px-5 pb-4 pt-3 [border-top-style:dashed] [border-top-width:1.5px]">
+          <p className="text-[15px] leading-relaxed">{rich(activity.blurb)}</p>
+          {activity.details.length > 0 && (
             <ul className="mt-2 space-y-2">
               {activity.details.map((d) => (
                 <li key={d} className="flex gap-2.5 text-sm leading-relaxed text-muted">
                   <span className="mt-[2px] shrink-0">·</span>
-                  <span>{d}</span>
+                  <span>{rich(d)}</span>
                 </li>
               ))}
             </ul>
           )}
-        </>
-      )}
-      {activity.votable && (
-        <VoteButton
-          activityId={activity.id}
-          state={state}
-          canVote={canVote}
-          onVote={onVote}
-        />
+        </div>
       )}
     </section>
   );

@@ -1,6 +1,5 @@
 import { neon } from "@neondatabase/serverless";
 import {
-  TRIP_HEADER,
   type RsvpRow,
   type RsvpStatus,
   type Trip,
@@ -14,10 +13,9 @@ function getSql() {
   return neon(url);
 }
 
-export function checkTripPassword(req: Request, trip: Trip): boolean {
-  const expected = process.env[trip.passcodeEnvKey];
-  if (!expected) return false;
-  return req.headers.get(TRIP_HEADER) === expected;
+// Passcode gate disabled for now — accepts every request.
+export function checkTripPassword(_req: Request, _trip: Trip): boolean {
+  return true;
 }
 
 export async function ensureTables() {

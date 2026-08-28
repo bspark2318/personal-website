@@ -20,7 +20,7 @@ export default function VoteButton({
     <button
       disabled={!canVote}
       onClick={() => onVote(activityId, mine === vote ? null : vote)}
-      className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors disabled:opacity-40 ${
+      className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[13px] transition-colors disabled:opacity-40 ${
         mine === vote
           ? "border-foreground bg-foreground text-background"
           : "border-card-border text-muted hover:border-card-border-hover"
@@ -32,7 +32,7 @@ export default function VoteButton({
   );
 
   return (
-    <div className="mt-2 flex gap-2">
+    <div className="flex gap-1.5">
       {button("up", "👍", tally.up)}
       {button("down", "👎", tally.down)}
     </div>

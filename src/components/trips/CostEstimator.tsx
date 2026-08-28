@@ -1,14 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { estimateCost, type Trip } from "@/lib/trips";
+import { useEffect, useState } from "react";
+import { estimateCost, type Trip, type TripState } from "@/lib/trips";
 
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
-export default function CostEstimator({ trip }: { trip: Trip }) {
+export default function CostEstimator({
+  trip,
+  state,
+}: {
+  trip: Trip;
+  state: TripState | null;
+}) {
   const [headcount, setHeadcount] = useState(trip.crew.length);
   const [off, setOff] = useState<string[]>([]);
+
+  // My 👎 votes drop their cost lines; manual toggles still override after.
+  const myVotes = state?.me?.votes;
+  useEffect(() => {
+    if (!myVotes) return;
+    setOff(
+      trip.activities
+        .filter((a) => myVotes[a.id] === "down")
+        .filter((a) => trip.costItems.some((c) => c.activityId === a.id))
+        .map((a) => a.id)
+    );
+  }, [myVotes, trip]);
 
   const { perPerson, lines } = estimateCost(trip.costItems, headcount, off);
   const toggle = (id: string) =>
@@ -76,6 +94,11 @@ export default function CostEstimator({ trip }: { trip: Trip }) {
               );
             })}
         </div>
+        {myVotes && (
+          <p className="mt-2 text-xs text-muted">
+            Synced to your votes — a 👎 on the Activities tab drops that line.
+          </p>
+        )}
       </section>
 
       <section>

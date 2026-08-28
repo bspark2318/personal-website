@@ -8,7 +8,6 @@ import CostEstimator from "@/components/trips/CostEstimator";
 import FoodTab from "@/components/trips/FoodTab";
 import NightlifeTab from "@/components/trips/NightlifeTab";
 import OverviewTab from "@/components/trips/OverviewTab";
-import PasscodeGate from "@/components/trips/PasscodeGate";
 import TabBar from "@/components/trips/TabBar";
 import RsvpPanel from "@/components/trips/RsvpPanel";
 import {
@@ -30,7 +29,7 @@ const TABS = [
   { id: "rsvp", label: "RSVP" },
 ];
 
-type Phase = "loading" | "locked" | "open";
+type Phase = "loading" | "open";
 
 export default function TripPage({
   params,
@@ -41,7 +40,6 @@ export default function TripPage({
   const trip = TRIPS[slug];
 
   const [phase, setPhase] = useState<Phase>("loading");
-  const [gateError, setGateError] = useState<string | null>(null);
   const [myName, setMyName] = useState<string | null>(null);
   const [state, setState] = useState<TripState | null>(null);
   const [dbDown, setDbDown] = useState(false);
@@ -60,13 +58,6 @@ export default function TripPage({
         setPhase("open");
         return;
       }
-      if (res.status === 401) {
-        localStorage.removeItem(storagePasscodeKey(slug));
-        setGateError("Wrong passcode");
-        setPhase("locked");
-        return;
-      }
-      localStorage.setItem(storagePasscodeKey(slug), passcode);
       if (res.ok) {
         setState(await res.json());
         setDbDown(false);
@@ -83,9 +74,7 @@ export default function TripPage({
     queueMicrotask(() => {
       const name = localStorage.getItem(storageNameKey(slug));
       if (name) setMyName(name);
-      const passcode = localStorage.getItem(storagePasscodeKey(slug));
-      if (passcode) void tryUnlock(passcode, name);
-      else setPhase("locked");
+      void tryUnlock(localStorage.getItem(storagePasscodeKey(slug)) ?? "", name);
     });
   }, [slug, trip, tryUnlock]);
 
@@ -139,21 +128,6 @@ export default function TripPage({
     );
   }
 
-  if (phase === "locked") {
-    return (
-      <div className="trip-light min-h-screen">
-        <PasscodeGate
-          tripTitle={trip.title}
-          error={gateError}
-          onSubmit={(p) => {
-            setGateError(null);
-            void tryUnlock(p, myName);
-          }}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="trip-light min-h-screen">
       <main className="mx-auto max-w-2xl px-5 pb-16 pt-10">
@@ -202,7 +176,7 @@ export default function TripPage({
           )}
           {tab === "food" && <FoodTab trip={trip} />}
           {tab === "night" && <NightlifeTab trip={trip} />}
-          {tab === "costs" && <CostEstimator trip={trip} />}
+          {tab === "costs" && <CostEstimator trip={trip} state={state} />}
           {tab === "rsvp" && (
             <RsvpPanel
               crew={trip.crew}
