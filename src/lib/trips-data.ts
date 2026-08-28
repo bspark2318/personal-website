@@ -26,13 +26,15 @@ const MIAMI_COSTS: CostItem[] = [
   { id: "house", label: "Airbnb (3 nights)", amount: 1600, kind: "fixed-split" },
   { id: "boat", label: "Boat day + tip", amount: 1160, kind: "fixed-split", activityId: "boat" },
   { id: "everglades", label: "Everglades entry + bike", amount: 35, kind: "per-person", activityId: "everglades" },
-  { id: "rental", label: "Rental car share (Everglades day)", amount: 25, kind: "per-person", activityId: "everglades" },
+  // 2 midsize/SUV rentals, Thu–Sun (~4 days): ~$55/day base + ~30% taxes/fees
+  // + $2/day FL surcharge ≈ $72/day/car → ~$580, + gas/tolls ~$60 + garages ~$80.
+  { id: "cars", label: "2 rental cars, Thu–Sun (taxes, gas, tolls, parking)", amount: 720, kind: "fixed-split", rangeLabel: "$650–800 total" },
   { id: "oleta", label: "Oleta entry + kayak", amount: 35, kind: "per-person", activityId: "oleta" },
   { id: "club-fri", label: "Friday club night (GA + drinks)", amount: 187, kind: "per-person", activityId: "club-fri", rangeLabel: "$150–225" },
   { id: "club-halloween", label: "Halloween Saturday (GA + drinks)", amount: 188, kind: "per-person", activityId: "club-halloween", rangeLabel: "$150–225" },
   { id: "food", label: "Food (3 days)", amount: 190, kind: "per-person", rangeLabel: "$150–240" },
   { id: "joes", label: "Joe's Stone Crab", amount: 60, kind: "per-person", activityId: "joes", rangeLabel: "$40–80" },
-  { id: "ubers", label: "Ubers", amount: 60, kind: "per-person" },
+  { id: "ubers", label: "Ubers (club nights — nobody drives)", amount: 40, kind: "per-person" },
 ];
 
 const miami2026: Trip = {
@@ -49,7 +51,7 @@ const miami2026: Trip = {
     "Stone crab season opened Oct 15 — we're eating claws.",
     "Sailfish season starting + fall mullet run = prime fishing window.",
     "Sat Oct 24 is Halloween Saturday — Wynwood becomes Miami's biggest street costume party.",
-    "Getting around: Uber everything (~$10–20/ride); 10–15 min to South Beach, 12 min to MIA.",
+    "Getting around: 2 rental cars for the weekend (Everglades, beach, Oleta) + Ubers for club nights (~$10–20/ride); 10–15 min to South Beach, 12 min to MIA.",
   ],
   days: [
     {
@@ -69,7 +71,7 @@ const miami2026: Trip = {
       label: "FRI 10/23",
       title: "Everglades + first club night",
       entries: [
-        { time: "7:30 AM", text: "Leave the house. Drive west on Tamiami Trail (~50 min) — rental cars for the day.", activityId: "everglades" },
+        { time: "7:30 AM", text: "Leave the house. Both cars west on Tamiami Trail (~50 min).", activityId: "everglades" },
         { time: "8:30 AM", text: "Shark Valley, Everglades NP. Bikes $27/day (reserve: sharkvalleytramtours.com), ~$35/vehicle entry. 15-mile flat loop, 2–3 hrs: gators on the path, 45-ft observation tower halfway. Alt: 2-hr guided tram, or airboat on the way back (~$30–40/pp).", activityId: "everglades" },
         { time: "12:30 PM", text: "Lunch on the drive back — La Camaronera: standing-room fried shrimp counter, pan con minuta." },
         { time: "2–6 PM", text: "Recover at the house. Nap. Hydrate. Tonight is long." },
