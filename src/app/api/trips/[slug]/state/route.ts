@@ -1,6 +1,6 @@
 import { shapeState } from "@/lib/trips";
 import { TRIPS } from "@/lib/trips-data";
-import { checkTripPassword, readRows } from "@/lib/trips-db";
+import { readRows } from "@/lib/trips-db";
 
 export async function GET(
   req: Request,
@@ -11,11 +11,7 @@ export async function GET(
   if (!trip) {
     return Response.json({ error: "unknown trip" }, { status: 404 });
   }
-  if (!checkTripPassword(req, trip)) {
-    return Response.json({ error: "unauthorized" }, { status: 401 });
-  }
-
   const me = new URL(req.url).searchParams.get("me");
-  const { rsvps, votes } = await readRows(slug);
-  return Response.json(shapeState(rsvps, votes, me));
+  const { rsvps, votes, datePrefs } = await readRows(slug);
+  return Response.json(shapeState(rsvps, votes, datePrefs, me));
 }

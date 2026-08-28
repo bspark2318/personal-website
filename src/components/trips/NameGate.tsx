@@ -2,17 +2,20 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { matchCrew, type CrewMember } from "@/lib/trips";
 
-export default function PasscodeGate({
+export default function NameGate({
   tripTitle,
-  error,
-  onSubmit,
+  crew,
+  onUnlock,
 }: {
   tripTitle: string;
-  error: string | null;
-  onSubmit: (passcode: string) => void;
+  crew: CrewMember[];
+  onUnlock: (name: string) => void;
 }) {
-  const [value, setValue] = useState("");
+  const [first, setFirst] = useState("");
+  const [last, setLast] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
@@ -29,17 +32,31 @@ export default function PasscodeGate({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (value.trim()) onSubmit(value.trim());
+            const name = matchCrew(first, last, crew);
+            if (name) onUnlock(name);
+            else setError("No match — check both names");
           }}
           className="flex flex-col gap-3"
         >
           <input
-            type="password"
-            inputMode="text"
+            type="text"
             autoFocus
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Passcode"
+            value={first}
+            onChange={(e) => {
+              setFirst(e.target.value);
+              setError(null);
+            }}
+            placeholder="First name"
+            className="rounded-xl border border-card-border bg-transparent px-4 py-3 text-center outline-none focus:border-card-border-hover"
+          />
+          <input
+            type="password"
+            value={last}
+            onChange={(e) => {
+              setLast(e.target.value);
+              setError(null);
+            }}
+            placeholder="Last name"
             className="rounded-xl border border-card-border bg-transparent px-4 py-3 text-center outline-none focus:border-card-border-hover"
           />
           <button

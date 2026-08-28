@@ -1,15 +1,15 @@
-import type { Activity, CostItem, Trip } from "./trips";
+import type { Activity, CostItem, CrewMember, Trip } from "./trips";
 
-// TODO(bspark): replace placeholder crew names with the real 8.
-const MIAMI_CREW = [
-  "Shai",
-  "Guest 2",
-  "Guest 3",
-  "Guest 4",
-  "Guest 5",
-  "Guest 6",
-  "Guest 7",
-  "Guest 8",
+// TODO(bspark): replace remaining placeholder crew with the real names.
+const MIAMI_CREW: CrewMember[] = [
+  { first: "BumSu", last: "Park" },
+  { first: "Guest 2", last: "Two" },
+  { first: "Guest 3", last: "Three" },
+  { first: "Guest 4", last: "Four" },
+  { first: "Guest 5", last: "Five" },
+  { first: "Guest 6", last: "Six" },
+  { first: "Guest 7", last: "Seven" },
+  { first: "Guest 8", last: "Eight" },
 ];
 
 const MIAMI_ACTIVITIES: Activity[] = [
@@ -136,10 +136,14 @@ const MIAMI_COSTS: CostItem[] = [
 const miami2026: Trip = {
   slug: "miami-2026",
   title: "Miami Crew Trip",
-  dates: "Oct 22–25, 2026",
+  dates: "Oct 2026 · weekend TBD",
   location: "Miami — hood TBD",
   crew: MIAMI_CREW,
-  passcodeEnvKey: "TRIP_PASSWORD_MIAMI_2026",
+  dateOptions: [
+    { id: "oct-8", label: "Oct 8–11 (Thu–Sun)" },
+    { id: "oct-15", label: "Oct 15–18 (Thu–Sun)" },
+    { id: "oct-22", label: "Oct 22–25 (Thu–Sun)" },
+  ],
   intro: [
     {
       text: "**Private party boat** — anchored at **Haulover Sandbar**, 4 hours, BYOB, **83°F water**, **snorkeling** off the boat, skyline ride back.",
