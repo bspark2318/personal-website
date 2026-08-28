@@ -208,15 +208,6 @@ const miami2026: Trip = {
       ],
     },
     {
-      title: "Logistics",
-      bullets: [
-        "Check-in 4 PM Thu at Shai's Airbnb. First stop: grocery + booze run, Publix on Biscayne.",
-        "Checkout 11 AM Sun — bags in cars by 8:30 if we're doing Oleta.",
-        "MIA is 12 min from the house; flight-dependent Sunday filler: Mid-Beach, Design District stroll (free ICA museum), brunch.",
-        "Only fixed point of the whole trip: Halloween Saturday night. Everything else floats.",
-      ],
-    },
-    {
       title: "The boat",
       bullets: [
         "Plan A — private party boat: captained 30–40ft, 4 hrs, BYOB, sandbar + skyline. $600–1,200 + 15–20% tip → $95–185/head. Book: GetMyBoat / Boatsetter / Aqua.",
