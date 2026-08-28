@@ -141,6 +141,14 @@ const miami2026: Trip = {
     "Kayaking mangrove tunnels with a real shot at manatees.",
     "Backyard fire pit pregames at our own house, 5 min from everything.",
   ],
+  conditions: [
+    { label: "Day high", value: "85°F", sub: "sun hits different" },
+    { label: "Night low", value: "75°F", sub: "shorts at 3 AM, fine" },
+    { label: "Ocean", value: "83°F", sub: "bathwater — no wetsuit" },
+    { label: "Rain", value: "~30%", sub: "brief PM shower, moves on" },
+    { label: "Sunset", value: "6:40 PM", sub: "golden hour on the water" },
+    { label: "Hurricane risk", value: "Low", sub: "past Sep 10 peak; check NHC week-of" },
+  ],
   food: [
     {
       group: "Cuban / Little Havana",
@@ -198,10 +206,9 @@ const miami2026: Trip = {
   },
   info: [
     {
-      title: "Practical",
+      title: "Pack right",
       bullets: [
-        "Weather: 85°F days, brief PM shower possible. Hurricane risk low but nonzero — everything is refundable on purpose; check nhc.noaa.gov week-of.",
-        "Pack: costume (non-negotiable), swimwear ×2, collared shirt + real shoes, sunscreen, dramamine for the boat, portable speaker.",
+        "Costume (non-negotiable), swimwear ×2, collared shirt + real shoes for clubs, sunscreen, dramamine for the boat, portable speaker.",
         "House rules: exterior cameras exist; keep the backyard neighbor-friendly after midnight; 8-guest cap is hard.",
         "Safety: tourist-normal zones; Uber door-to-door at night; phones in front pockets on Ocean Drive at 3 AM.",
         "Money: boat and table get Venmo'd within 24 hrs, no ghosts.",

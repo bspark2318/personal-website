@@ -41,6 +41,12 @@ export interface Venue {
   notes: string;
 }
 
+export interface ConditionStat {
+  label: string;
+  value: string;
+  sub?: string;
+}
+
 export interface InfoSection {
   title: string;
   bullets: string[];
@@ -54,6 +60,7 @@ export interface Trip {
   crew: string[];
   passcodeEnvKey: string;
   intro: string[];
+  conditions: ConditionStat[];
   food: { group: string; spots: FoodSpot[] }[];
   nightlife: { venues: Venue[]; rules: string[] };
   info: InfoSection[];

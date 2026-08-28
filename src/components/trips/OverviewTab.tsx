@@ -16,6 +16,27 @@ export default function OverviewTab({ trip }: { trip: Trip }) {
           ))}
         </ul>
       </section>
+      {trip.conditions.length > 0 && (
+        <section>
+          <h2 className="display mb-4 text-xl font-semibold">Late October, Miami</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {trip.conditions.map((c) => (
+              <div
+                key={c.label}
+                className="rounded-2xl border border-card-border p-4"
+              >
+                <p className="text-[11px] uppercase tracking-[0.15em] text-muted">
+                  {c.label}
+                </p>
+                <p className="display mt-1 text-2xl font-semibold tabular-nums">
+                  {c.value}
+                </p>
+                {c.sub && <p className="mt-1 text-xs text-muted">{c.sub}</p>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       {trip.info.map((section) => (
         <section key={section.title}>
           <h2 className="display mb-4 text-xl font-semibold">{section.title}</h2>
