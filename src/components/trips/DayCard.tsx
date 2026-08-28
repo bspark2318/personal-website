@@ -1,5 +1,6 @@
 "use client";
 
+import VoteButton from "@/components/trips/VoteButton";
 import type { TripDay, TripState, VoteValue } from "@/lib/trips";
 
 export default function DayCard({
@@ -13,9 +14,6 @@ export default function DayCard({
   canVote: boolean;
   onVote: (activityId: string, vote: VoteValue | null) => void;
 }) {
-  void state;
-  void canVote;
-  void onVote;
   return (
     <section className="rounded-2xl border border-card-border p-5">
       <p className="text-xs uppercase tracking-[0.25em] text-muted">{day.label}</p>
@@ -28,6 +26,14 @@ export default function DayCard({
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-[15px] leading-relaxed">{entry.text}</p>
+              {entry.activityId && (
+                <VoteButton
+                  activityId={entry.activityId}
+                  state={state}
+                  canVote={canVote}
+                  onVote={onVote}
+                />
+              )}
             </div>
           </li>
         ))}
