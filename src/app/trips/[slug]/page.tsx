@@ -3,7 +3,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { notFound } from "next/navigation";
 import { use, useCallback, useEffect, useState } from "react";
+import DaysTab from "@/components/trips/DaysTab";
+import FoodTab from "@/components/trips/FoodTab";
 import NamePicker from "@/components/trips/NamePicker";
+import NightlifeTab from "@/components/trips/NightlifeTab";
+import OverviewTab from "@/components/trips/OverviewTab";
 import PasscodeGate from "@/components/trips/PasscodeGate";
 import TabBar from "@/components/trips/TabBar";
 import {
@@ -141,10 +145,17 @@ export default function TripPage({
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.15 }}
         >
-          {tab === "overview" && <div className="text-muted">Overview soon.</div>}
-          {tab === "days" && <div className="text-muted">Days soon.</div>}
-          {tab === "food" && <div className="text-muted">Food soon.</div>}
-          {tab === "night" && <div className="text-muted">Nightlife soon.</div>}
+          {tab === "overview" && <OverviewTab trip={trip} />}
+          {tab === "days" && (
+            <DaysTab
+              trip={trip}
+              state={state}
+              canVote={Boolean(myName) && !dbDown}
+              onVote={() => {}}
+            />
+          )}
+          {tab === "food" && <FoodTab trip={trip} />}
+          {tab === "night" && <NightlifeTab trip={trip} />}
           {tab === "costs" && <div className="text-muted">Costs soon.</div>}
           {tab === "rsvp" && <div className="text-muted">RSVP soon.</div>}
         </motion.div>

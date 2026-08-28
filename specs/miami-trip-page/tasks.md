@@ -38,7 +38,7 @@
   - Files: `src/app/trips/[slug]/page.tsx`, `src/components/trips/{PasscodeGate,NamePicker,TabBar}.tsx`
   - Verify: dev server — wrong passcode shows gate only; correct passcode + name persist across reload; tabs switch
 
-- [ ] **T09** — Content tabs: Overview / Days / Food / Nightlife rendering from trip data, Apple-style, mobile-first (FR-001, FR-008; AC-8)
+- [x] **T09** — Content tabs: Overview / Days / Food / Nightlife rendering from trip data, Apple-style, mobile-first (FR-001, FR-008; AC-8)
   - Files: `src/components/trips/{OverviewTab,DaysTab,FoodTab,NightlifeTab,DayCard}.tsx`
   - Verify: iPhone-width DevTools — every tab readable, zero horizontal scroll
 
