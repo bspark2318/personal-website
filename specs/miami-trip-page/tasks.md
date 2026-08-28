@@ -26,7 +26,7 @@
   - Files: `src/lib/trips-data.ts`
   - Verify: `npx tsc --noEmit`; cost items sum matches budget table §7
 
-- [ ] **T06** — DB layer: ensure `trip_rsvps` + `trip_votes` (slug-scoped PKs), upsert/delete helpers, state read (FR-007)
+- [x] **T06** — DB layer: ensure `trip_rsvps` + `trip_votes` (slug-scoped PKs), upsert/delete helpers, state read (FR-007)
   - Files: `src/lib/trips-db.ts`
   - Verify: scratch script against dev DATABASE_URL: upsert rsvp+vote, read back, toggle vote to null deletes row
 
