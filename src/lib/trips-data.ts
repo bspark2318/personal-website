@@ -1,8 +1,8 @@
 import type { Activity, CostItem, CrewMember, Trip } from "./trips";
 
-// TODO(bspark): replace placeholder crew with the real 8 (first + last).
+// TODO(bspark): replace remaining placeholder crew with the real names.
 const MIAMI_CREW: CrewMember[] = [
-  { first: "Guest 1", last: "One" },
+  { first: "BumSu", last: "Park" },
   { first: "Guest 2", last: "Two" },
   { first: "Guest 3", last: "Three" },
   { first: "Guest 4", last: "Four" },
