@@ -198,6 +198,16 @@ const miami2026: Trip = {
   },
   info: [
     {
+      title: "Practical",
+      bullets: [
+        "Weather: 85°F days, brief PM shower possible. Hurricane risk low but nonzero — everything is refundable on purpose; check nhc.noaa.gov week-of.",
+        "Pack: costume (non-negotiable), swimwear ×2, collared shirt + real shoes, sunscreen, dramamine for the boat, portable speaker.",
+        "House rules: exterior cameras exist; keep the backyard neighbor-friendly after midnight; 8-guest cap is hard.",
+        "Safety: tourist-normal zones; Uber door-to-door at night; phones in front pockets on Ocean Drive at 3 AM.",
+        "Money: boat and table get Venmo'd within 24 hrs, no ghosts.",
+      ],
+    },
+    {
       title: "Logistics",
       bullets: [
         "Check-in 4 PM Thu at Shai's Airbnb. First stop: grocery + booze run, Publix on Biscayne.",
@@ -222,27 +232,6 @@ const miami2026: Trip = {
         "Manatees: late Oct is the start of season — Oleta kayak is the best shot; peak reliability is Dec–Feb.",
         "Birds: fall migration peaking — bring binoculars Friday.",
         "Marine: 83°F water; turtles, rays, nurse sharks if we snorkel.",
-      ],
-    },
-    {
-      title: "Book ahead (in order of urgency)",
-      bullets: [
-        "1. Saturday Halloween club tickets — sell out earliest.",
-        "2. Boat — free-cancellation listing.",
-        "3. KYU reservation (Resy) — Friday 8 PM for 8.",
-        "4. Shark Valley bikes — reserve online.",
-        "5. Rental cars for Friday.",
-        "6. Group Venmo/Splitwise before the trip.",
-      ],
-    },
-    {
-      title: "Practical",
-      bullets: [
-        "Weather: 85°F days, brief PM shower possible. Hurricane risk low but nonzero — everything is refundable on purpose; check nhc.noaa.gov week-of.",
-        "Pack: costume (non-negotiable), swimwear ×2, collared shirt + real shoes, sunscreen, dramamine for the boat, portable speaker.",
-        "House rules: exterior cameras exist; keep the backyard neighbor-friendly after midnight; 8-guest cap is hard.",
-        "Safety: tourist-normal zones; Uber door-to-door at night; phones in front pockets on Ocean Drive at 3 AM.",
-        "Money: boat and table get Venmo'd within 24 hrs, no ghosts.",
       ],
     },
   ],
