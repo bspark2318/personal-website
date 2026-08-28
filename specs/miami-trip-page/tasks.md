@@ -34,7 +34,7 @@
   - Files: `src/app/api/trips/[slug]/{state,rsvp,vote}/route.ts`
   - Verify: `curl` matrix: no/wrong passcode → 401; bad slug → 404; bad body → 400; happy path mutates then `state` reflects it
 
-- [ ] **T08** — Page shell: `/trips/[slug]` client page — passcode gate (localStorage, showroom pattern), name picker, tab bar, framer-motion transitions; loading/empty/error states (FR-001a, FR-002, FR-003, FR-008; AC-1, AC-2)
+- [x] **T08** — Page shell: `/trips/[slug]` client page — passcode gate (localStorage, showroom pattern), name picker, tab bar, framer-motion transitions; loading/empty/error states (FR-001a, FR-002, FR-003, FR-008; AC-1, AC-2)
   - Files: `src/app/trips/[slug]/page.tsx`, `src/components/trips/{PasscodeGate,NamePicker,TabBar}.tsx`
   - Verify: dev server — wrong passcode shows gate only; correct passcode + name persist across reload; tabs switch
 
