@@ -34,7 +34,7 @@ describe("estimateCost", () => {
 
   it("toggling both club nights off drops the total by exactly those lines", () => {
     const on = estimateCost(miami.costItems, 8, []);
-    const off = estimateCost(miami.costItems, 8, ["club-fri", "club-halloween"]);
+    const off = estimateCost(miami.costItems, 8, ["club-fri", "club-sat"]);
     const clubTotal = on.lines
       .filter((l) => l.id.startsWith("club-"))
       .reduce((sum, l) => sum + l.perPerson, 0);
