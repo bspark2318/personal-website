@@ -1,9 +1,8 @@
 import { neon } from "@neondatabase/serverless";
 import {
-  TRIP_HEADER,
+  type DatePrefRow,
   type RsvpRow,
   type RsvpStatus,
-  type Trip,
   type VoteRow,
   type VoteValue,
 } from "./trips";
@@ -14,13 +13,18 @@ function getSql() {
   return neon(url);
 }
 
-export function checkTripPassword(req: Request, trip: Trip): boolean {
-  const expected = process.env[trip.passcodeEnvKey];
-  if (!expected) return false;
-  return req.headers.get(TRIP_HEADER) === expected;
+// DDL runs at most once per process; the endpoints are unauthenticated, so
+// per-request CREATE TABLE round-trips would be free cost amplification.
+let tablesReady: Promise<void> | null = null;
+
+export function ensureTables(): Promise<void> {
+  return (tablesReady ??= createTables().catch((e) => {
+    tablesReady = null;
+    throw e;
+  }));
 }
 
-export async function ensureTables() {
+async function createTables() {
   const sql = getSql();
   await sql`
     CREATE TABLE IF NOT EXISTS trip_rsvps (
@@ -39,6 +43,15 @@ export async function ensureTables() {
       vote TEXT NOT NULL,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       PRIMARY KEY (trip_slug, activity_id, name)
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS trip_date_prefs (
+      trip_slug TEXT NOT NULL,
+      option_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      PRIMARY KEY (trip_slug, option_id, name)
     )
   `;
 }
@@ -76,14 +89,37 @@ export async function setVote(
   }
 }
 
-export async function readRows(
-  slug: string
-): Promise<{ rsvps: RsvpRow[]; votes: VoteRow[] }> {
+export async function setDatePref(
+  slug: string,
+  optionId: string,
+  name: string,
+  works: boolean
+) {
   const sql = getSql();
   await ensureTables();
-  const [rsvps, votes] = await Promise.all([
+  if (works) {
+    await sql`
+      INSERT INTO trip_date_prefs (trip_slug, option_id, name)
+      VALUES (${slug}, ${optionId}, ${name})
+      ON CONFLICT (trip_slug, option_id, name) DO NOTHING
+    `;
+  } else {
+    await sql`
+      DELETE FROM trip_date_prefs
+      WHERE trip_slug = ${slug} AND option_id = ${optionId} AND name = ${name}
+    `;
+  }
+}
+
+export async function readRows(
+  slug: string
+): Promise<{ rsvps: RsvpRow[]; votes: VoteRow[]; datePrefs: DatePrefRow[] }> {
+  const sql = getSql();
+  await ensureTables();
+  const [rsvps, votes, datePrefs] = await Promise.all([
     sql`SELECT name, status FROM trip_rsvps WHERE trip_slug = ${slug}`,
     sql`SELECT activity_id, name, vote FROM trip_votes WHERE trip_slug = ${slug}`,
+    sql`SELECT option_id, name FROM trip_date_prefs WHERE trip_slug = ${slug}`,
   ]);
   return {
     rsvps: rsvps.map((r) => ({ name: r.name as string, status: r.status as RsvpStatus })),
@@ -91,6 +127,10 @@ export async function readRows(
       activityId: v.activity_id as string,
       name: v.name as string,
       vote: v.vote as VoteValue,
+    })),
+    datePrefs: datePrefs.map((p) => ({
+      optionId: p.option_id as string,
+      name: p.name as string,
     })),
   };
 }
