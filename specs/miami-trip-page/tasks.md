@@ -30,7 +30,7 @@
   - Files: `src/lib/trips-db.ts`
   - Verify: scratch script against dev DATABASE_URL: upsert rsvp+vote, read back, toggle vote to null deletes row
 
-- [ ] **T07** — API routes: `GET state`, `POST rsvp`, `POST vote` under `/api/trips/[slug]/`, passcode header check, input validation, 404 unknown slug (FR-002, FR-004, FR-005)
+- [x] **T07** — API routes: `GET state`, `POST rsvp`, `POST vote` under `/api/trips/[slug]/`, passcode header check, input validation, 404 unknown slug (FR-002, FR-004, FR-005)
   - Files: `src/app/api/trips/[slug]/{state,rsvp,vote}/route.ts`
   - Verify: `curl` matrix: no/wrong passcode → 401; bad slug → 404; bad body → 400; happy path mutates then `state` reflects it
 
