@@ -18,8 +18,8 @@ Miami crew trip (Oct 22–25, 2026, 8 people) is planned in a doc. Need a sharea
 
 ## Functional requirements
 
-- **FR-001:** MUST render the full itinerary: overview, day-by-day (Thu–Sun), food master list, boat options + math, nightlife guide, wildlife, budget, book-ahead checklist, practical notes.
-- **FR-001a:** MUST organize content as tabbed sections (e.g., Overview / Days / Food / Nightlife / Costs / RSVP) — not one long scroll.
+- **FR-001:** MUST render the full trip content organized by **activity** (boat, Everglades, clubs, Joe's, Oleta, Little Havana…), not by day — freedom of movement over fixed schedule. Overview keeps logistics (check-in/checkout, getting around); food/nightlife/budget/practical retained.
+- **FR-001a:** MUST organize content as tabbed sections (e.g., Overview / Activities / Food / Nightlife / Costs / RSVP) — not one long scroll.
 - **FR-002:** MUST gate the page behind a shared passcode; wrong/no passcode shows only the passcode prompt.
 - **FR-003:** MUST let each visitor identify as one of the 8 crew names (tap to pick); choice persists on their device.
 - **FR-004:** MUST let an identified visitor set trip RSVP: in / out / maybe, changeable anytime.

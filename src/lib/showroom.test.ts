@@ -11,6 +11,7 @@ function item(id: number, room: string): Item {
     image_url: null,
     added_by: "t",
     created_at: null as unknown as string,
+    status: "고민중",
   };
 }
 

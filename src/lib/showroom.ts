@@ -9,7 +9,16 @@ export type Item = {
   image_url: string | null;
   added_by: string;
   created_at: string;
+  status: string;
 };
+
+export type Reaction = {
+  item_id: number;
+  name: string;
+  vote: "like" | "nope";
+};
+
+export const STATUSES = ["고민중", "주문함", "도착함"];
 
 export const ROOMS = [
   "거실",

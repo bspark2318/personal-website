@@ -13,12 +13,100 @@ const MIAMI_CREW = [
 ];
 
 const MIAMI_ACTIVITIES: Activity[] = [
-  { id: "everglades", dayId: "fri", title: "Everglades — Shark Valley bikes", votable: true },
-  { id: "club-fri", dayId: "fri", title: "Club night — E11EVEN / Space", votable: true },
-  { id: "boat", dayId: "sat", title: "Private boat — sandbar + skyline", votable: true },
-  { id: "joes", dayId: "sat", title: "Joe's Stone Crab", votable: true },
-  { id: "club-halloween", dayId: "sat", title: "Halloween Saturday — Wynwood / clubs", votable: true },
-  { id: "oleta", dayId: "sun", title: "Oleta River kayaks — manatees", votable: true },
+  {
+    id: "boat",
+    title: "Private boat — sandbar + skyline",
+    when: "best Sat morning",
+    blurb: "Captained 30–40ft, 4 hrs, BYOB. Star Island celeb mansions → Haulover Sandbar (anchor, swim, float, party scene) → Biscayne Bay skyline.",
+    details: [
+      "~$145/head all-in at 8 people. Pack the cooler from the house.",
+      "Book GetMyBoat / Boatsetter / Aqua; confirm fuel, cooler/ice, sandbar stop, cancellation. Slots go 2–4 weeks out.",
+      "Fishing alternative: 6-pack boats cap at 6 people — for 8 it's a bigger inspected boat (~$1,500–2,500) or two boats. Late Oct = sailfish, mahi, kingfish.",
+    ],
+    votable: true,
+  },
+  {
+    id: "everglades",
+    title: "Everglades — Shark Valley bikes",
+    when: "any morning, cars needed",
+    blurb: "15-mile flat paved loop through gator country — they sun themselves ON the path. 45-ft observation tower at the halfway point. 2–3 hrs.",
+    details: [
+      "Bikes $27/day, reserve at sharkvalleytramtours.com; ~$35/vehicle entry. ~50 min drive west on Tamiami Trail.",
+      "Don't want to bike? 2-hr guided tram, or airboat on the way back (~$30–40/pp).",
+      "Wildlife: gators guaranteed, herons, egrets, turtles, maybe crocs. Keep 15 ft.",
+      "Pair with La Camaronera on the drive back — standing-room fried shrimp counter, pan con minuta.",
+    ],
+    votable: true,
+  },
+  {
+    id: "little-havana",
+    title: "Little Havana — Calle Ocho",
+    when: "easy first evening",
+    blurb: "Walk SW 8th St: Domino Park old-timers, cigar rollers at Cuba Tobacco, Azucar ice cream (guava + cheese). Dinner at Sanguich or Versailles.",
+    details: [
+      "12 min Uber from the house. Zero cost beyond food.",
+      "Old's Havana for sit-down + live music if the night stretches.",
+    ],
+    votable: true,
+  },
+  {
+    id: "joes",
+    title: "Joe's Stone Crab",
+    when: "dinner, any night",
+    blurb: "100+ years old, tuxedoed waiters, stone crab season just opened Oct 15. Claws + mustard sauce, hash browns, creamed spinach, key lime pie.",
+    details: [
+      "Main dining room takes no reservations — go at opening or expect 1–2 hr waits.",
+      "Cheat code: Joe's Take Away next door — same claws, no wait.",
+      "Medium claws ~$40s, large $60s+; the fried chicken is famously ~$7.",
+    ],
+    votable: true,
+  },
+  {
+    id: "club-fri",
+    title: "Club night — E11EVEN / Space",
+    when: "any night that isn't Halloween",
+    blurb: "E11EVEN: 24/7 ultraclub, performers over the crowd, hip-hop-leaning. Club Space literally across the street: house/techno temple, Terrace runs past sunrise.",
+    details: [
+      "GA in advance: 11miami.com / clubspace.com, $20–60. 8-min Uber.",
+      "21+, physical ID, no shorts/flip-flops/athletic wear.",
+      "Budget $100–150/head inside (cocktails $18–25).",
+    ],
+    votable: true,
+  },
+  {
+    id: "club-halloween",
+    title: "Halloween Saturday",
+    when: "Sat 10/24 — fixed",
+    blurb: "The one immovable night: Wynwood becomes Miami's biggest street costume party. Costumes mandatory.",
+    details: [
+      "Free version: Wynwood street scene — thousands in costume, stumble between Gramps / Wood Tavern / Shots.",
+      "Club version: LIV / Story / E11EVEN — covers $50–150, buy 2+ weeks ahead, they sell out.",
+      "Table math for 8: $1,500–3K minimum ≈ breaks even with GA + drinks, and guarantees entry.",
+    ],
+    votable: true,
+  },
+  {
+    id: "oleta",
+    title: "Oleta River kayaks — manatees",
+    when: "best Sun morning",
+    blurb: "FL's largest urban park: paddle mangrove tunnels toward Raccoon Island on calm, beginner water. Manatee season is just starting — real chance, not a promise.",
+    details: [
+      "~$25–40/hr kayak/paddleboard, concession opens 9 AM (oletariveradventures.com). ~20 min drive.",
+      "Dolphins possible too. Bring a dry bag for phones.",
+    ],
+    votable: true,
+  },
+  {
+    id: "beach",
+    title: "South Beach / Mid-Beach hours",
+    when: "whenever",
+    blurb: "Ocean's 83°F. Default filler between everything else — post-boat, pre-Joe's, hangover repair.",
+    details: [
+      "La Sandwicherie (open till 5 AM) is the eternal post-anything move.",
+      "Phones in front pockets on Ocean Drive at 3 AM.",
+    ],
+    votable: true,
+  },
 ];
 
 // Budget §7 of the doc: per-person total at 8 people ≈ $1,125.
@@ -30,7 +118,7 @@ const MIAMI_COSTS: CostItem[] = [
   // 9+ rated): compact SUV ~$240–290/3 days all-in → 2 cars ~$540 + gas/tolls ~$60.
   { id: "cars", label: "2 rental SUVs, Thu–Sun (taxes, gas, tolls)", amount: 600, kind: "fixed-split", rangeLabel: "$540–660 total" },
   { id: "oleta", label: "Oleta entry + kayak", amount: 35, kind: "per-person", activityId: "oleta" },
-  { id: "club-fri", label: "Friday club night (GA + drinks)", amount: 187, kind: "per-person", activityId: "club-fri", rangeLabel: "$150–225" },
+  { id: "club-fri", label: "Club night — E11EVEN/Space (GA + drinks)", amount: 187, kind: "per-person", activityId: "club-fri", rangeLabel: "$150–225" },
   { id: "club-halloween", label: "Halloween Saturday (GA + drinks)", amount: 188, kind: "per-person", activityId: "club-halloween", rangeLabel: "$150–225" },
   { id: "food", label: "Food (3 days)", amount: 190, kind: "per-person", rangeLabel: "$150–240" },
   { id: "joes", label: "Joe's Stone Crab", amount: 60, kind: "per-person", activityId: "joes", rangeLabel: "$40–80" },
@@ -52,56 +140,6 @@ const miami2026: Trip = {
     "Sailfish season starting + fall mullet run = prime fishing window.",
     "Sat Oct 24 is Halloween Saturday — Wynwood becomes Miami's biggest street costume party.",
     "Getting around: 2 rental cars for the weekend (Everglades, beach, Oleta) + Ubers for club nights (~$10–20/ride); 10–15 min to South Beach, 12 min to MIA.",
-  ],
-  days: [
-    {
-      id: "thu",
-      label: "THU 10/22",
-      title: "Land, settle, Little Havana",
-      entries: [
-        { time: "3–4 PM", text: "Check-in (4 PM at Shai's). Grocery + booze run — Publix, 1776 Biscayne Blvd." },
-        { time: "6 PM", text: "Uber to Little Havana (~12 min)." },
-        { time: "6–8 PM", text: "Walk Calle Ocho (12th–17th Ave): Domino Park, cigar rollers at Cuba Tobacco, Azucar ice cream (guava + cheese)." },
-        { time: "8 PM", text: "Dinner — Sanguich de Miami (best Cubans in the city) or Versailles (the legendary old-school giant; ventanita cafecito)." },
-        { time: "10 PM+", text: "Easy night: fire pit at the house, or Wynwood warm-up — Gramps (backyard bar/arcade) or Coyo Taco (hidden bar behind the tortilla counter)." },
-      ],
-    },
-    {
-      id: "fri",
-      label: "FRI 10/23",
-      title: "Everglades + first club night",
-      entries: [
-        { time: "7:30 AM", text: "Leave the house. Both cars west on Tamiami Trail (~50 min).", activityId: "everglades" },
-        { time: "8:30 AM", text: "Shark Valley, Everglades NP. Bikes $27/day (reserve: sharkvalleytramtours.com), ~$35/vehicle entry. 15-mile flat loop, 2–3 hrs: gators on the path, 45-ft observation tower halfway. Alt: 2-hr guided tram, or airboat on the way back (~$30–40/pp).", activityId: "everglades" },
-        { time: "12:30 PM", text: "Lunch on the drive back — La Camaronera: standing-room fried shrimp counter, pan con minuta." },
-        { time: "2–6 PM", text: "Recover at the house. Nap. Hydrate. Tonight is long." },
-        { time: "8 PM", text: "Dinner in Wynwood — KYU (wood-fired Asian, book on Resy: Korean fried chicken + brisket burnt ends) or 1-800-Lucky (Asian food hall, everyone picks their own)." },
-        { time: "11 PM+", text: "Club night one: E11EVEN (24/7 ultraclub, performers over the crowd) or Club Space across the street (house/techno, Terrace runs past sunrise). GA in advance $20–60. 21+, no shorts/flip-flops.", activityId: "club-fri" },
-      ],
-    },
-    {
-      id: "sat",
-      label: "SAT 10/24",
-      title: "Boat day + stone crab + Halloween",
-      entries: [
-        { time: "10 AM", text: "Private boat, 4 hrs: Star Island celeb mansions → Haulover Sandbar (anchor, swim, party scene) → Biscayne Bay skyline. BYOB — pack the cooler. ~$145/head all-in.", activityId: "boat" },
-        { time: "2:30 PM", text: "Post-boat food — La Sandwicherie (South Beach institution since '88, open till 5 AM)." },
-        { time: "3–5 PM", text: "Beach hour on South Beach or back to the house to rally." },
-        { time: "6:30 PM", text: "Joe's Stone Crab — 100+ years old, season just opened. Claws at market price + mustard sauce, hash browns, key lime pie. No reservations in the dining room — go at opening, or hit Joe's Take Away next door (same claws, no wait).", activityId: "joes" },
-        { time: "10 PM+", text: "HALLOWEEN SATURDAY. Costumes mandatory. (a) Wynwood street scene — thousands in costume, no tickets; or (b) club it — LIV / Story / E11EVEN. Halloween covers $50–150, buy 2+ weeks out. Table for 8 ≈ breaks even with GA + drinks and guarantees entry.", activityId: "club-halloween" },
-      ],
-    },
-    {
-      id: "sun",
-      label: "SUN 10/25",
-      title: "Manatees + brunch + out",
-      entries: [
-        { time: "8:15 AM", text: "Checkout prep — bags in cars by 8:30 (checkout 11 AM, do it early)." },
-        { time: "9 AM", text: "Oleta River State Park (~20 min): kayak/paddleboard the mangrove tunnels toward Raccoon Island (~$25–40/hr). Manatee season is just starting — real chance, not a guarantee; dolphins possible.", activityId: "oleta" },
-        { time: "11:30 AM", text: "Brunch — Zak the Baker (Wynwood, James Beard-noted, closes 3 PM) or El Bagel (NYC-tier hand-rolled bagels)." },
-        { time: "1 PM+", text: "Flight-dependent: Mid-Beach hour, Design District stroll (free ICA museum), or straight to MIA (12 min)." },
-      ],
-    },
   ],
   food: [
     {
@@ -159,6 +197,15 @@ const miami2026: Trip = {
     ],
   },
   info: [
+    {
+      title: "Logistics",
+      bullets: [
+        "Check-in 4 PM Thu at Shai's Airbnb. First stop: grocery + booze run, Publix on Biscayne.",
+        "Checkout 11 AM Sun — bags in cars by 8:30 if we're doing Oleta.",
+        "MIA is 12 min from the house; flight-dependent Sunday filler: Mid-Beach, Design District stroll (free ICA museum), brunch.",
+        "Only fixed point of the whole trip: Halloween Saturday night. Everything else floats.",
+      ],
+    },
     {
       title: "The boat",
       bullets: [

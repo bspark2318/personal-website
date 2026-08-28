@@ -7,8 +7,11 @@ export type CostKind = "fixed-split" | "per-person";
 
 export interface Activity {
   id: string;
-  dayId: string;
   title: string;
+  /** Loose timing hint, e.g. "Sat morning" — not a schedule. */
+  when?: string;
+  blurb: string;
+  details: string[];
   votable: boolean;
 }
 
@@ -22,19 +25,6 @@ export interface CostItem {
   activityId?: string;
   /** Optional display label for ranged estimates, e.g. "$300–450". */
   rangeLabel?: string;
-}
-
-export interface DayEntry {
-  time: string;
-  text: string;
-  activityId?: string;
-}
-
-export interface TripDay {
-  id: string;
-  label: string; // "THU 10/22"
-  title: string; // "Land, settle, Little Havana"
-  entries: DayEntry[];
 }
 
 export interface FoodSpot {
@@ -64,7 +54,6 @@ export interface Trip {
   crew: string[];
   passcodeEnvKey: string;
   intro: string[];
-  days: TripDay[];
   food: { group: string; spots: FoodSpot[] }[];
   nightlife: { venues: Venue[]; rules: string[] };
   info: InfoSection[];

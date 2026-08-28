@@ -3,8 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { notFound } from "next/navigation";
 import { use, useCallback, useEffect, useState } from "react";
+import ActivitiesTab from "@/components/trips/ActivitiesTab";
 import CostEstimator from "@/components/trips/CostEstimator";
-import DaysTab from "@/components/trips/DaysTab";
 import FoodTab from "@/components/trips/FoodTab";
 import NightlifeTab from "@/components/trips/NightlifeTab";
 import OverviewTab from "@/components/trips/OverviewTab";
@@ -23,7 +23,7 @@ import { TRIPS } from "@/lib/trips-data";
 
 const TABS = [
   { id: "overview", label: "Overview" },
-  { id: "days", label: "Days" },
+  { id: "activities", label: "Activities" },
   { id: "food", label: "Food" },
   { id: "night", label: "Night" },
   { id: "costs", label: "Costs" },
@@ -192,8 +192,8 @@ export default function TripPage({
           transition={{ duration: 0.15 }}
         >
           {tab === "overview" && <OverviewTab trip={trip} />}
-          {tab === "days" && (
-            <DaysTab
+          {tab === "activities" && (
+            <ActivitiesTab
               trip={trip}
               state={state}
               canVote={Boolean(myName) && !dbDown}
