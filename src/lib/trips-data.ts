@@ -208,15 +208,6 @@ const miami2026: Trip = {
       ],
     },
     {
-      title: "The boat",
-      bullets: [
-        "Plan A — private party boat: captained 30–40ft, 4 hrs, BYOB, sandbar + skyline. $600–1,200 + 15–20% tip → $95–185/head. Book: GetMyBoat / Boatsetter / Aqua.",
-        "Confirm before booking: fuel included? cooler/ice? sandbar stop? cancellation policy? Sunset slots go 2–4 weeks out.",
-        "Plan B — fishing: 6-pack boats cap at 6 (Coast Guard); for 8 it's a bigger inspected boat (~$1,500–2,500 half day) or two boats. Late Oct = sailfish ramping, mahi, kingfish; charters cover licenses.",
-        "Cheap seats: Kelley Fishing Fleet party boat, $69/adult 4-hr, bait + license included.",
-      ],
-    },
-    {
       title: "Wildlife",
       bullets: [
         "Alligators: guaranteed at Shark Valley — often on the bike path. Keep 15 ft, don't feed.",
