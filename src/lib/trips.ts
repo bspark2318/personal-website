@@ -60,6 +60,12 @@ export function toCelsiusLabel(value: string): string {
     });
 }
 
+/** A photo with an attribution string, used by highlights and parks. */
+export interface CreditedPhoto {
+  src: string;
+  credit: string;
+}
+
 export interface Neighborhood {
   id: string;
   name: string;
@@ -70,9 +76,24 @@ export interface Neighborhood {
   mapsQuery: string;
 }
 
+export interface Park {
+  id: string;
+  name: string;
+  emoji: string;
+  tagline: string;
+  bullets: string[];
+  mapsQuery: string;
+  photos: CreditedPhoto[];
+}
+
 export interface InfoSection {
   title: string;
   bullets: string[];
+}
+
+export interface IntroHighlight {
+  text: string;
+  photo: CreditedPhoto;
 }
 
 export interface DateOption {
@@ -118,9 +139,10 @@ export interface Trip {
   crew: CrewMember[];
   /** Candidate date ranges; crew marks which ones work for them. */
   dateOptions: DateOption[];
-  intro: string[];
+  intro: IntroHighlight[];
   conditions: ConditionStat[];
   neighborhoods: Neighborhood[];
+  parks: Park[];
   food: { group: string; spots: FoodSpot[] }[];
   nightlife: { venues: Venue[]; rules: string[] };
   info: InfoSection[];
