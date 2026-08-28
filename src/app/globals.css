@@ -85,3 +85,77 @@ body {
     radial-gradient(50% 55% at 50% 90%, rgba(251, 146, 60, 0.2), transparent 70%);
   filter: blur(60px);
 }
+
+/* Nightlife lineup ticker (NightlifeTab) — a Bloomberg-style scrolling tape. */
+.tape {
+  margin-top: 0.85rem;
+  overflow: hidden;
+  border-top: 1px solid var(--card-border);
+  padding-top: 0.7rem;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.tape__track {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+  animation-name: tape-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.tape:hover .tape__track {
+  animation-play-state: paused;
+}
+.tape__run {
+  display: inline-block;
+}
+@keyframes tape-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.tape__week,
+.tape__act,
+.tape__tba {
+  display: inline-block;
+  padding: 0 0.95rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+.tape__week {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--foreground);
+  border-left: 2px solid var(--foreground);
+}
+.tape__tba {
+  color: var(--muted);
+  opacity: 0.55;
+}
+.tape__arrow {
+  color: #059669;
+  font-size: 0.6rem;
+}
+.tape__date {
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.tape__name {
+  color: #047857;
+  font-weight: 600;
+}
+.tape__note {
+  color: var(--muted);
+  font-style: italic;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tape {
+    overflow-x: auto;
+  }
+  .tape__track {
+    animation: none;
+  }
+  .tape__run[aria-hidden] {
+    display: none;
+  }
+}

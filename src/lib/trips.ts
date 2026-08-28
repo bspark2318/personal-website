@@ -48,12 +48,21 @@ export interface FoodSpot {
   price?: string;
 }
 
+export interface LineupSlot {
+  /** Night the act plays, e.g. "Fri Oct 9". */
+  date: string;
+  act: string;
+  note?: string;
+}
+
 export interface Venue {
   name: string;
   where: string;
   vibe: string;
   cover: string;
   notes: string;
+  /** Expected acts per candidate weekend, keyed by DateOption id. */
+  lineups?: Record<string, LineupSlot[]>;
 }
 
 export interface ConditionStat {

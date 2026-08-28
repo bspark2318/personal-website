@@ -17,9 +17,10 @@ import { TRIPS } from "./trips-data";
 const miami = TRIPS["miami-2026"];
 
 describe("estimateCost", () => {
-  it("miami core plan at 8 (skydive off) lands in the doc's $1,000–1,250 range", () => {
-    // Skydiving is a premium add-on (~$400/pp); the doc's budget is the core plan.
-    const { perPerson } = estimateCost(miami.costItems, 8, ["skydive"]);
+  it("miami core plan at 8 (skydive + fishing off) lands in the doc's $1,000–1,250 range", () => {
+    // Skydiving (~$400/pp) and fishing (an alternative to the boat day) are
+    // add-ons; the doc's budget is the core plan with the boat.
+    const { perPerson } = estimateCost(miami.costItems, 8, ["skydive", "fishing"]);
     expect(perPerson).toBeGreaterThanOrEqual(1000);
     expect(perPerson).toBeLessThanOrEqual(1250);
   });
@@ -38,15 +39,17 @@ describe("estimateCost", () => {
     expect(food6.perPerson).toBe(food8.perPerson);
   });
 
-  it("toggling Saturday night off drops the total by exactly that line; Fri club stays fixed", () => {
+  it("toggling a linked activity drops exactly its line; unlinked lines stay fixed", () => {
     const on = estimateCost(miami.costItems, 8, []);
-    const off = estimateCost(miami.costItems, 8, ["club-fri", "club-sat"]);
-    const satLine = on.lines.find((l) => l.id === "club-sat")!;
-    expect(satLine.perPerson).toBeGreaterThan(0);
-    expect(off.perPerson).toBeCloseTo(on.perPerson - satLine.perPerson, 5);
-    expect(off.lines.find((l) => l.id === "club-sat")).toBeUndefined();
-    // club-fri has no linked activity anymore — it can't be toggled off
-    expect(off.lines.find((l) => l.id === "club-fri")).toBeDefined();
+    const off = estimateCost(miami.costItems, 8, ["oleta"]);
+    const oletaLine = on.lines.find((l) => l.id === "oleta")!;
+    expect(oletaLine.perPerson).toBeGreaterThan(0);
+    expect(off.perPerson).toBeCloseTo(on.perPerson - oletaLine.perPerson, 5);
+    expect(off.lines.find((l) => l.id === "oleta")).toBeUndefined();
+    // Lines with no linked activity (house, cars, food, ubers) can't toggle off.
+    const fixed = estimateCost(miami.costItems, 8, ["house", "cars", "food", "ubers"]);
+    expect(fixed.lines.find((l) => l.id === "food")).toBeDefined();
+    expect(fixed.lines.find((l) => l.id === "cars")).toBeDefined();
   });
 
   it("splits fixed costs by headcount with no floor", () => {

@@ -74,7 +74,7 @@ export default function CostEstimator({
         <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted">
           How many go
         </p>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           <button
             onClick={() => setHeadcount((h) => Math.max(2, h - 1))}
             className="h-11 w-11 rounded-full border border-card-border text-xl hover:border-card-border-hover"
