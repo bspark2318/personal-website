@@ -60,6 +60,16 @@ export function toCelsiusLabel(value: string): string {
     });
 }
 
+export interface Neighborhood {
+  id: string;
+  name: string;
+  emoji: string;
+  tagline: string;
+  bullets: string[];
+  /** Query string for Google Maps (link + embed). */
+  mapsQuery: string;
+}
+
 export interface InfoSection {
   title: string;
   bullets: string[];
@@ -74,6 +84,7 @@ export interface Trip {
   passcodeEnvKey: string;
   intro: string[];
   conditions: ConditionStat[];
+  neighborhoods: Neighborhood[];
   food: { group: string; spots: FoodSpot[] }[];
   nightlife: { venues: Venue[]; rules: string[] };
   info: InfoSection[];

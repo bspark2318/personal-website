@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import NeighborhoodPicker from "@/components/trips/NeighborhoodPicker";
 import { toCelsiusLabel, type Trip } from "@/lib/trips";
 
 export default function OverviewTab({ trip }: { trip: Trip }) {
@@ -67,6 +68,14 @@ export default function OverviewTab({ trip }: { trip: Trip }) {
               </div>
             ))}
           </div>
+        </section>
+      )}
+      {trip.neighborhoods.length > 0 && (
+        <section>
+          <h2 className="display mb-4 text-xl font-semibold">
+            Where we stay — pick a lane
+          </h2>
+          <NeighborhoodPicker neighborhoods={trip.neighborhoods} />
         </section>
       )}
       {trip.info.map((section) => (

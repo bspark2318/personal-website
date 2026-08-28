@@ -158,6 +158,44 @@ const miami2026: Trip = {
     { label: "UV", value: "High", sub: "sunscreen, non-negotiable" },
     { label: "Hurricane risk", value: "Low", sub: "past Sep 10 peak; check NHC week-of", span: "wide" },
   ],
+  neighborhoods: [
+    {
+      id: "buena-vista",
+      name: "Buena Vista",
+      emoji: "🏡",
+      tagline: "The chill HQ",
+      bullets: [
+        "Quiet residential pocket with actual houses — backyard, fire pit, room to pregame loud-ish.",
+        "Wynwood 5–7 min, South Beach 10–15 via I-195, MIA 12 min. Uber to everything.",
+        "Cheapest way to get a whole house for 8.",
+      ],
+      mapsQuery: "Buena Vista, Miami, FL",
+    },
+    {
+      id: "wynwood",
+      name: "Wynwood",
+      emoji: "🎨",
+      tagline: "Sleep inside the party",
+      bullets: [
+        "Bars, murals, and street food at the front door — walk home at 3 AM, no Ubers.",
+        "Loudest of the three; more lofts/condos than houses, backyard unlikely.",
+        "Best if the group's priority is going out over hanging in.",
+      ],
+      mapsQuery: "Wynwood, Miami, FL",
+    },
+    {
+      id: "design-district",
+      name: "Design District",
+      emoji: "🛍️",
+      tagline: "The polished one",
+      bullets: [
+        "Luxury shopping blocks, free ICA museum, Mandolin's garden a corner away.",
+        "Dead quiet at night — you go to the party, it never comes to you.",
+        "Sits right between Buena Vista and Wynwood; same Uber math everywhere.",
+      ],
+      mapsQuery: "Miami Design District, Miami, FL",
+    },
+  ],
   food: [
     {
       group: "Cuban / Little Havana",
@@ -214,15 +252,6 @@ const miami2026: Trip = {
     ],
   },
   info: [
-    {
-      title: "Where we stay — 3 candidates",
-      bullets: [
-        "Buena Vista — quiet residential pocket with actual houses: backyard, fire pit, room to pregame. Uber to everything (Wynwood 5–7 min, SoBe 10–15). The chill-HQ option.",
-        "Wynwood — sleep inside the party: bars, murals, street food at the door, walk home at 3 AM. Louder, more scene, less house.",
-        "Design District — the polished one: luxury blocks, free ICA museum, Mandolin around the corner. Dead quiet at night, sits right between the other two.",
-        "All three are 12–15 min from MIA and share the same Uber math — this mostly decides vibe, not logistics.",
-      ],
-    },
     {
       title: "Pack right",
       bullets: [
