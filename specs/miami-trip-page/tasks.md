@@ -22,7 +22,7 @@
   - Files: `src/lib/trips.test.ts`, `src/lib/trips.ts`
   - Verify: `npm run test` green; test asserts no out/maybe/vote names in payload
 
-- [ ] **T05** — Full Miami content transcription into `trips-data.ts`: 9 sections, days, food list, activities (votable: boat, Everglades, Joe's, Oleta, 2 club nights), cost items with fixed-split/per-person kinds (FR-001)
+- [x] **T05** — Full Miami content transcription into `trips-data.ts`: 9 sections, days, food list, activities (votable: boat, Everglades, Joe's, Oleta, 2 club nights), cost items with fixed-split/per-person kinds (FR-001)
   - Files: `src/lib/trips-data.ts`
   - Verify: `npx tsc --noEmit`; cost items sum matches budget table §7
 
