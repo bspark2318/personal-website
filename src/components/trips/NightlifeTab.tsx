@@ -1,6 +1,91 @@
 "use client";
 
-import type { Trip } from "@/lib/trips";
+import { useLayoutEffect, useRef, useState } from "react";
+import type { DateOption, LineupSlot, Trip, Venue } from "@/lib/trips";
+
+// Every ticker scrolls at the same visual pace regardless of content length.
+const TAPE_PX_PER_SEC = 55;
+
+// Flatten a venue's lineups into an ordered ticker-tape sequence:
+// each candidate weekend becomes an "index" marker, followed by its acts
+// (or a TBA tick when nothing is announced yet).
+type Tick =
+  | { kind: "week"; label: string }
+  | { kind: "act"; slot: LineupSlot }
+  | { kind: "tba" };
+
+function toTicks(lineups: NonNullable<Venue["lineups"]>, options: DateOption[]): Tick[] {
+  const ticks: Tick[] = [];
+  for (const opt of options) {
+    ticks.push({ kind: "week", label: opt.label });
+    const slots = lineups[opt.id] ?? [];
+    if (slots.length === 0) ticks.push({ kind: "tba" });
+    else for (const slot of slots) ticks.push({ kind: "act", slot });
+  }
+  return ticks;
+}
+
+function Tape({ ticks }: { ticks: Tick[] }) {
+  const runRef = useRef<HTMLSpanElement>(null);
+  const [duration, setDuration] = useState(20);
+
+  // Derive duration from the run's real pixel width so every tape moves at the
+  // same px/sec. Re-measure on resize and after the mono webfont loads.
+  useLayoutEffect(() => {
+    const measure = () => {
+      const w = runRef.current?.scrollWidth ?? 0;
+      if (w) setDuration(w / TAPE_PX_PER_SEC);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    document.fonts?.ready.then(measure).catch(() => {});
+    return () => window.removeEventListener("resize", measure);
+  }, [ticks]);
+
+  const run = (aria: boolean) => (
+    <span
+      className="tape__run"
+      aria-hidden={aria || undefined}
+      ref={aria ? undefined : runRef}
+    >
+      {ticks.map((t, i) => {
+        if (t.kind === "week")
+          return (
+            <span key={i} className="tape__week">
+              {t.label.replace(/\s*\(.*\)$/, "")}
+            </span>
+          );
+        if (t.kind === "tba")
+          return (
+            <span key={i} className="tape__tba">
+              TBA
+            </span>
+          );
+        return (
+          <span key={i} className="tape__act">
+            <span className="tape__arrow">▲</span>{" "}
+            <span className="tape__date">{t.slot.date}</span>{" "}
+            <span className="tape__name">{t.slot.act}</span>
+            {t.slot.note ? (
+              <>
+                {" "}
+                <span className="tape__note">({t.slot.note})</span>
+              </>
+            ) : null}
+          </span>
+        );
+      })}
+    </span>
+  );
+  return (
+    <div className="tape">
+      <div className="tape__track" style={{ animationDuration: `${duration}s` }}>
+        {run(false)}
+        {run(true)}
+      </div>
+    </div>
+  );
+}
 
 export default function NightlifeTab({ trip }: { trip: Trip }) {
   return (
@@ -17,6 +102,8 @@ export default function NightlifeTab({ trip }: { trip: Trip }) {
             </p>
             <p className="mt-2 text-sm leading-relaxed">{v.vibe}</p>
             <p className="mt-1 text-sm text-muted">{v.notes}</p>
+
+            {v.lineups && <Tape ticks={toTicks(v.lineups, trip.dateOptions)} />}
           </div>
         ))}
       </section>

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  costLinePerPerson,
   estimateCost,
   firstNameOf,
   matchCrew,
@@ -17,10 +18,15 @@ import { TRIPS } from "./trips-data";
 const miami = TRIPS["miami-2026"];
 
 describe("estimateCost", () => {
-  it("miami at 8 with everything on lands in the doc's $1,000–1,250 range", () => {
-    const { perPerson } = estimateCost(miami.costItems, 8, []);
-    expect(perPerson).toBeGreaterThanOrEqual(1000);
-    expect(perPerson).toBeLessThanOrEqual(1250);
+  it("miami core plan at 8 (skydive + fishing off) lands in the ~$900–1,150 range, ex-flights", () => {
+    // Skydiving (~$400/pp) and fishing (an alternative to the boat day) are
+    // add-ons; the core plan keeps the boat. Nights out are a modest $100/pp
+    // each. Range excludes airfare, so subtract the flight line before comparing.
+    const { perPerson, lines } = estimateCost(miami.costItems, 8, ["skydive", "fishing"]);
+    const flights = lines.find((l) => l.id === "flights")?.perPerson ?? 0;
+    const onGround = perPerson - flights;
+    expect(onGround).toBeGreaterThanOrEqual(900);
+    expect(onGround).toBeLessThanOrEqual(1150);
   });
 
   it("dropping headcount raises fixed-split lines, leaves per-person lines alone", () => {
@@ -37,15 +43,17 @@ describe("estimateCost", () => {
     expect(food6.perPerson).toBe(food8.perPerson);
   });
 
-  it("toggling Saturday night off drops the total by exactly that line; Fri club stays fixed", () => {
+  it("toggling a linked activity drops exactly its line; unlinked lines stay fixed", () => {
     const on = estimateCost(miami.costItems, 8, []);
-    const off = estimateCost(miami.costItems, 8, ["club-fri", "club-sat"]);
-    const satLine = on.lines.find((l) => l.id === "club-sat")!;
-    expect(satLine.perPerson).toBeGreaterThan(0);
-    expect(off.perPerson).toBeCloseTo(on.perPerson - satLine.perPerson, 5);
-    expect(off.lines.find((l) => l.id === "club-sat")).toBeUndefined();
-    // club-fri has no linked activity anymore — it can't be toggled off
-    expect(off.lines.find((l) => l.id === "club-fri")).toBeDefined();
+    const off = estimateCost(miami.costItems, 8, ["oleta"]);
+    const oletaLine = on.lines.find((l) => l.id === "oleta")!;
+    expect(oletaLine.perPerson).toBeGreaterThan(0);
+    expect(off.perPerson).toBeCloseTo(on.perPerson - oletaLine.perPerson, 5);
+    expect(off.lines.find((l) => l.id === "oleta")).toBeUndefined();
+    // Lines with no linked activity (house, cars, food, ubers) can't toggle off.
+    const fixed = estimateCost(miami.costItems, 8, ["house", "cars", "food", "ubers"]);
+    expect(fixed.lines.find((l) => l.id === "food")).toBeDefined();
+    expect(fixed.lines.find((l) => l.id === "cars")).toBeDefined();
   });
 
   it("splits fixed costs by headcount with no floor", () => {
@@ -53,6 +61,51 @@ describe("estimateCost", () => {
       { id: "villa", label: "Villa", amount: 1000, kind: "fixed-split" },
     ];
     expect(estimateCost(items, 2, []).perPerson).toBe(500);
+  });
+});
+
+describe("spend profiles", () => {
+  it("conservative < medium < aggressive on the real plan", () => {
+    const lo = estimateCost(miami.costItems, 8, [], "conservative").perPerson;
+    const mid = estimateCost(miami.costItems, 8, [], "medium").perPerson;
+    const hi = estimateCost(miami.costItems, 8, [], "aggressive").perPerson;
+    expect(lo).toBeLessThan(mid);
+    expect(mid).toBeLessThan(hi);
+  });
+
+  it("costLinePerPerson picks low/high by profile for both kinds", () => {
+    const fixed: CostItem = {
+      id: "villa",
+      label: "Villa",
+      amount: 800,
+      low: 640,
+      high: 960,
+      kind: "fixed-split",
+    };
+    expect(costLinePerPerson(fixed, 8, "conservative")).toBe(640 / 8);
+    expect(costLinePerPerson(fixed, 8, "aggressive")).toBe(960 / 8);
+    expect(costLinePerPerson(fixed, 8, "medium")).toBe(800 / 8);
+
+    const perHead: CostItem = {
+      id: "drinks",
+      label: "Drinks",
+      amount: 100,
+      low: 50,
+      high: 150,
+      kind: "per-person",
+    };
+    expect(costLinePerPerson(perHead, 8, "aggressive")).toBe(150);
+  });
+
+  it("falls back to amount when low/high are absent", () => {
+    const item: CostItem = {
+      id: "flat",
+      label: "Flat",
+      amount: 100,
+      kind: "per-person",
+    };
+    expect(costLinePerPerson(item, 8, "conservative")).toBe(100);
+    expect(costLinePerPerson(item, 8, "aggressive")).toBe(100);
   });
 });
 

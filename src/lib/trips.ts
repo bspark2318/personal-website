@@ -4,6 +4,7 @@
 export type RsvpStatus = "in" | "out" | "maybe";
 export type VoteValue = "up" | "down";
 export type CostKind = "fixed-split" | "per-person";
+export type SpendProfile = "conservative" | "medium" | "aggressive";
 
 export interface Activity {
   id: string;
@@ -25,8 +26,15 @@ export interface Activity {
 export interface CostItem {
   id: string;
   label: string;
-  /** fixed-split: total dollars split by headcount. per-person: dollars per head. */
+  /**
+   * Medium/default estimate. fixed-split: total dollars split by headcount.
+   * per-person: dollars per head.
+   */
   amount: number;
+  /** Conservative-profile estimate (range low). Falls back to `amount`. */
+  low?: number;
+  /** Aggressive-profile estimate (range high). Falls back to `amount`. */
+  high?: number;
   kind: CostKind;
   /** When set, toggling this activity off in the estimator removes the item. */
   activityId?: string;
@@ -40,12 +48,21 @@ export interface FoodSpot {
   price?: string;
 }
 
+export interface LineupSlot {
+  /** Night the act plays, e.g. "Fri Oct 9". */
+  date: string;
+  act: string;
+  note?: string;
+}
+
 export interface Venue {
   name: string;
   where: string;
   vibe: string;
   cover: string;
   notes: string;
+  /** Expected acts per candidate weekend, keyed by DateOption id. */
+  lineups?: Record<string, LineupSlot[]>;
 }
 
 export interface ConditionStat {
@@ -90,6 +107,21 @@ export interface Park {
   bullets: string[];
   mapsQuery: string;
   photos: CreditedPhoto[];
+}
+
+export interface StayOption {
+  id: string;
+  name: string;
+  url: string;
+  neighborhood: string;
+  /** Whole-stay total, fees in. */
+  total: number;
+  perNight: number;
+  sleeps: number;
+  /** e.g. "4 BR · 3 BA" */
+  layout: string;
+  images: string[];
+  notes: string[];
 }
 
 export interface InfoSection {
@@ -149,6 +181,8 @@ export interface Trip {
   conditions: ConditionStat[];
   neighborhoods: Neighborhood[];
   parks: Park[];
+  /** Candidate Airbnbs — photos, costs, links. */
+  stays: StayOption[];
   food: { group: string; spots: FoodSpot[] }[];
   nightlife: { venues: Venue[]; rules: string[] };
   info: InfoSection[];
@@ -200,12 +234,32 @@ export function parseRich(text: string): RichSegment[] {
   return out;
 }
 
+// Pick an item's total by spend profile: conservative→low, aggressive→high,
+// medium→amount. Ranged fields fall back to amount when absent.
+function amountFor(item: CostItem, profile: SpendProfile): number {
+  if (profile === "conservative") return item.low ?? item.amount;
+  if (profile === "aggressive") return item.high ?? item.amount;
+  return item.amount;
+}
+
+// Per-person cost of a single line at the given headcount + spend profile.
+// Fixed-split totals divide by headcount; per-person totals pass through.
+export function costLinePerPerson(
+  item: CostItem,
+  headcount: number,
+  profile: SpendProfile = "medium"
+): number {
+  const total = amountFor(item, profile);
+  return item.kind === "fixed-split" ? total / headcount : total;
+}
+
 // Fixed costs split by headcount, per-person costs pass through.
 // Items tied to a toggled-off activity are excluded.
 export function estimateCost(
   items: CostItem[],
   headcount: number,
-  offActivityIds: string[]
+  offActivityIds: string[],
+  profile: SpendProfile = "medium"
 ): { perPerson: number; lines: CostLine[] } {
   const off = new Set(offActivityIds);
   const lines: CostLine[] = items
@@ -213,7 +267,7 @@ export function estimateCost(
     .map((i) => ({
       id: i.id,
       label: i.label,
-      perPerson: i.kind === "fixed-split" ? i.amount / headcount : i.amount,
+      perPerson: costLinePerPerson(i, headcount, profile),
       ...(i.rangeLabel ? { rangeLabel: i.rangeLabel } : {}),
     }));
   return { perPerson: lines.reduce((s, l) => s + l.perPerson, 0), lines };
