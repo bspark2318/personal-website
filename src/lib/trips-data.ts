@@ -129,14 +129,14 @@ const MIAMI_ACTIVITIES: Activity[] = [
   {
     id: "club-sat",
     emoji: "🥂",
-    title: "Saturday night — LIV / Story / Wynwood",
+    title: "Saturday night — LIV / Wynwood",
     when: "Sat night",
     route: "MIA · Wynwood / Mid-Beach",
     price: "$150–225",
     facts: ["Club covers $40–150", "Wynwood covers $0–20", "GA + drinks $150–225"],
-    blurb: "Two options: a **Wynwood bar crawl** (Gramps / Wood Tavern / Shots) or a big club — **LIV** at the Fontainebleau, **Story**, or **E11EVEN** again.",
+    blurb: "Two options: a **Wynwood bar crawl** (Las Rosas / El Patio / MAD Club) or a big club — **LIV** at the Fontainebleau, **Club Space**, or **E11EVEN** again.",
     details: [
-      "Strict doors at LIV/Story — **collared shirts**, enter in **mixed groups**, no sneakers.",
+      "Strict doors at LIV — **collared shirts**, enter in **mixed groups**, no sneakers.",
       "Table for 8: **$1,500–3K minimum**, roughly equal to GA + drinks, and guarantees entry.",
       "Wynwood bars are walkable between spots.",
     ],

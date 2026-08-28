@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  costLinePerPerson,
   estimateCost,
   firstNameOf,
   matchCrew,
@@ -60,6 +61,51 @@ describe("estimateCost", () => {
       { id: "villa", label: "Villa", amount: 1000, kind: "fixed-split" },
     ];
     expect(estimateCost(items, 2, []).perPerson).toBe(500);
+  });
+});
+
+describe("spend profiles", () => {
+  it("conservative < medium < aggressive on the real plan", () => {
+    const lo = estimateCost(miami.costItems, 8, [], "conservative").perPerson;
+    const mid = estimateCost(miami.costItems, 8, [], "medium").perPerson;
+    const hi = estimateCost(miami.costItems, 8, [], "aggressive").perPerson;
+    expect(lo).toBeLessThan(mid);
+    expect(mid).toBeLessThan(hi);
+  });
+
+  it("costLinePerPerson picks low/high by profile for both kinds", () => {
+    const fixed: CostItem = {
+      id: "villa",
+      label: "Villa",
+      amount: 800,
+      low: 640,
+      high: 960,
+      kind: "fixed-split",
+    };
+    expect(costLinePerPerson(fixed, 8, "conservative")).toBe(640 / 8);
+    expect(costLinePerPerson(fixed, 8, "aggressive")).toBe(960 / 8);
+    expect(costLinePerPerson(fixed, 8, "medium")).toBe(800 / 8);
+
+    const perHead: CostItem = {
+      id: "drinks",
+      label: "Drinks",
+      amount: 100,
+      low: 50,
+      high: 150,
+      kind: "per-person",
+    };
+    expect(costLinePerPerson(perHead, 8, "aggressive")).toBe(150);
+  });
+
+  it("falls back to amount when low/high are absent", () => {
+    const item: CostItem = {
+      id: "flat",
+      label: "Flat",
+      amount: 100,
+      kind: "per-person",
+    };
+    expect(costLinePerPerson(item, 8, "conservative")).toBe(100);
+    expect(costLinePerPerson(item, 8, "aggressive")).toBe(100);
   });
 });
 
