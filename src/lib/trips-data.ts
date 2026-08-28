@@ -137,7 +137,7 @@ const miami2026: Trip = {
   slug: "miami-2026",
   title: "Miami Crew Trip",
   dates: "Oct 22–25, 2026",
-  location: "Buena Vista / Design District",
+  location: "Miami — hood TBD",
   crew: MIAMI_CREW,
   passcodeEnvKey: "TRIP_PASSWORD_MIAMI_2026",
   intro: [
@@ -215,12 +215,12 @@ const miami2026: Trip = {
   },
   info: [
     {
-      title: "The neighborhood — Buena Vista",
+      title: "Where we stay — 3 candidates",
       bullets: [
-        "Quiet residential pocket right next to the Design District — tree-lined streets, our own backyard + fire pit as pregame HQ.",
-        "Walkable: Design District (2 min) with the free ICA museum and the Fly's Eye Dome; Mandolin Aegean Bistro is a garden dinner a few blocks away.",
-        "Wynwood's bars and murals are 5–7 min away; South Beach 10–15 via I-195; MIA 12 min.",
-        "It's residential — Ubers run everywhere at night (~$10–20), and the backyard stays neighbor-friendly after midnight.",
+        "Buena Vista — quiet residential pocket with actual houses: backyard, fire pit, room to pregame. Uber to everything (Wynwood 5–7 min, SoBe 10–15). The chill-HQ option.",
+        "Wynwood — sleep inside the party: bars, murals, street food at the door, walk home at 3 AM. Louder, more scene, less house.",
+        "Design District — the polished one: luxury blocks, free ICA museum, Mandolin around the corner. Dead quiet at night, sits right between the other two.",
+        "All three are 12–15 min from MIA and share the same Uber math — this mostly decides vibe, not logistics.",
       ],
     },
     {
