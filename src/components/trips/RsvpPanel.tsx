@@ -1,5 +1,6 @@
 "use client";
 
+import NamePicker from "@/components/trips/NamePicker";
 import type { RsvpStatus, TripState } from "@/lib/trips";
 
 const OPTIONS: { status: RsvpStatus; label: string }[] = [
@@ -9,16 +10,21 @@ const OPTIONS: { status: RsvpStatus; label: string }[] = [
 ];
 
 export default function RsvpPanel({
-  crewSize,
+  crew,
+  myName,
+  onPickName,
   state,
   canRsvp,
   onRsvp,
 }: {
-  crewSize: number;
+  crew: string[];
+  myName: string | null;
+  onPickName: (name: string) => void;
   state: TripState | null;
   canRsvp: boolean;
   onRsvp: (status: RsvpStatus) => void;
 }) {
+  const crewSize = crew.length;
   const me = state?.me?.rsvp ?? null;
   const ins = state?.ins ?? [];
   const pending =
@@ -26,6 +32,10 @@ export default function RsvpPanel({
 
   return (
     <div className="space-y-8">
+      <section className="rounded-2xl border border-card-border p-4">
+        <NamePicker crew={crew} value={myName} onChange={onPickName} />
+      </section>
+
       <section>
         <h2 className="display mb-1 text-xl font-semibold">Are you in?</h2>
         <p className="mb-4 text-sm text-muted">

@@ -6,7 +6,6 @@ import { use, useCallback, useEffect, useState } from "react";
 import CostEstimator from "@/components/trips/CostEstimator";
 import DaysTab from "@/components/trips/DaysTab";
 import FoodTab from "@/components/trips/FoodTab";
-import NamePicker from "@/components/trips/NamePicker";
 import NightlifeTab from "@/components/trips/NightlifeTab";
 import OverviewTab from "@/components/trips/OverviewTab";
 import PasscodeGate from "@/components/trips/PasscodeGate";
@@ -157,21 +156,32 @@ export default function TripPage({
 
   return (
     <div className="trip-light min-h-screen">
-      <main className="mx-auto max-w-2xl px-5 pb-28 pt-12">
-      <header className="mb-8">
-        <p className="text-xs uppercase tracking-[0.3em] text-muted">
-          {trip.dates} · {trip.location}
-        </p>
-        <h1 className="display mt-2 text-4xl font-semibold">{trip.title}</h1>
+      <main className="mx-auto max-w-2xl px-5 pb-16 pt-10">
+      <header className="mb-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted">
+              {trip.dates} · {trip.location}
+            </p>
+            <h1 className="display mt-2 text-4xl font-semibold">{trip.title}</h1>
+          </div>
+          {myName && (
+            <button
+              onClick={() => setTab("rsvp")}
+              className="mt-1 shrink-0 rounded-full border border-card-border px-3 py-1.5 text-sm text-muted hover:border-card-border-hover"
+            >
+              {myName}
+            </button>
+          )}
+        </div>
         {dbDown && (
           <p className="mt-3 rounded-lg border border-card-border px-3 py-2 text-sm text-muted">
             RSVPs and votes are offline right now — the plan below still stands.
           </p>
         )}
-        <div className="mt-6">
-          <NamePicker crew={trip.crew} value={myName} onChange={pickName} />
-        </div>
       </header>
+
+      <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -195,7 +205,9 @@ export default function TripPage({
           {tab === "costs" && <CostEstimator trip={trip} />}
           {tab === "rsvp" && (
             <RsvpPanel
-              crewSize={trip.crew.length}
+              crew={trip.crew}
+              myName={myName}
+              onPickName={pickName}
               state={state}
               canRsvp={Boolean(myName) && !dbDown}
               onRsvp={sendRsvp}
@@ -203,8 +215,6 @@ export default function TripPage({
           )}
         </motion.div>
       </AnimatePresence>
-
-        <TabBar tabs={TABS} active={tab} onChange={setTab} />
       </main>
     </div>
   );
