@@ -13,7 +13,9 @@ function getSql() {
   return neon(url);
 }
 
-// Passcode gate disabled for now — accepts every request.
+// Passcode gate disabled for now — accepts every request. To re-enable:
+// compare req.headers.get(TRIP_HEADER) against process.env[trip.passcodeEnvKey]
+// and restore the locked phase + PasscodeGate in the trip page.
 export function checkTripPassword(_req: Request, _trip: Trip): boolean {
   return true;
 }

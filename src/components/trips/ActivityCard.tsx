@@ -1,48 +1,32 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import VoteButton from "@/components/trips/VoteButton";
-import type { Activity, TripState, VoteValue } from "@/lib/trips";
+import { parseRich, type Activity, type TripState, type VoteValue } from "@/lib/trips";
 
-const URL_RE = /\b((?:https?:\/\/)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|net|gov)(?:\/[^\s,;)]*)?)/gi;
-const BOLD_RE = /\*\*([^*]+)\*\*/g;
-
-/** Renders **bold** spans and turns bare domains into links. */
+/** Renders **bold** spans and bare domains as links via parseRich(). */
 function rich(text: string) {
-  const parts: ReactNode[] = [];
-  let key = 0;
-  const pushLinkified = (seg: string) => {
-    let last = 0;
-    for (const m of seg.matchAll(URL_RE)) {
-      const raw = m[1];
-      if (m.index > last) parts.push(seg.slice(last, m.index));
-      parts.push(
+  return parseRich(text).map((seg, i) => {
+    if (seg.kind === "bold")
+      return (
+        <strong key={i} className="font-semibold">
+          {seg.value}
+        </strong>
+      );
+    if (seg.kind === "link")
+      return (
         <a
-          key={key++}
-          href={raw.startsWith("http") ? raw : `https://${raw}`}
+          key={i}
+          href={seg.href}
           target="_blank"
           rel="noreferrer"
           className="underline underline-offset-2 hover:text-foreground"
         >
-          {raw}
+          {seg.value}
         </a>
       );
-      last = m.index + raw.length;
-    }
-    parts.push(seg.slice(last));
-  };
-  let last = 0;
-  for (const m of text.matchAll(BOLD_RE)) {
-    if (m.index > last) pushLinkified(text.slice(last, m.index));
-    parts.push(
-      <strong key={key++} className="font-semibold">
-        {m[1]}
-      </strong>
-    );
-    last = m.index + m[0].length;
-  }
-  pushLinkified(text.slice(last));
-  return parts;
+    return seg.value;
+  });
 }
 
 const notch =

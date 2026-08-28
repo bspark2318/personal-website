@@ -11,9 +11,7 @@ import OverviewTab from "@/components/trips/OverviewTab";
 import TabBar from "@/components/trips/TabBar";
 import RsvpPanel from "@/components/trips/RsvpPanel";
 import {
-  TRIP_HEADER,
   storageNameKey,
-  storagePasscodeKey,
   type RsvpStatus,
   type TripState,
   type VoteValue,
@@ -45,14 +43,14 @@ export default function TripPage({
   const [dbDown, setDbDown] = useState(false);
   const [tab, setTab] = useState("overview");
 
-  const tryUnlock = useCallback(
-    async (passcode: string, name: string | null) => {
+  // Passcode gate is disabled (see checkTripPassword in trips-db.ts); requests
+  // carry no auth header. Re-add TRIP_HEADER here when the gate comes back.
+  const loadState = useCallback(
+    async (name: string | null) => {
       const me = name ? `?me=${encodeURIComponent(name)}` : "";
       let res: Response;
       try {
-        res = await fetch(`/api/trips/${slug}/state${me}`, {
-          headers: { [TRIP_HEADER]: passcode },
-        });
+        res = await fetch(`/api/trips/${slug}/state${me}`);
       } catch {
         setDbDown(true);
         setPhase("open");
@@ -74,21 +72,16 @@ export default function TripPage({
     queueMicrotask(() => {
       const name = localStorage.getItem(storageNameKey(slug));
       if (name) setMyName(name);
-      void tryUnlock(localStorage.getItem(storagePasscodeKey(slug)) ?? "", name);
+      void loadState(name);
     });
-  }, [slug, trip, tryUnlock]);
+  }, [slug, trip, loadState]);
 
   if (!trip) notFound();
-
-  const passcode = () =>
-    typeof window === "undefined"
-      ? ""
-      : localStorage.getItem(storagePasscodeKey(slug)) ?? "";
 
   const pickName = (name: string) => {
     setMyName(name);
     localStorage.setItem(storageNameKey(slug), name);
-    void tryUnlock(passcode(), name);
+    void loadState(name);
   };
 
   const sendRsvp = async (status: RsvpStatus) => {
@@ -97,11 +90,11 @@ export default function TripPage({
     setState({ ...state, me: { rsvp: status, votes: state.me?.votes ?? {} } });
     const res = await fetch(`/api/trips/${slug}/rsvp`, {
       method: "POST",
-      headers: { [TRIP_HEADER]: passcode(), "content-type": "application/json" },
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({ name: myName, status }),
     });
     if (!res.ok) setState(prev);
-    else void tryUnlock(passcode(), myName);
+    else void loadState(myName);
   };
 
   const sendVote = async (activityId: string, vote: VoteValue | null) => {
@@ -113,11 +106,11 @@ export default function TripPage({
     setState({ ...state, me: { rsvp: state.me?.rsvp ?? null, votes: meVotes } });
     const res = await fetch(`/api/trips/${slug}/vote`, {
       method: "POST",
-      headers: { [TRIP_HEADER]: passcode(), "content-type": "application/json" },
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({ name: myName, activityId, vote }),
     });
     if (!res.ok) setState(prev);
-    else void tryUnlock(passcode(), myName);
+    else void loadState(myName);
   };
 
   if (phase === "loading") {

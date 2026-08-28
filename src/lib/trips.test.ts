@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   estimateCost,
+  parseRich,
   shapeState,
   toCelsiusLabel,
   type CostItem,
@@ -48,6 +49,60 @@ describe("estimateCost", () => {
       { id: "villa", label: "Villa", amount: 1000, kind: "fixed-split" },
     ];
     expect(estimateCost(items, 2, []).perPerson).toBe(500);
+  });
+});
+
+describe("cost data integrity", () => {
+  it("every cost item's activityId points at a real activity", () => {
+    const ids = new Set(miami.activities.map((a) => a.id));
+    const dangling = miami.costItems
+      .filter((c) => c.activityId)
+      .filter((c) => !ids.has(c.activityId!))
+      .map((c) => c.id);
+    expect(dangling).toEqual([]);
+  });
+});
+
+describe("parseRich", () => {
+  it("returns a single text segment for plain prose", () => {
+    expect(parseRich("just words")).toEqual([{ kind: "text", value: "just words" }]);
+  });
+
+  it("isolates **bold** spans from surrounding text", () => {
+    expect(parseRich("a **b** c")).toEqual([
+      { kind: "text", value: "a " },
+      { kind: "bold", value: "b" },
+      { kind: "text", value: " c" },
+    ]);
+  });
+
+  it("prefixes bare domains with https and keeps http(s) urls as-is", () => {
+    expect(parseRich("book at sharkvalleytramtours.com today")).toEqual([
+      { kind: "text", value: "book at " },
+      { kind: "link", value: "sharkvalleytramtours.com", href: "https://sharkvalleytramtours.com" },
+      { kind: "text", value: " today" },
+    ]);
+    const [seg] = parseRich("https://11miami.com");
+    expect(seg).toEqual({ kind: "link", value: "https://11miami.com", href: "https://11miami.com" });
+  });
+
+  it("does not over-match a TLD embedded in a longer word", () => {
+    // "company" must not linkify as "com" + stray "pany"
+    expect(parseRich("the company picnic")).toEqual([
+      { kind: "text", value: "the company picnic" },
+    ]);
+  });
+
+  it("linkifies multiple domains in one string", () => {
+    const segs = parseRich("11miami.com / clubspace.com");
+    expect(segs.filter((s) => s.kind === "link").map((s) => s.value)).toEqual([
+      "11miami.com",
+      "clubspace.com",
+    ]);
+  });
+
+  it("leaves a lone ** marker as literal text", () => {
+    expect(parseRich("2 ** 3 = 8")).toEqual([{ kind: "text", value: "2 ** 3 = 8" }]);
   });
 });
 

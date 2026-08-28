@@ -136,7 +136,9 @@ const MIAMI_COSTS: CostItem[] = [
   // 9+ rated): compact SUV ~$240–290/3 days all-in → 2 cars ~$540 + gas/tolls ~$60.
   { id: "cars", label: "2 rental SUVs, Thu–Sun (taxes, gas, tolls)", amount: 600, kind: "fixed-split", rangeLabel: "$540–660 total" },
   { id: "oleta", label: "Oleta entry + kayak", amount: 35, kind: "per-person", activityId: "oleta" },
-  { id: "club-fri", label: "Club night — E11EVEN/Space (GA + drinks)", amount: 187, kind: "per-person", rangeLabel: "$150–225" },
+  // First night out — a general nightlife budget line, not tied to a votable
+  // activity (the E11EVEN/Space card lives in the Night tab now).
+  { id: "club-fri", label: "First night out (GA + drinks)", amount: 187, kind: "per-person", rangeLabel: "$150–225" },
   { id: "club-sat", label: "Saturday night (GA + drinks)", amount: 188, kind: "per-person", activityId: "club-sat", rangeLabel: "$150–225" },
   { id: "food", label: "Food (3 days)", amount: 190, kind: "per-person", rangeLabel: "$150–240" },
   { id: "joes", label: "Joe's Stone Crab", amount: 60, kind: "per-person", activityId: "joes", rangeLabel: "$40–80" },
