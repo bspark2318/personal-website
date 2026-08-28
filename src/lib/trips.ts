@@ -60,6 +60,11 @@ export function toCelsiusLabel(value: string): string {
     });
 }
 
+export interface ParkPhoto {
+  src: string;
+  credit: string;
+}
+
 export interface Neighborhood {
   id: string;
   name: string;
@@ -70,9 +75,24 @@ export interface Neighborhood {
   mapsQuery: string;
 }
 
+export interface Park {
+  id: string;
+  name: string;
+  emoji: string;
+  tagline: string;
+  bullets: string[];
+  mapsQuery: string;
+  photos: ParkPhoto[];
+}
+
 export interface InfoSection {
   title: string;
   bullets: string[];
+}
+
+export interface IntroHighlight {
+  text: string;
+  photo: ParkPhoto;
 }
 
 export interface Trip {
@@ -82,9 +102,10 @@ export interface Trip {
   location: string;
   crew: string[];
   passcodeEnvKey: string;
-  intro: string[];
+  intro: IntroHighlight[];
   conditions: ConditionStat[];
   neighborhoods: Neighborhood[];
+  parks: Park[];
   food: { group: string; spots: FoodSpot[] }[];
   nightlife: { venues: Venue[]; rules: string[] };
   info: InfoSection[];

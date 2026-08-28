@@ -61,9 +61,10 @@ export default function TripPage({
         return;
       }
       if (res.status === 401) {
+        // Passcode gate disabled for now — open with live features offline.
         localStorage.removeItem(storagePasscodeKey(slug));
-        setGateError("Wrong passcode");
-        setPhase("locked");
+        setDbDown(true);
+        setPhase("open");
         return;
       }
       localStorage.setItem(storagePasscodeKey(slug), passcode);
@@ -84,8 +85,7 @@ export default function TripPage({
       const name = localStorage.getItem(storageNameKey(slug));
       if (name) setMyName(name);
       const passcode = localStorage.getItem(storagePasscodeKey(slug));
-      if (passcode) void tryUnlock(passcode, name);
-      else setPhase("locked");
+      void tryUnlock(passcode ?? "", name);
     });
   }, [slug, trip, tryUnlock]);
 
