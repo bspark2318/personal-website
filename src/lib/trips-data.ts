@@ -227,7 +227,7 @@ const miami2026: Trip = {
       title: "Pack right",
       bullets: [
         "Swimwear ×2, collared shirt + real shoes for clubs, sunscreen, dramamine for the boat, portable speaker.",
-        "House rules: exterior cameras exist; keep the backyard neighbor-friendly after midnight; 8-guest cap is hard.",
+        "House rules: exterior cameras exist; 8-guest cap is hard.",
         "Safety: tourist-normal zones; Uber door-to-door at night; phones in front pockets on Ocean Drive at 3 AM.",
       ],
     },
