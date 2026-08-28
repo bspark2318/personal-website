@@ -1,5 +1,6 @@
+import { fullName } from "@/lib/trips";
 import { TRIPS } from "@/lib/trips-data";
-import { checkTripPassword, setVote } from "@/lib/trips-db";
+import { setVote } from "@/lib/trips-db";
 
 export async function POST(
   req: Request,
@@ -10,13 +11,9 @@ export async function POST(
   if (!trip) {
     return Response.json({ error: "unknown trip" }, { status: 404 });
   }
-  if (!checkTripPassword(req, trip)) {
-    return Response.json({ error: "unauthorized" }, { status: 401 });
-  }
-
   const body = await req.json().catch(() => ({}));
   const { name, activityId, vote } = body;
-  if (typeof name !== "string" || !trip.crew.includes(name)) {
+  if (typeof name !== "string" || !trip.crew.some((m) => fullName(m) === name)) {
     return Response.json({ error: "name must be one of the crew" }, { status: 400 });
   }
   if (!trip.activities.some((a) => a.id === activityId && a.votable)) {

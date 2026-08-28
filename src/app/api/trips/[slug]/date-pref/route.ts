@@ -1,8 +1,6 @@
 import { fullName } from "@/lib/trips";
 import { TRIPS } from "@/lib/trips-data";
-import { upsertRsvp } from "@/lib/trips-db";
-
-const STATUSES = ["in", "out", "maybe"] as const;
+import { setDatePref } from "@/lib/trips-db";
 
 export async function POST(
   req: Request,
@@ -13,15 +11,19 @@ export async function POST(
   if (!trip) {
     return Response.json({ error: "unknown trip" }, { status: 404 });
   }
+
   const body = await req.json().catch(() => ({}));
-  const { name, status } = body;
+  const { name, optionId, works } = body;
   if (typeof name !== "string" || !trip.crew.some((m) => fullName(m) === name)) {
     return Response.json({ error: "name must be one of the crew" }, { status: 400 });
   }
-  if (!STATUSES.includes(status)) {
-    return Response.json({ error: "status must be in, out, or maybe" }, { status: 400 });
+  if (!trip.dateOptions.some((o) => o.id === optionId)) {
+    return Response.json({ error: "unknown date option" }, { status: 400 });
+  }
+  if (typeof works !== "boolean") {
+    return Response.json({ error: "works must be a boolean" }, { status: 400 });
   }
 
-  await upsertRsvp(slug, name, status);
+  await setDatePref(slug, optionId, name, works);
   return Response.json({ ok: true });
 }

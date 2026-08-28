@@ -4,6 +4,7 @@ import {
   shapeState,
   toCelsiusLabel,
   type CostItem,
+  type DatePrefRow,
   type RsvpRow,
   type VoteRow,
 } from "./trips";
@@ -72,16 +73,21 @@ describe("shapeState", () => {
     { activityId: "boat", name: "Guest 3", vote: "up" },
     { activityId: "club-fri", name: "Guest 4", vote: "down" },
   ];
+  const datePrefs: DatePrefRow[] = [
+    { optionId: "oct-8", name: "Shai" },
+    { optionId: "oct-8", name: "Guest 2" },
+    { optionId: "oct-22", name: "Shai" },
+  ];
 
   it("names only the ins; out/maybe are counts", () => {
-    const state = shapeState(rsvps, votes, null);
+    const state = shapeState(rsvps, votes, datePrefs, null);
     expect(state.ins).toEqual(["Shai", "Guest 2"]);
     expect(state.maybeCount).toBe(1);
     expect(state.outCount).toBe(1);
   });
 
   it("vote tallies are anonymous counts", () => {
-    const state = shapeState(rsvps, votes, null);
+    const state = shapeState(rsvps, votes, datePrefs, null);
     expect(state.votes).toEqual({
       boat: { up: 2, down: 0 },
       "club-fri": { up: 0, down: 1 },
@@ -89,22 +95,31 @@ describe("shapeState", () => {
     expect(JSON.stringify(state.votes)).not.toContain("Shai");
   });
 
-  it("payload never leaks non-in names anywhere", () => {
-    const json = JSON.stringify(shapeState(rsvps, votes, null));
+  it("rsvp/vote data never leaks non-in names", () => {
+    const json = JSON.stringify(shapeState(rsvps, votes, [], null));
     expect(json).not.toContain("Guest 3");
     expect(json).not.toContain("Guest 4");
   });
 
-  it("includes the caller's own rsvp and votes", () => {
-    const state = shapeState(rsvps, votes, "Guest 3");
+  it("groups date prefs by option with names", () => {
+    const state = shapeState(rsvps, votes, datePrefs, null);
+    expect(state.datePrefs).toEqual({
+      "oct-8": ["Shai", "Guest 2"],
+      "oct-22": ["Shai"],
+    });
+  });
+
+  it("includes the caller's own rsvp, votes, and dates", () => {
+    const state = shapeState(rsvps, votes, datePrefs, "Guest 3");
     expect(state.me).toEqual({
       rsvp: "maybe",
       votes: { boat: "up" },
+      dates: [],
     });
   });
 
   it("caller with no rows gets an empty me block", () => {
-    const state = shapeState(rsvps, votes, "Guest 8");
-    expect(state.me).toEqual({ rsvp: null, votes: {} });
+    const state = shapeState(rsvps, votes, datePrefs, "Guest 8");
+    expect(state.me).toEqual({ rsvp: null, votes: {}, dates: [] });
   });
 });

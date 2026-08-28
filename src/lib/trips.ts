@@ -75,13 +75,33 @@ export interface InfoSection {
   bullets: string[];
 }
 
+export interface DateOption {
+  id: string;
+  label: string;
+}
+
+// Gate: first name identifies, last name is the password.
+// Full name is the identity key in the DB and API payloads.
+export interface CrewMember {
+  first: string;
+  last: string;
+}
+
+export const fullName = (m: CrewMember) => `${m.first} ${m.last}`;
+
+/** Display name for a stored full-name key; falls back to the key itself. */
+export function firstNameOf(name: string, crew: CrewMember[]): string {
+  return crew.find((m) => fullName(m) === name)?.first ?? name;
+}
+
 export interface Trip {
   slug: string;
   title: string;
   dates: string;
   location: string;
-  crew: string[];
-  passcodeEnvKey: string;
+  crew: CrewMember[];
+  /** Candidate date ranges; crew marks which ones work for them. */
+  dateOptions: DateOption[];
   intro: string[];
   conditions: ConditionStat[];
   neighborhoods: Neighborhood[];
@@ -129,12 +149,23 @@ export interface VoteRow {
   vote: VoteValue;
 }
 
+export interface DatePrefRow {
+  optionId: string;
+  name: string;
+}
+
 export interface TripState {
   ins: string[];
   outCount: number;
   maybeCount: number;
   votes: Record<string, { up: number; down: number }>;
-  me: { rsvp: RsvpStatus | null; votes: Record<string, VoteValue> } | null;
+  /** optionId → names it works for. */
+  datePrefs: Record<string, string[]>;
+  me: {
+    rsvp: RsvpStatus | null;
+    votes: Record<string, VoteValue>;
+    dates: string[];
+  } | null;
 }
 
 // Anonymity contract (FR-006): only "in" RSVPs are named; everything else
@@ -142,6 +173,7 @@ export interface TripState {
 export function shapeState(
   rsvps: RsvpRow[],
   votes: VoteRow[],
+  datePrefs: DatePrefRow[],
   me: string | null
 ): TripState {
   const tallies: TripState["votes"] = {};
@@ -149,11 +181,16 @@ export function shapeState(
     const t = (tallies[v.activityId] ??= { up: 0, down: 0 });
     t[v.vote === "up" ? "up" : "down"] += 1;
   }
+  const prefs: TripState["datePrefs"] = {};
+  for (const p of datePrefs) {
+    (prefs[p.optionId] ??= []).push(p.name);
+  }
   return {
     ins: rsvps.filter((r) => r.status === "in").map((r) => r.name),
     outCount: rsvps.filter((r) => r.status === "out").length,
     maybeCount: rsvps.filter((r) => r.status === "maybe").length,
     votes: tallies,
+    datePrefs: prefs,
     me:
       me === null
         ? null
@@ -162,10 +199,9 @@ export function shapeState(
             votes: Object.fromEntries(
               votes.filter((v) => v.name === me).map((v) => [v.activityId, v.vote])
             ),
+            dates: datePrefs.filter((p) => p.name === me).map((p) => p.optionId),
           },
   };
 }
 
-export const TRIP_HEADER = "x-trip-password";
-export const storagePasscodeKey = (slug: string) => `trip-${slug}-passcode`;
 export const storageNameKey = (slug: string) => `trip-${slug}-name`;
