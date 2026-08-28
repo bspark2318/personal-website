@@ -42,19 +42,19 @@
   - Files: `src/components/trips/{OverviewTab,DaysTab,FoodTab,NightlifeTab,DayCard}.tsx`
   - Verify: iPhone-width DevTools — every tab readable, zero horizontal scroll
 
-- [ ] **T10** — RSVP tab: in/out/maybe buttons wired to API, tally display (in-names, anonymous counts), optimistic update (FR-004, FR-006; AC-3, AC-4)
+- [x] **T10** — RSVP tab: in/out/maybe buttons wired to API, tally display (in-names, anonymous counts), optimistic update (FR-004, FR-006; AC-3, AC-4)
   - Files: `src/components/trips/RsvpPanel.tsx`, page wiring
   - Verify: two browsers — browser A RSVPs "in" → name appears in B; A switches to "maybe" → B shows count only
 
-- [ ] **T11** [P] — Vote buttons on activities (Days tab): 👍/👎 toggle, anonymous counts, own vote highlighted (FR-005, FR-006; AC-5)
+- [x] **T11** [P] — Vote buttons on activities (Days tab): 👍/👎 toggle, anonymous counts, own vote highlighted (FR-005, FR-006; AC-5)
   - Files: `src/components/trips/VoteButton.tsx`, `DayCard.tsx`
   - Verify: two browsers — vote in A increments count in B with no name; re-tap removes vote, count decrements
 
-- [ ] **T12** [P] — Costs tab: estimator UI — headcount stepper, activity toggles, live per-person total + line breakdown, range labels (FR-009, FR-010; AC-6, AC-7)
+- [x] **T12** [P] — Costs tab: estimator UI — headcount stepper, activity toggles, live per-person total + line breakdown, range labels (FR-009, FR-010; AC-6, AC-7)
   - Files: `src/components/trips/CostEstimator.tsx`
   - Verify: dev server — defaults show ~$1,000–1,250/pp; drop to 6 → house/boat lines rise; clubs off → total drops
 
-- [ ] **T13** — DB-unavailable degradation: state fetch fails → content tabs still render, RSVP/vote disabled with notice (edge case)
+- [x] **T13** — DB-unavailable degradation: state fetch fails → content tabs still render, RSVP/vote disabled with notice (edge case)
   - Files: `src/app/trips/[slug]/page.tsx`
   - Verify: dev server with DATABASE_URL unset — itinerary renders, voting UI shows disabled notice
 

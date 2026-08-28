@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { notFound } from "next/navigation";
 import { use, useCallback, useEffect, useState } from "react";
+import CostEstimator from "@/components/trips/CostEstimator";
 import DaysTab from "@/components/trips/DaysTab";
 import FoodTab from "@/components/trips/FoodTab";
 import NamePicker from "@/components/trips/NamePicker";
@@ -10,11 +11,14 @@ import NightlifeTab from "@/components/trips/NightlifeTab";
 import OverviewTab from "@/components/trips/OverviewTab";
 import PasscodeGate from "@/components/trips/PasscodeGate";
 import TabBar from "@/components/trips/TabBar";
+import RsvpPanel from "@/components/trips/RsvpPanel";
 import {
   TRIP_HEADER,
   storageNameKey,
   storagePasscodeKey,
+  type RsvpStatus,
   type TripState,
+  type VoteValue,
 } from "@/lib/trips";
 import { TRIPS } from "@/lib/trips-data";
 
@@ -99,6 +103,35 @@ export default function TripPage({
     void tryUnlock(passcode(), name);
   };
 
+  const sendRsvp = async (status: RsvpStatus) => {
+    if (!myName || !state) return;
+    const prev = state;
+    setState({ ...state, me: { rsvp: status, votes: state.me?.votes ?? {} } });
+    const res = await fetch(`/api/trips/${slug}/rsvp`, {
+      method: "POST",
+      headers: { [TRIP_HEADER]: passcode(), "content-type": "application/json" },
+      body: JSON.stringify({ name: myName, status }),
+    });
+    if (!res.ok) setState(prev);
+    else void tryUnlock(passcode(), myName);
+  };
+
+  const sendVote = async (activityId: string, vote: VoteValue | null) => {
+    if (!myName || !state) return;
+    const prev = state;
+    const meVotes = { ...(state.me?.votes ?? {}) };
+    if (vote === null) delete meVotes[activityId];
+    else meVotes[activityId] = vote;
+    setState({ ...state, me: { rsvp: state.me?.rsvp ?? null, votes: meVotes } });
+    const res = await fetch(`/api/trips/${slug}/vote`, {
+      method: "POST",
+      headers: { [TRIP_HEADER]: passcode(), "content-type": "application/json" },
+      body: JSON.stringify({ name: myName, activityId, vote }),
+    });
+    if (!res.ok) setState(prev);
+    else void tryUnlock(passcode(), myName);
+  };
+
   if (phase === "loading") {
     return (
       <main className="flex min-h-screen items-center justify-center">
@@ -151,13 +184,20 @@ export default function TripPage({
               trip={trip}
               state={state}
               canVote={Boolean(myName) && !dbDown}
-              onVote={() => {}}
+              onVote={sendVote}
             />
           )}
           {tab === "food" && <FoodTab trip={trip} />}
           {tab === "night" && <NightlifeTab trip={trip} />}
-          {tab === "costs" && <div className="text-muted">Costs soon.</div>}
-          {tab === "rsvp" && <div className="text-muted">RSVP soon.</div>}
+          {tab === "costs" && <CostEstimator trip={trip} />}
+          {tab === "rsvp" && (
+            <RsvpPanel
+              crewSize={trip.crew.length}
+              state={state}
+              canRsvp={Boolean(myName) && !dbDown}
+              onRsvp={sendRsvp}
+            />
+          )}
         </motion.div>
       </AnimatePresence>
 
