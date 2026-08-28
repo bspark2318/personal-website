@@ -14,11 +14,11 @@
   - Files: `src/lib/trips.ts`, `src/lib/trips-data.ts`
   - Verify: `npx tsc --noEmit` passes; `TRIPS["miami-2026"].crew.length === 8`
 
-- [ ] **T03** — Cost estimator math, TDD: tests first for `estimateCost(headcount, offActivityIds)` — 8pp all-on ≈ $1,000–1,250; headcount 6 raises fixed-split lines; clubs off drops total (FR-009, FR-010; AC-6, AC-7)
+- [x] **T03** — Cost estimator math, TDD: tests first for `estimateCost(headcount, offActivityIds)` — 8pp all-on ≈ $1,000–1,250; headcount 6 raises fixed-split lines; clubs off drops total (FR-009, FR-010; AC-6, AC-7)
   - Files: `src/lib/trips.test.ts`, `src/lib/trips.ts`
   - Verify: `npm run test` green, incl. the three named cases
 
-- [ ] **T04** [P] — Anonymity/tally shaping, TDD: `shapeState(rsvps, votes, me)` → in-names only, out/maybe counts, per-activity counts, `me` block; vote toggle idempotent (FR-006; AC-3, AC-4, AC-5)
+- [x] **T04** [P] — Anonymity/tally shaping, TDD: `shapeState(rsvps, votes, me)` → in-names only, out/maybe counts, per-activity counts, `me` block; vote toggle idempotent (FR-006; AC-3, AC-4, AC-5)
   - Files: `src/lib/trips.test.ts`, `src/lib/trips.ts`
   - Verify: `npm run test` green; test asserts no out/maybe/vote names in payload
 

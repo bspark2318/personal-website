@@ -72,6 +72,80 @@ export interface Trip {
   costItems: CostItem[];
 }
 
+export interface CostLine {
+  id: string;
+  label: string;
+  perPerson: number;
+  rangeLabel?: string;
+}
+
+// Fixed costs split by headcount, per-person costs pass through.
+// Items tied to a toggled-off activity are excluded.
+export function estimateCost(
+  items: CostItem[],
+  headcount: number,
+  offActivityIds: string[]
+): { perPerson: number; lines: CostLine[] } {
+  const off = new Set(offActivityIds);
+  const lines: CostLine[] = items
+    .filter((i) => !i.activityId || !off.has(i.activityId))
+    .map((i) => ({
+      id: i.id,
+      label: i.label,
+      perPerson: i.kind === "fixed-split" ? i.amount / headcount : i.amount,
+      ...(i.rangeLabel ? { rangeLabel: i.rangeLabel } : {}),
+    }));
+  return { perPerson: lines.reduce((s, l) => s + l.perPerson, 0), lines };
+}
+
+export interface RsvpRow {
+  name: string;
+  status: RsvpStatus;
+}
+
+export interface VoteRow {
+  activityId: string;
+  name: string;
+  vote: VoteValue;
+}
+
+export interface TripState {
+  ins: string[];
+  outCount: number;
+  maybeCount: number;
+  votes: Record<string, { up: number; down: number }>;
+  me: { rsvp: RsvpStatus | null; votes: Record<string, VoteValue> } | null;
+}
+
+// Anonymity contract (FR-006): only "in" RSVPs are named; everything else
+// leaves this function as counts. Callers must not re-attach names.
+export function shapeState(
+  rsvps: RsvpRow[],
+  votes: VoteRow[],
+  me: string | null
+): TripState {
+  const tallies: TripState["votes"] = {};
+  for (const v of votes) {
+    const t = (tallies[v.activityId] ??= { up: 0, down: 0 });
+    t[v.vote === "up" ? "up" : "down"] += 1;
+  }
+  return {
+    ins: rsvps.filter((r) => r.status === "in").map((r) => r.name),
+    outCount: rsvps.filter((r) => r.status === "out").length,
+    maybeCount: rsvps.filter((r) => r.status === "maybe").length,
+    votes: tallies,
+    me:
+      me === null
+        ? null
+        : {
+            rsvp: rsvps.find((r) => r.name === me)?.status ?? null,
+            votes: Object.fromEntries(
+              votes.filter((v) => v.name === me).map((v) => [v.activityId, v.vote])
+            ),
+          },
+  };
+}
+
 export const TRIP_HEADER = "x-trip-password";
 export const storagePasscodeKey = (slug: string) => `trip-${slug}-passcode`;
 export const storageNameKey = (slug: string) => `trip-${slug}-name`;
