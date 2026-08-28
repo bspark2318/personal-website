@@ -197,7 +197,7 @@ export default function TripPage({
           )}
           {tab === "food" && <FoodTab trip={trip} />}
           {tab === "night" && <NightlifeTab trip={trip} />}
-          {tab === "costs" && <CostEstimator trip={trip} />}
+          {tab === "costs" && <CostEstimator trip={trip} state={state} />}
           {tab === "rsvp" && (
             <RsvpPanel
               crew={trip.crew}

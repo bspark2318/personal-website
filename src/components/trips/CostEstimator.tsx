@@ -1,18 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { estimateCost, type Trip } from "@/lib/trips";
+import { estimateCost, type Trip, type TripState } from "@/lib/trips";
 
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
-export default function CostEstimator({ trip }: { trip: Trip }) {
+export default function CostEstimator({
+  trip,
+  state,
+}: {
+  trip: Trip;
+  state: TripState | null;
+}) {
   const [headcount, setHeadcount] = useState(trip.crew.length);
-  const [off, setOff] = useState<string[]>([]);
+  // Explicit chip toggles override the vote-derived default (id → on/off).
+  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
+
+  // A 👎 drops that activity's cost line by default; a manual toggle wins.
+  const myVotes = state?.me?.votes;
+  const isOn = (id: string) => overrides[id] ?? myVotes?.[id] !== "down";
+  const off = trip.activities.filter((a) => !isOn(a.id)).map((a) => a.id);
 
   const { perPerson, lines } = estimateCost(trip.costItems, headcount, off);
   const toggle = (id: string) =>
-    setOff((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setOverrides((prev) => ({ ...prev, [id]: !isOn(id) }));
 
   return (
     <div className="space-y-8">
@@ -59,7 +71,7 @@ export default function CostEstimator({ trip }: { trip: Trip }) {
           {trip.activities
             .filter((a) => trip.costItems.some((c) => c.activityId === a.id))
             .map((a) => {
-              const on = !off.includes(a.id);
+              const on = isOn(a.id);
               return (
                 <button
                   key={a.id}
@@ -76,6 +88,11 @@ export default function CostEstimator({ trip }: { trip: Trip }) {
               );
             })}
         </div>
+        {myVotes && (
+          <p className="mt-2 text-xs text-muted">
+            Synced to your votes — a 👎 on the Activities tab drops that line.
+          </p>
+        )}
       </section>
 
       <section>

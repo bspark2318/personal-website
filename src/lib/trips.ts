@@ -11,6 +11,12 @@ export interface Activity {
   emoji?: string;
   /** Loose timing hint, e.g. "Sat morning" — not a schedule. */
   when?: string;
+  /** Short logistics chips, e.g. "4 hrs", "~$145/pp". */
+  facts?: string[];
+  /** Ticket route line, e.g. "MIA · Biscayne Bay". */
+  route?: string;
+  /** Ticket stub price, e.g. "$145". */
+  price?: string;
   blurb: string;
   details: string[];
   votable: boolean;
@@ -155,6 +161,43 @@ export interface CostLine {
   label: string;
   perPerson: number;
   rangeLabel?: string;
+}
+
+export type RichSegment =
+  | { kind: "text"; value: string }
+  | { kind: "bold"; value: string }
+  | { kind: "link"; value: string; href: string };
+
+const URL_RE =
+  /\b((?:https?:\/\/)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|net|gov)\b(?:\/[^\s,;)]*)?)/gi;
+const BOLD_RE = /\*\*([^*]+)\*\*/g;
+
+// Parse **bold** spans and bare/http domains into ordered segments.
+// Pure so it can be unit-tested; ActivityCard maps segments to JSX.
+export function parseRich(text: string): RichSegment[] {
+  const out: RichSegment[] = [];
+  const pushLinks = (seg: string) => {
+    let last = 0;
+    for (const m of seg.matchAll(URL_RE)) {
+      const raw = m[1];
+      if (m.index > last) out.push({ kind: "text", value: seg.slice(last, m.index) });
+      out.push({
+        kind: "link",
+        value: raw,
+        href: /^https?:/i.test(raw) ? raw : `https://${raw}`,
+      });
+      last = m.index + raw.length;
+    }
+    if (last < seg.length) out.push({ kind: "text", value: seg.slice(last) });
+  };
+  let last = 0;
+  for (const m of text.matchAll(BOLD_RE)) {
+    if (m.index > last) pushLinks(text.slice(last, m.index));
+    out.push({ kind: "bold", value: m[1] });
+    last = m.index + m[0].length;
+  }
+  pushLinks(text.slice(last));
+  return out;
 }
 
 // Fixed costs split by headcount, per-person costs pass through.
