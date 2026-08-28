@@ -27,8 +27,8 @@ const MIAMI_COSTS: CostItem[] = [
   { id: "boat", label: "Boat day + tip", amount: 1160, kind: "fixed-split", activityId: "boat" },
   { id: "everglades", label: "Everglades entry + bike", amount: 35, kind: "per-person", activityId: "everglades" },
   // 2 midsize/SUV rentals, Thu–Sun (~4 days): ~$55/day base + ~30% taxes/fees
-  // + $2/day FL surcharge ≈ $72/day/car → ~$580, + gas/tolls ~$60 + garages ~$80.
-  { id: "cars", label: "2 rental cars, Thu–Sun (taxes, gas, tolls, parking)", amount: 720, kind: "fixed-split", rangeLabel: "$650–800 total" },
+  // + $2/day FL surcharge ≈ $72/day/car → ~$580, + gas/tolls ~$60. Parking free.
+  { id: "cars", label: "2 rental cars, Thu–Sun (taxes, gas, tolls)", amount: 640, kind: "fixed-split", rangeLabel: "$580–700 total" },
   { id: "oleta", label: "Oleta entry + kayak", amount: 35, kind: "per-person", activityId: "oleta" },
   { id: "club-fri", label: "Friday club night (GA + drinks)", amount: 187, kind: "per-person", activityId: "club-fri", rangeLabel: "$150–225" },
   { id: "club-halloween", label: "Halloween Saturday (GA + drinks)", amount: 188, kind: "per-person", activityId: "club-halloween", rangeLabel: "$150–225" },
