@@ -134,7 +134,7 @@ export default function TripPage({
 
   if (phase === "loading") {
     return (
-      <main className="flex min-h-screen items-center justify-center">
+      <main className="trip-light flex min-h-screen items-center justify-center">
         <p className="animate-pulse text-sm text-muted">Loading…</p>
       </main>
     );
@@ -142,19 +142,22 @@ export default function TripPage({
 
   if (phase === "locked") {
     return (
-      <PasscodeGate
-        tripTitle={trip.title}
-        error={gateError}
-        onSubmit={(p) => {
-          setGateError(null);
-          void tryUnlock(p, myName);
-        }}
-      />
+      <div className="trip-light min-h-screen">
+        <PasscodeGate
+          tripTitle={trip.title}
+          error={gateError}
+          onSubmit={(p) => {
+            setGateError(null);
+            void tryUnlock(p, myName);
+          }}
+        />
+      </div>
     );
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-5 pb-28 pt-12">
+    <div className="trip-light min-h-screen">
+      <main className="mx-auto max-w-2xl px-5 pb-28 pt-12">
       <header className="mb-8">
         <p className="text-xs uppercase tracking-[0.3em] text-muted">
           {trip.dates} · {trip.location}
@@ -201,8 +204,9 @@ export default function TripPage({
         </motion.div>
       </AnimatePresence>
 
-      <TabBar tabs={TABS} active={tab} onChange={setTab} />
-    </main>
+        <TabBar tabs={TABS} active={tab} onChange={setTab} />
+      </main>
+    </div>
   );
 }
 

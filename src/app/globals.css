@@ -38,6 +38,18 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Trip pages are always light — shared with people who never set the site theme. */
+.trip-light {
+  --background: #fbfbfd;
+  --foreground: #1d1d1f;
+  --muted: #6e6e73;
+  --card-from: rgba(0, 0, 0, 0.04);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --card-border-hover: rgba(0, 0, 0, 0.16);
+  background: var(--background);
+  color: var(--foreground);
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
