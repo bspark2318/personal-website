@@ -17,8 +17,9 @@ import { TRIPS } from "./trips-data";
 const miami = TRIPS["miami-2026"];
 
 describe("estimateCost", () => {
-  it("miami at 8 with everything on lands in the doc's $1,000–1,250 range", () => {
-    const { perPerson } = estimateCost(miami.costItems, 8, []);
+  it("miami core plan at 8 (skydive off) lands in the doc's $1,000–1,250 range", () => {
+    // Skydiving is a premium add-on (~$400/pp); the doc's budget is the core plan.
+    const { perPerson } = estimateCost(miami.costItems, 8, ["skydive"]);
     expect(perPerson).toBeGreaterThanOrEqual(1000);
     expect(perPerson).toBeLessThanOrEqual(1250);
   });

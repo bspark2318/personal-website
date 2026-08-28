@@ -1,10 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { estimateCost, type Trip, type TripState } from "@/lib/trips";
+import { estimateCost, type SpendProfile, type Trip, type TripState } from "@/lib/trips";
 
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
+const PROFILES: { id: SpendProfile; label: string; hint: string }[] = [
+  { id: "conservative", label: "Conservative", hint: "low end of every range" },
+  { id: "medium", label: "Medium", hint: "middle of every range" },
+  { id: "aggressive", label: "Aggressive", hint: "high end of every range" },
+];
 
 export default function CostEstimator({
   trip,
@@ -14,6 +20,7 @@ export default function CostEstimator({
   state: TripState | null;
 }) {
   const [headcount, setHeadcount] = useState(trip.crew.length);
+  const [profile, setProfile] = useState<SpendProfile>("medium");
   // Explicit chip toggles override the vote-derived default (id → on/off).
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
 
@@ -22,7 +29,8 @@ export default function CostEstimator({
   const isOn = (id: string) => overrides[id] ?? myVotes?.[id] !== "down";
   const off = trip.activities.filter((a) => !isOn(a.id)).map((a) => a.id);
 
-  const { perPerson, lines } = estimateCost(trip.costItems, headcount, off);
+  const { perPerson, lines } = estimateCost(trip.costItems, headcount, off, profile);
+  const activeHint = PROFILES.find((p) => p.id === profile)?.hint;
   const toggle = (id: string) =>
     setOverrides((prev) => ({ ...prev, [id]: !isOn(id) }));
 
@@ -36,6 +44,30 @@ export default function CostEstimator({
           {fmt(perPerson)}
         </p>
         <p className="mt-1 text-sm text-muted">per person + flights</p>
+      </section>
+
+      <section>
+        <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted">
+          Spend level
+        </p>
+        <div className="flex rounded-full border border-card-border p-1">
+          {PROFILES.map((p) => {
+            const on = p.id === profile;
+            return (
+              <button
+                key={p.id}
+                onClick={() => setProfile(p.id)}
+                aria-pressed={on}
+                className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
+                  on ? "bg-foreground text-background" : "text-muted hover:text-foreground"
+                }`}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+        {activeHint && <p className="mt-2 text-xs text-muted">{activeHint}</p>}
       </section>
 
       <section>

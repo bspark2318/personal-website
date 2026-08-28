@@ -1,4 +1,4 @@
-import type { Activity, CostItem, CrewMember, Trip } from "./trips";
+import type { Activity, CostItem, CrewMember, StayOption, Trip } from "./trips";
 
 // TODO(bspark): replace remaining placeholder crew with the real names.
 const MIAMI_CREW: CrewMember[] = [
@@ -25,6 +25,22 @@ const MIAMI_ACTIVITIES: Activity[] = [
       "Bring a packed **cooler** from the house.",
       "Book via **GetMyBoat / Boatsetter / Aqua**; confirm fuel, cooler/ice, sandbar stop, and **cancellation policy**. Slots book **2–4 weeks out**.",
       "Ask the charter to include **snorkel gear** — sandbar water is shallow and clear.",
+    ],
+    votable: true,
+  },
+  {
+    id: "skydive",
+    emoji: "🪂",
+    title: "Skydiving — tandem jump",
+    route: "Homestead · 13,500 ft",
+    price: "$230–350",
+    facts: ["Tandem 13,500 ft", "~60 sec freefall", "Cars needed", "45–60 min south"],
+    blurb: "**Skydive Miami** at Homestead: tandem from **13,500 ft**, ~**60 sec of freefall** over the **coast, Biscayne Bay, and the Everglades**.",
+    details: [
+      "**$230–350/pp** for the jump (weekday cheaper); **handcam video + photos** add ~**$100–120**.",
+      "**Homestead General Airport**, ~45–60 min south — **cars needed**. Book the **first morning slot**: calmest winds, least likely to scrub.",
+      "Weight limit ~**230–240 lb**, photo ID, closed-toe shoes. **Weather-dependent** — they rebook if it's windy or storming.",
+      "Reserve **2–3 weeks out** at **skydivemiami.com**; whoever sits out can watch the landings from the drop zone.",
     ],
     votable: true,
   },
@@ -131,23 +147,93 @@ const MIAMI_ACTIVITIES: Activity[] = [
 const MIAMI_COSTS: CostItem[] = [
   { id: "house", label: "Airbnb (3 nights)", amount: 1600, kind: "fixed-split" },
   { id: "boat", label: "Boat day + tip", amount: 1160, kind: "fixed-split", activityId: "boat" },
+  { id: "skydive", label: "Skydiving — tandem + video", amount: 400, low: 230, high: 470, kind: "per-person", activityId: "skydive", rangeLabel: "$230–470" },
   { id: "everglades", label: "Everglades bike + split entry", amount: 32, kind: "per-person", activityId: "everglades" },
   // Booking.com quotes, MIA Thu→Sun, reputable tier (Alamo/Enterprise/Dollar,
   // 9+ rated): compact SUV ~$240–290/3 days all-in → 2 cars ~$540 + gas/tolls ~$60.
-  { id: "cars", label: "2 rental SUVs, Thu–Sun (taxes, gas, tolls)", amount: 600, kind: "fixed-split", rangeLabel: "$540–660 total" },
+  { id: "cars", label: "2 rental SUVs, Thu–Sun (taxes, gas, tolls)", amount: 600, low: 540, high: 660, kind: "fixed-split", rangeLabel: "$540–660 total" },
   { id: "oleta", label: "Oleta entry + kayak", amount: 35, kind: "per-person", activityId: "oleta" },
   // First night out — a general nightlife budget line, not tied to a votable
   // activity (the E11EVEN/Space card lives in the Night tab now).
-  { id: "club-fri", label: "First night out (GA + drinks)", amount: 187, kind: "per-person", rangeLabel: "$150–225" },
-  { id: "club-sat", label: "Saturday night (GA + drinks)", amount: 188, kind: "per-person", activityId: "club-sat", rangeLabel: "$150–225" },
-  { id: "food", label: "Food (3 days)", amount: 190, kind: "per-person", rangeLabel: "$150–240" },
-  { id: "joes", label: "Joe's Stone Crab", amount: 60, kind: "per-person", activityId: "joes", rangeLabel: "$40–80" },
+  { id: "club-fri", label: "First night out (GA + drinks)", amount: 187, low: 150, high: 225, kind: "per-person", rangeLabel: "$150–225" },
+  { id: "club-sat", label: "Saturday night (GA + drinks)", amount: 188, low: 150, high: 225, kind: "per-person", activityId: "club-sat", rangeLabel: "$150–225" },
+  { id: "food", label: "Food (3 days)", amount: 190, low: 150, high: 240, kind: "per-person", rangeLabel: "$150–240" },
+  { id: "joes", label: "Joe's Stone Crab", amount: 60, low: 40, high: 80, kind: "per-person", activityId: "joes", rangeLabel: "$40–80" },
   { id: "ubers", label: "Ubers (club nights — nobody drives)", amount: 40, kind: "per-person" },
+];
+
+// Candidate Airbnbs. Metadata + photos pulled from the live listings;
+// `total` is a rough Oct Thu–Sun all-in estimate — confirm real quotes on Airbnb.
+const IMG = "?im_w=720";
+const MIAMI_STAYS: StayOption[] = [
+  {
+    id: "modern-villa",
+    name: "Modern villa — Design District & Wynwood",
+    url: "https://www.airbnb.com/rooms/1006171965970945656",
+    neighborhood: "Design District / Wynwood",
+    total: 2100,
+    perNight: 700,
+    sleeps: 10,
+    layout: "4 BR · 6 beds · 2 BA · ★4.96 (123)",
+    images: [
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1006171965970945656/original/3b97c449-72d2-46c7-b8a2-117d51f2339d.jpeg" + IMG,
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1006171965970945656/original/1c75aced-a91f-497c-92c9-9c2b67dd0cca.jpeg" + IMG,
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1006171965970945656/original/75dab6e0-772d-4d65-ad1a-7c8fc9686e22.jpeg" + IMG,
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1006171965970945656/original/630c71e3-b934-46a1-a1cb-c7a4440e9596.jpeg" + IMG,
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1006171965970945656/original/df2b8f75-dabf-445d-a31e-28976d5ef205.jpeg" + IMG,
+    ],
+    notes: [
+      "Highest-rated of the three (★4.96, 123 reviews) — the safe pick.",
+      "Walkable to Wynwood; sleeps 10 so we're not maxed at 8.",
+    ],
+  },
+  {
+    id: "big-yard",
+    name: "Big Yard & Fire Pit — near Design District",
+    url: "https://www.airbnb.com/rooms/1572599686379859890",
+    neighborhood: "Near Design District",
+    total: 2700,
+    perNight: 900,
+    sleeps: 14,
+    layout: "4 BR · 9 beds · 3 BA · ★4.92 (25)",
+    images: [
+      "https://a0.muscache.com/im/pictures/airflow/Hosting-1572599686379859890/original/342b9dd0-9274-4882-9ed5-3a6f293ca850.jpg" + IMG,
+      "https://a0.muscache.com/im/pictures/airflow/Hosting-1572599686379859890/original/6077ecf9-4d6a-405c-99be-aca0d3cc3188.jpg" + IMG,
+      "https://a0.muscache.com/im/pictures/airflow/Hosting-1572599686379859890/original/c90ef2a0-2064-418c-ad85-d1c978417bdf.jpg" + IMG,
+      "https://a0.muscache.com/im/pictures/airflow/Hosting-1572599686379859890/original/79012a73-e4e3-4cd4-89a0-a22879d6999e.jpg" + IMG,
+      "https://a0.muscache.com/im/pictures/airflow/Hosting-1572599686379859890/original/0cf7e05b-7158-4f1f-af77-e73d1e3710ff.jpg" + IMG,
+    ],
+    notes: [
+      "Backyard + fire pit — the pregame spot. Sleeps 14, most beds.",
+      "Newest listing, fewest reviews (25) but strong rating.",
+    ],
+  },
+  {
+    id: "cloud-couch",
+    name: "Cloud Couch — Design District",
+    url: "https://www.airbnb.com/rooms/1299863899868599119",
+    neighborhood: "Design District",
+    total: 1900,
+    perNight: 633,
+    sleeps: 8,
+    layout: "4 BR · 5 beds · 3 BA · ★4.93 (68)",
+    images: [
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1299863899868599119/original/ebaf470c-29c7-4eeb-85ec-f26f6198d4e6.jpeg" + IMG,
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1299863899868599119/original/a47187ac-06bb-4633-81db-b64152924c85.jpeg" + IMG,
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1299863899868599119/original/ed2acc57-550a-401d-8cfb-b0e0f6aef0ce.jpeg" + IMG,
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1299863899868599119/original/421e2d31-0074-4e9d-958d-7f738095f57d.jpeg" + IMG,
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1299863899868599119/original/0268661e-811b-4d4c-8214-361589a1df09.jpeg" + IMG,
+    ],
+    notes: [
+      "Exactly 8 beds for 8 — tightest fit, no extra room.",
+      "Design District location; solid ★4.93 over 68 reviews.",
+    ],
+  },
 ];
 
 const miami2026: Trip = {
   slug: "miami-2026",
-  title: "Miami Crew Trip",
+  title: "Miami '26",
   dates: "Oct 2026 · weekend TBD",
   location: "Miami — hood TBD",
   crew: MIAMI_CREW,
@@ -377,6 +463,7 @@ const miami2026: Trip = {
   ],
   activities: MIAMI_ACTIVITIES,
   costItems: MIAMI_COSTS,
+  stays: MIAMI_STAYS,
 };
 
 export const TRIPS: Record<string, Trip> = {

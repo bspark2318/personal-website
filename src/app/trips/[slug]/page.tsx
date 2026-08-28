@@ -9,6 +9,7 @@ import FoodTab from "@/components/trips/FoodTab";
 import NightlifeTab from "@/components/trips/NightlifeTab";
 import NameGate from "@/components/trips/NameGate";
 import OverviewTab from "@/components/trips/OverviewTab";
+import StayTab from "@/components/trips/StayTab";
 import TabBar from "@/components/trips/TabBar";
 import RsvpPanel from "@/components/trips/RsvpPanel";
 import {
@@ -23,9 +24,9 @@ import { TRIPS } from "@/lib/trips-data";
 const TABS = [
   { id: "overview", label: "Overview" },
   { id: "activities", label: "Activities" },
+  { id: "stay", label: "Stay" },
   { id: "food", label: "Food" },
   { id: "night", label: "Night" },
-  { id: "costs", label: "Costs" },
   { id: "rsvp", label: "RSVP" },
 ];
 
@@ -195,19 +196,22 @@ export default function TripPage({
               onVote={sendVote}
             />
           )}
+          {tab === "stay" && <StayTab trip={trip} />}
           {tab === "food" && <FoodTab trip={trip} />}
           {tab === "night" && <NightlifeTab trip={trip} />}
-          {tab === "costs" && <CostEstimator trip={trip} state={state} />}
           {tab === "rsvp" && (
-            <RsvpPanel
-              crew={trip.crew}
-              dateOptions={trip.dateOptions}
-              myName={myName}
-              state={state}
-              canRsvp={Boolean(myName) && !dbDown}
-              onRsvp={sendRsvp}
-              onDatePref={sendDatePref}
-            />
+            <div className="space-y-12">
+              <RsvpPanel
+                crew={trip.crew}
+                dateOptions={trip.dateOptions}
+                myName={myName}
+                state={state}
+                canRsvp={Boolean(myName) && !dbDown}
+                onRsvp={sendRsvp}
+                onDatePref={sendDatePref}
+              />
+              <CostEstimator trip={trip} state={state} />
+            </div>
           )}
         </motion.div>
       </AnimatePresence>
