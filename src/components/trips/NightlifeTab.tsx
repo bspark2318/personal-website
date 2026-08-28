@@ -1,6 +1,10 @@
 "use client";
 
+import { useLayoutEffect, useRef, useState } from "react";
 import type { DateOption, LineupSlot, Trip, Venue } from "@/lib/trips";
+
+// Every ticker scrolls at the same visual pace regardless of content length.
+const TAPE_PX_PER_SEC = 55;
 
 // Flatten a venue's lineups into an ordered ticker-tape sequence:
 // each candidate weekend becomes an "index" marker, followed by its acts
@@ -22,10 +26,28 @@ function toTicks(lineups: NonNullable<Venue["lineups"]>, options: DateOption[]):
 }
 
 function Tape({ ticks }: { ticks: Tick[] }) {
-  // Duration scales with content so scroll speed stays constant across venues.
-  const duration = Math.max(ticks.length * 3.5, 16);
+  const runRef = useRef<HTMLSpanElement>(null);
+  const [duration, setDuration] = useState(20);
+
+  // Derive duration from the run's real pixel width so every tape moves at the
+  // same px/sec. Re-measure on resize and after the mono webfont loads.
+  useLayoutEffect(() => {
+    const measure = () => {
+      const w = runRef.current?.scrollWidth ?? 0;
+      if (w) setDuration(w / TAPE_PX_PER_SEC);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    document.fonts?.ready.then(measure).catch(() => {});
+    return () => window.removeEventListener("resize", measure);
+  }, [ticks]);
+
   const run = (aria: boolean) => (
-    <span className="tape__run" aria-hidden={aria || undefined}>
+    <span
+      className="tape__run"
+      aria-hidden={aria || undefined}
+      ref={aria ? undefined : runRef}
+    >
       {ticks.map((t, i) => {
         if (t.kind === "week")
           return (

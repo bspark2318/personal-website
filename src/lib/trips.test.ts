@@ -17,12 +17,15 @@ import { TRIPS } from "./trips-data";
 const miami = TRIPS["miami-2026"];
 
 describe("estimateCost", () => {
-  it("miami core plan at 8 (skydive + fishing off) lands in the doc's $1,000–1,250 range", () => {
+  it("miami core plan at 8 (skydive + fishing off) lands in the ~$900–1,150 range, ex-flights", () => {
     // Skydiving (~$400/pp) and fishing (an alternative to the boat day) are
-    // add-ons; the doc's budget is the core plan with the boat.
-    const { perPerson } = estimateCost(miami.costItems, 8, ["skydive", "fishing"]);
-    expect(perPerson).toBeGreaterThanOrEqual(1000);
-    expect(perPerson).toBeLessThanOrEqual(1250);
+    // add-ons; the core plan keeps the boat. Nights out are a modest $100/pp
+    // each. Range excludes airfare, so subtract the flight line before comparing.
+    const { perPerson, lines } = estimateCost(miami.costItems, 8, ["skydive", "fishing"]);
+    const flights = lines.find((l) => l.id === "flights")?.perPerson ?? 0;
+    const onGround = perPerson - flights;
+    expect(onGround).toBeGreaterThanOrEqual(900);
+    expect(onGround).toBeLessThanOrEqual(1150);
   });
 
   it("dropping headcount raises fixed-split lines, leaves per-person lines alone", () => {

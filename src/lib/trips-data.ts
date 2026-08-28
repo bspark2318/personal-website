@@ -3,8 +3,8 @@ import type { Activity, CostItem, CrewMember, StayOption, Trip } from "./trips";
 // TODO(bspark): replace remaining placeholder crew with the real names.
 const MIAMI_CREW: CrewMember[] = [
   { first: "BumSu", last: "Park" },
-  { first: "Guest 2", last: "Two" },
-  { first: "Guest 3", last: "Three" },
+  { first: "Emily", last: "Lam" },
+  { first: "Taku", last: "Takamatsu" },
   { first: "Guest 4", last: "Four" },
   { first: "Guest 5", last: "Five" },
   { first: "Guest 6", last: "Six" },
@@ -161,6 +161,8 @@ const MIAMI_ACTIVITIES: Activity[] = [
 
 // Budget §7 of the doc: per-person total at 8 people ≈ $1,125.
 const MIAMI_COSTS: CostItem[] = [
+  // Roundtrip domestic airfare to MIA — single reasonable estimate, no range.
+  { id: "flights", label: "Flights — roundtrip to MIA", amount: 300, kind: "per-person" },
   // Budget-to-splurge spread for the house — from a cheaper find to a nicer stay.
   { id: "house", label: "Airbnb (3 nights)", amount: 1600, low: 1200, high: 2000, kind: "fixed-split", rangeLabel: "$1,200–2,000 total" },
   { id: "boat", label: "Boat day + tip", amount: 1160, kind: "fixed-split", activityId: "boat" },
@@ -173,8 +175,8 @@ const MIAMI_COSTS: CostItem[] = [
   { id: "cars", label: "2 rental SUVs, Thu–Sun (taxes, gas, tolls)", amount: 600, low: 540, high: 660, kind: "fixed-split", rangeLabel: "$540–660 total" },
   { id: "oleta", label: "Oleta entry + kayak", amount: 35, kind: "per-person", activityId: "oleta" },
   // Both nights are optional — toggle either off in the estimator (or 👎 it).
-  { id: "club-fri", label: "First night out (GA + drinks)", amount: 187, low: 150, high: 225, kind: "per-person", activityId: "club-fri", rangeLabel: "$150–225" },
-  { id: "club-sat", label: "Saturday night (GA + drinks)", amount: 188, low: 150, high: 225, kind: "per-person", activityId: "club-sat", rangeLabel: "$150–225" },
+  { id: "club-fri", label: "First night out (GA + drinks)", amount: 100, low: 50, high: 150, kind: "per-person", activityId: "club-fri", rangeLabel: "$50–150" },
+  { id: "club-sat", label: "Saturday night (GA + drinks)", amount: 100, low: 50, high: 150, kind: "per-person", activityId: "club-sat", rangeLabel: "$50–150" },
   { id: "food", label: "Food (3 days)", amount: 190, low: 150, high: 240, kind: "per-person", rangeLabel: "$150–240" },
   { id: "joes", label: "Joe's Stone Crab", amount: 60, low: 40, high: 80, kind: "per-person", activityId: "joes", rangeLabel: "$40–80" },
   { id: "ubers", label: "Ubers (club nights — nobody drives)", amount: 40, kind: "per-person" },

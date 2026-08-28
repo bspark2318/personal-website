@@ -242,6 +242,17 @@ function amountFor(item: CostItem, profile: SpendProfile): number {
   return item.amount;
 }
 
+// Per-person cost of a single line at the given headcount + spend profile.
+// Fixed-split totals divide by headcount; per-person totals pass through.
+export function costLinePerPerson(
+  item: CostItem,
+  headcount: number,
+  profile: SpendProfile = "medium"
+): number {
+  const total = amountFor(item, profile);
+  return item.kind === "fixed-split" ? total / headcount : total;
+}
+
 // Fixed costs split by headcount, per-person costs pass through.
 // Items tied to a toggled-off activity are excluded.
 export function estimateCost(
@@ -253,15 +264,12 @@ export function estimateCost(
   const off = new Set(offActivityIds);
   const lines: CostLine[] = items
     .filter((i) => !i.activityId || !off.has(i.activityId))
-    .map((i) => {
-      const total = amountFor(i, profile);
-      return {
-        id: i.id,
-        label: i.label,
-        perPerson: i.kind === "fixed-split" ? total / headcount : total,
-        ...(i.rangeLabel ? { rangeLabel: i.rangeLabel } : {}),
-      };
-    });
+    .map((i) => ({
+      id: i.id,
+      label: i.label,
+      perPerson: costLinePerPerson(i, headcount, profile),
+      ...(i.rangeLabel ? { rangeLabel: i.rangeLabel } : {}),
+    }));
   return { perPerson: lines.reduce((s, l) => s + l.perPerson, 0), lines };
 }
 
