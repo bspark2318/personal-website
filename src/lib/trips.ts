@@ -8,6 +8,7 @@ export type CostKind = "fixed-split" | "per-person";
 export interface Activity {
   id: string;
   title: string;
+  emoji?: string;
   /** Loose timing hint, e.g. "Sat morning" — not a schedule. */
   when?: string;
   blurb: string;
@@ -45,6 +46,8 @@ export interface ConditionStat {
   label: string;
   value: string;
   sub?: string;
+  /** Bento sizing: big = 2×2 hero tile, wide = 2×1. */
+  span?: "big" | "wide";
 }
 
 // "84–87°F" → "29–31°C"; strings without °F pass through untouched.

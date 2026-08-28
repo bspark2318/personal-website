@@ -15,6 +15,7 @@ const MIAMI_CREW = [
 const MIAMI_ACTIVITIES: Activity[] = [
   {
     id: "boat",
+    emoji: "🚤",
     title: "Private boat — sandbar + skyline",
     when: "best Sat morning",
     blurb: "Captained 30–40ft, 4 hrs, BYOB. Star Island celeb mansions → Haulover Sandbar (anchor, swim, float, party scene) → Biscayne Bay skyline.",
@@ -27,6 +28,7 @@ const MIAMI_ACTIVITIES: Activity[] = [
   },
   {
     id: "everglades",
+    emoji: "🐊",
     title: "Everglades — Shark Valley bikes",
     when: "any morning, cars needed",
     blurb: "15-mile flat paved loop through gator country — they sun themselves ON the path. 45-ft observation tower at the halfway point. 2–3 hrs.",
@@ -40,6 +42,7 @@ const MIAMI_ACTIVITIES: Activity[] = [
   },
   {
     id: "little-havana",
+    emoji: "🇨🇺",
     title: "Little Havana — Calle Ocho",
     when: "easy first evening",
     blurb: "Walk SW 8th St: Domino Park old-timers, cigar rollers at Cuba Tobacco, Azucar ice cream (guava + cheese). Dinner at Sanguich or Versailles.",
@@ -51,6 +54,7 @@ const MIAMI_ACTIVITIES: Activity[] = [
   },
   {
     id: "joes",
+    emoji: "🦞",
     title: "Joe's Stone Crab",
     when: "dinner, any night",
     blurb: "100+ years old, tuxedoed waiters, stone crab season just opened Oct 15. Claws + mustard sauce, hash browns, creamed spinach, key lime pie.",
@@ -63,6 +67,7 @@ const MIAMI_ACTIVITIES: Activity[] = [
   },
   {
     id: "club-fri",
+    emoji: "🪩",
     title: "Club night — E11EVEN / Space",
     when: "any night that isn't Halloween",
     blurb: "E11EVEN: 24/7 ultraclub, performers over the crowd, hip-hop-leaning. Club Space literally across the street: house/techno temple, Terrace runs past sunrise.",
@@ -75,6 +80,7 @@ const MIAMI_ACTIVITIES: Activity[] = [
   },
   {
     id: "club-halloween",
+    emoji: "🎃",
     title: "Halloween Saturday",
     when: "Sat 10/24 — fixed",
     blurb: "The one immovable night: Wynwood becomes Miami's biggest street costume party. Costumes mandatory.",
@@ -87,6 +93,7 @@ const MIAMI_ACTIVITIES: Activity[] = [
   },
   {
     id: "oleta",
+    emoji: "🛶",
     title: "Oleta River kayaks — manatees",
     when: "best Sun morning",
     blurb: "FL's largest urban park: paddle mangrove tunnels toward Raccoon Island on calm, beginner water. Manatee season is just starting — real chance, not a promise.",
@@ -98,6 +105,7 @@ const MIAMI_ACTIVITIES: Activity[] = [
   },
   {
     id: "beach",
+    emoji: "🌴",
     title: "South Beach / Mid-Beach hours",
     when: "whenever",
     blurb: "Ocean's 83°F. Default filler between everything else — post-boat, pre-Joe's, hangover repair.",
@@ -142,12 +150,13 @@ const miami2026: Trip = {
     "Backyard fire pit pregames at our own house, 5 min from everything.",
   ],
   conditions: [
+    { label: "Ocean", value: "83–84°F", sub: "bathwater — no wetsuit", span: "big" },
     { label: "Day high", value: "84–87°F", sub: "sun hits different" },
     { label: "Night low", value: "73–77°F", sub: "shorts at 3 AM, fine" },
-    { label: "Ocean", value: "83–84°F", sub: "bathwater — no wetsuit" },
+    { label: "Sunset", value: "~6:45 PM", sub: "golden hour on the water", span: "wide" },
     { label: "Rain", value: "30–40%", sub: "brief PM shower, moves on" },
-    { label: "Sunset", value: "~6:45 PM", sub: "golden hour on the water" },
-    { label: "Hurricane risk", value: "Low", sub: "past Sep 10 peak; check NHC week-of" },
+    { label: "UV", value: "High", sub: "sunscreen, non-negotiable" },
+    { label: "Hurricane risk", value: "Low", sub: "past Sep 10 peak; check NHC week-of", span: "wide" },
   ],
   food: [
     {

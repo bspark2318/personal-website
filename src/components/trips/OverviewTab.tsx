@@ -41,16 +41,26 @@ export default function OverviewTab({ trip }: { trip: Trip }) {
               </div>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {trip.conditions.map((c) => (
               <div
                 key={c.label}
-                className="rounded-2xl border border-card-border p-4"
+                className={`flex flex-col justify-end rounded-2xl border border-card-border p-4 ${
+                  c.span === "big"
+                    ? "col-span-2 row-span-2 bg-gradient-to-br from-sky-100 to-emerald-50"
+                    : c.span === "wide"
+                      ? "col-span-2 bg-gradient-to-br from-amber-50 to-orange-50"
+                      : ""
+                }`}
               >
                 <p className="text-[11px] uppercase tracking-[0.15em] text-muted">
                   {c.label}
                 </p>
-                <p className="display mt-1 text-2xl font-semibold tabular-nums">
+                <p
+                  className={`display mt-1 font-semibold tabular-nums ${
+                    c.span === "big" ? "text-4xl" : "text-2xl"
+                  }`}
+                >
                   {celsius ? toCelsiusLabel(c.value) : c.value}
                 </p>
                 {c.sub && <p className="mt-1 text-xs text-muted">{c.sub}</p>}

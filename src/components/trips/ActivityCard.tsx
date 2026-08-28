@@ -20,7 +20,10 @@ export default function ActivityCard({
   return (
     <section className="rounded-2xl border border-card-border p-5">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="display text-xl font-semibold">{activity.title}</h2>
+        <h2 className="display text-xl font-semibold">
+          {activity.emoji && <span className="mr-2">{activity.emoji}</span>}
+          {activity.title}
+        </h2>
         {activity.when && (
           <span className="shrink-0 text-xs uppercase tracking-[0.15em] text-muted">
             {activity.when}

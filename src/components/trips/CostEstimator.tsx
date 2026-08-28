@@ -70,6 +70,7 @@ export default function CostEstimator({ trip }: { trip: Trip }) {
                       : "border-card-border text-muted line-through"
                   }`}
                 >
+                  {a.emoji && <span className="mr-1">{a.emoji}</span>}
                   {a.title}
                 </button>
               );
