@@ -60,7 +60,8 @@ export function toCelsiusLabel(value: string): string {
     });
 }
 
-export interface ParkPhoto {
+/** A photo with an attribution string, used by highlights and parks. */
+export interface CreditedPhoto {
   src: string;
   credit: string;
 }
@@ -82,7 +83,7 @@ export interface Park {
   tagline: string;
   bullets: string[];
   mapsQuery: string;
-  photos: ParkPhoto[];
+  photos: CreditedPhoto[];
 }
 
 export interface InfoSection {
@@ -92,7 +93,7 @@ export interface InfoSection {
 
 export interface IntroHighlight {
   text: string;
-  photo: ParkPhoto;
+  photo: CreditedPhoto;
 }
 
 export interface Trip {

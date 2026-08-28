@@ -139,6 +139,9 @@ export default function TripPage({
     );
   }
 
+  // TODO: passcode gate is intentionally disabled (tryUnlock opens on 401
+  // instead of locking). This branch, the "locked" phase, PasscodeGate, and
+  // gateError stay here to re-enable it later — don't delete as "dead code".
   if (phase === "locked") {
     return (
       <div className="trip-light min-h-screen">

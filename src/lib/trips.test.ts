@@ -51,6 +51,29 @@ describe("estimateCost", () => {
   });
 });
 
+describe("miami-2026 data shape", () => {
+  it("every highlight has a photo with src + credit", () => {
+    expect(miami.intro.length).toBeGreaterThan(0);
+    for (const h of miami.intro) {
+      expect(h.photo.src).toBeTruthy();
+      expect(h.photo.credit).toBeTruthy();
+    }
+  });
+
+  it("every park has a unique id and at least one credited photo", () => {
+    const ids = miami.parks.map((p) => p.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const park of miami.parks) {
+      // ParkPicker indexes photos[0] unconditionally.
+      expect(park.photos.length).toBeGreaterThanOrEqual(1);
+      for (const photo of park.photos) {
+        expect(photo.src).toBeTruthy();
+        expect(photo.credit).toBeTruthy();
+      }
+    }
+  });
+});
+
 describe("toCelsiusLabel", () => {
   it("converts single temps and ranges, passes through non-temps", () => {
     expect(toCelsiusLabel("83°F")).toBe("28°C");

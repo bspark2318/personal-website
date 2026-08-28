@@ -48,7 +48,7 @@ export default function ParkPicker({ parks }: { parks: Park[] }) {
         >
           {/* eslint-disable @next/next/no-img-element */}
           <img
-            src={active.photos[0].src}
+            src={active.photos[0]?.src}
             alt={active.name}
             className="h-48 w-full object-cover sm:h-64"
           />

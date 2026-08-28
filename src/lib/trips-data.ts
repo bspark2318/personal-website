@@ -159,7 +159,7 @@ const miami2026: Trip = {
     },
     {
       text: "**Deep-sea fishing** option — late October runs **sailfish, mahi, kingfish**.",
-      photo: { src: "/trips/hl-fishing.jpg", credit: "Florida Memory" },
+      photo: { src: "/trips/hl-fishing.jpg", credit: "Florida Memory, public domain" },
     },
     {
       text: "**Joe's Stone Crab** — 100 years old, season opens right before we land.",
