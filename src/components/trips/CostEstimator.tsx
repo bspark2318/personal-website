@@ -177,15 +177,13 @@ export default function CostEstimator({
                       aria-checked={on}
                       aria-label={`${on ? "Remove" : "Add"} ${item.label}`}
                       onClick={() => toggle(item.activityId!)}
-                      className={`relative h-6 w-10 shrink-0 rounded-full transition-colors ${
-                        on ? "bg-green-500" : "bg-card-border"
+                      className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                        on
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-card-border text-muted"
                       }`}
                     >
-                      <span
-                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                          on ? "translate-x-[18px]" : "translate-x-0.5"
-                        }`}
-                      />
+                      {on ? "On" : "Off"}
                     </button>
                   )}
                 </div>
