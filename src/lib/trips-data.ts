@@ -1,15 +1,13 @@
 import type { Activity, CostItem, CrewMember, StayOption, Trip } from "./trips";
 
-// TODO(bspark): replace remaining placeholder crew with the real names.
 const MIAMI_CREW: CrewMember[] = [
   { first: "BumSu", last: "Park" },
   { first: "Emily", last: "Lam" },
   { first: "Taku", last: "Takamatsu" },
-  { first: "Guest 4", last: "Four" },
-  { first: "Guest 5", last: "Five" },
-  { first: "Guest 6", last: "Six" },
-  { first: "Guest 7", last: "Seven" },
-  { first: "Guest 8", last: "Eight" },
+  { first: "Rohan", last: "Datar" },
+  { first: "Andy", last: "Chan" },
+  { first: "Sam", last: "Choi" },
+  { first: "Ratik", last: "Dubey" },
 ];
 
 const MIAMI_ACTIVITIES: Activity[] = [
