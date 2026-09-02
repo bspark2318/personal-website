@@ -93,6 +93,23 @@ const MIAMI_ACTIVITIES: Activity[] = [
     votable: true,
   },
   {
+    id: "birding",
+    emoji: "🦜",
+    title: "Birding — fall migration",
+    when: "Sat or Sun morning",
+    route: "MIA · parks + hammocks",
+    price: "$0–20",
+    facts: ["October = peak migration", "Free–$20/pp guided", "2–3.5 hrs", "Binoculars help"],
+    blurb: "October is **peak fall migration** in Miami — warblers, raptors, spoonbills. Structured options from **free Audubon walks** to a **$20 guided walk at Deering Estate**.",
+    details: [
+      "**Tropical Audubon Society** half-day walks — **free**, ~7:30–11 AM, e.g. **A.D. Barnes Park**; register at tropicalaudubon.org/birding-field-trips.",
+      "**Deering Estate guided bird walk** — **$20/pp incl. admission**, 2nd Saturday monthly (**Oct 10** — lines up with the Oct 8–11 weekend); deeringestate.org.",
+      "Splurge: **Wild Lime Adventures** private guide — **$1,085 for up to 5** (part/full day, hotel pickup) — skip unless people are serious.",
+      "DIY backup: **Bill Baggs (Key Biscayne)** or **Matheson Hammock** at sunrise — both top migration hotspots, park entry only.",
+    ],
+    votable: true,
+  },
+  {
     id: "joes",
     emoji: "🦞",
     title: "Stone crab season — Joe's",
@@ -172,6 +189,7 @@ const MIAMI_COSTS: CostItem[] = [
   // 9+ rated): compact SUV ~$240–290/3 days all-in → 2 cars ~$540 + gas/tolls ~$60.
   { id: "cars", label: "2 rental SUVs, Thu–Sun (taxes, gas, tolls)", amount: 600, low: 540, high: 660, kind: "fixed-split", rangeLabel: "$540–660 total" },
   { id: "oleta", label: "Oleta entry + kayak", amount: 35, kind: "per-person", activityId: "oleta" },
+  { id: "birding", label: "Guided bird walk", amount: 20, low: 0, high: 20, kind: "per-person", activityId: "birding", rangeLabel: "Free–$20" },
   // Both nights are optional — toggle either off in the estimator (or 👎 it).
   { id: "club-fri", label: "First night out (GA + drinks)", amount: 100, low: 50, high: 150, kind: "per-person", activityId: "club-fri", rangeLabel: "$50–150" },
   { id: "club-sat", label: "Saturday night (GA + drinks)", amount: 100, low: 50, high: 150, kind: "per-person", activityId: "club-sat", rangeLabel: "$50–150" },
