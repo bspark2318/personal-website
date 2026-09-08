@@ -270,13 +270,17 @@ const MIAMI_STAYS: StayOption[] = [
 const miami2026: Trip = {
   slug: "miami-2026",
   title: "Miami '26",
-  dates: "Oct 2026 · weekend TBD",
+  dates: "Oct–Nov 2026 · weekend TBD",
   location: "Miami — hood TBD",
   crew: MIAMI_CREW,
   dateOptions: [
     { id: "oct-8", label: "Oct 8–11 (Thu–Sun)" },
     { id: "oct-15", label: "Oct 15–18 (Thu–Sun)" },
     { id: "oct-22", label: "Oct 22–25 (Thu–Sun)" },
+    { id: "nov-5", label: "Nov 5–8 (Thu–Sun)" },
+    { id: "nov-12", label: "Nov 12–15 (Thu–Sun)" },
+    { id: "nov-19", label: "Nov 19–22 (Thu–Sun)" },
+    { id: "nov-26", label: "Nov 26–29 (Thu–Sun · Thanksgiving)" },
   ],
   intro: [
     {
