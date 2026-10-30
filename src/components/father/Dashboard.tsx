@@ -10,6 +10,7 @@ import Trend from "./Trend";
 
 const TABS = [
   { id: "summary", label: "요약" },
+  { id: "prep", label: "진료 준비" },
   { id: "trends", label: "추세" },
   { id: "timeline", label: "타임라인" },
   { id: "labs", label: "검사 수치" },
@@ -83,7 +84,7 @@ export default function Dashboard({ data }: { data: FatherData }) {
           </form>
         </div>
         <div className="mt-3 flex flex-wrap gap-2 text-xs">
-          {[data.patient.dx, data.patient.hospital, data.patient.doctor, `자료 ${data.dates[0]} ~ ${data.dates.at(-1)}`, `갱신 ${data.updated}`].map((c) => (
+          {[data.patient.dx, data.patient.hospital, data.patient.doctor, `${data.patient.weightKg} kg`, data.patient.residence, `자료 ${data.dates[0]} ~ ${data.dates.at(-1)}`, `갱신 ${data.updated}`].map((c) => (
             <span key={c} className="rounded-full border border-card-border px-2.5 py-1 text-muted">{c}</span>
           ))}
         </div>
@@ -100,15 +101,27 @@ export default function Dashboard({ data }: { data: FatherData }) {
                 {kpis.map((l) => <Kpi key={l.name} lab={l} dates={data.dates} />)}
               </div>
               <Card className="border-red-500/30 from-red-500/[0.07]">
-                <Eyebrow>1순위 질문</Eyebrow>
-                <H2>빈혈이 “못 만드는” 것인가, “파괴되는” 것인가?</H2>
+                <Eyebrow>1순위 — 다음 진료</Eyebrow>
+                <H2>{data.priority.title}</H2>
                 <ul className="space-y-2 text-[15px] leading-relaxed">
-                  <li><b>망상적혈구 7–15%</b> (정상 0.5–2) → 골수가 적혈구를 <b>과생산</b> 중. 전형적 MDS(저생산) 그림이 아님.</li>
-                  <li><b>빌리루빈 상승</b> (0.7→2.0) + <b>AST ≫ ALT</b> (212 vs 61) → 적혈구 파괴 산물.</li>
-                  <li>Hb 낮은 날(5/20, 9/16)에 Retic·Bili·AST·Cr·MCV가 <b>동시에 최고</b> → 한 가지 과정으로 설명됨.</li>
-                  <li>→ <b>용혈 또는 무효조혈</b>이 MDS 위에 얹혀 있을 가능성. <b>LDH · haptoglobin · 간접빌리루빈 · Coombs(DAT) · PNH flow</b> 기록 없음 → 요청 필요.</li>
+                  {data.priority.points.map((pt) => <li key={pt} dangerouslySetInnerHTML={{ __html: pt }} />)}
                 </ul>
-                <p className="mt-4 text-xs text-muted">추정 — 의사 확인 필요. Retic %는 RBC 수가 적을 때 과장되지만 절대치도 정상의 3–5배.</p>
+                <p className="mt-4 text-xs text-muted">{data.priority.caveat}</p>
+              </Card>
+              <Card>
+                <H2>가족 확인 결과 <span className="text-sm font-normal text-muted">(2026-10-29)</span></H2>
+                <ul className="divide-y divide-card-border">
+                  {data.family.answered.map((f) => (
+                    <li key={f.q} className="grid gap-1 py-3 sm:grid-cols-[200px_1fr] sm:gap-4">
+                      <span className="font-medium"><span className="mr-2 text-emerald-600 dark:text-emerald-400">✓</span>{f.q}</span>
+                      <span className="text-sm text-muted">{f.a}</span>
+                    </li>
+                  ))}
+                </ul>
+                <h3 className="mt-5 mb-2 text-sm font-semibold text-muted">아직 확인 안 됨</h3>
+                <ul className="space-y-1.5 text-sm">
+                  {data.family.open.map((o) => <li key={o} className="flex gap-2"><span className="text-muted">○</span><span>{o}</span></li>)}
+                </ul>
               </Card>
               <Card>
                 <H2>현재 상태</H2>
@@ -125,6 +138,72 @@ export default function Dashboard({ data }: { data: FatherData }) {
               <Card>
                 <H2>데이터 한계</H2>
                 <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted">{data.gaps.map((g) => <li key={g}>{g}</li>)}</ul>
+              </Card>
+            </>
+          )}
+
+          {tab === "prep" && (
+            <>
+              <Card className="border-red-500/30 from-red-500/[0.07]">
+                <Eyebrow>다음 진료 질문지 · 정철원 교수님께 · 어머니/아버지용</Eyebrow>
+                <H2>꼭 물어볼 것 {data.visitPrep.must.length}개 <span className="text-sm font-normal text-muted">(위에서부터 순서대로)</span></H2>
+                <ol className="space-y-4">
+                  {data.visitPrep.must.map((m, i) => (
+                    <li key={m.q} className="flex gap-3">
+                      <span className="mt-0.5 h-7 w-7 shrink-0 rounded-full bg-foreground text-center text-sm font-bold leading-7 text-background">{i + 1}</span>
+                      <div>
+                        <p className="text-[16px] font-semibold leading-snug">{m.q}</p>
+                        {m.why && <p className="mt-1 text-sm text-muted">→ {m.why}</p>}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-5 text-xs text-muted">메모: {data.visitPrep.memo}</p>
+              </Card>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <Card>
+                  <H2>시간 되면</H2>
+                  <ol className="space-y-2 text-[15px]">
+                    {data.visitPrep.ifTime.map((q, i) => (
+                      <li key={q} className="flex gap-3"><span className="mt-0.5 h-6 w-6 shrink-0 rounded-full bg-foreground/[0.06] text-center text-xs font-semibold leading-6 text-muted">{data.visitPrep.must.length + i + 1}</span><span>{q}</span></li>
+                    ))}
+                  </ol>
+                </Card>
+                <Card>
+                  <H2>진료 끝나고 받아올 것</H2>
+                  <ul className="space-y-2 text-[15px]">
+                    {data.visitPrep.bring.map((b) => <li key={b} className="flex gap-2"><span className="text-muted">☐</span><span>{b}</span></li>)}
+                  </ul>
+                </Card>
+              </div>
+              <Card>
+                <Eyebrow>치료 옵션 조사 · 2026-10-29</Eyebrow>
+                <H2>레블로질 (Luspatercept)</H2>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <h3 className="mb-1.5 text-sm font-semibold">적격성 — 핵심 게이트</h3>
+                    <ul className="list-disc space-y-1 pl-5 text-sm text-muted">{data.luspatercept.gate.map((g) => <li key={g}>{g}</li>)}</ul>
+                  </div>
+                  <div>
+                    <h3 className="mb-1.5 text-sm font-semibold">급여</h3>
+                    <ul className="list-disc space-y-1 pl-5 text-sm text-muted">{data.luspatercept.coverage.map((g) => <li key={g}>{g}</li>)}</ul>
+                    <h3 className="mb-1.5 mt-4 text-sm font-semibold">용법</h3>
+                    <ul className="list-disc space-y-1 pl-5 text-sm text-muted">{data.luspatercept.dosing.map((g) => <li key={g}>{g}</li>)}</ul>
+                  </div>
+                </div>
+                <h3 className="mb-2 mt-6 text-sm font-semibold">비용 추정 <span className="font-normal text-muted">(체중 {data.patient.weightKg}kg · 한국 공시가 미확인)</span></h3>
+                <div className="-mx-5 overflow-x-auto px-5">
+                  <table className="w-full min-w-[480px] text-sm">
+                    <thead><tr className="text-xs uppercase tracking-wider text-muted"><th className="py-2 text-left font-medium">단계</th><th className="py-2 text-left font-medium">용량</th><th className="py-2 text-left font-medium">바이알</th><th className="py-2 text-right font-medium">1회</th><th className="py-2 text-right font-medium">연간(17회)</th></tr></thead>
+                    <tbody>{data.luspatercept.cost.map((c) => (
+                      <tr key={c.step} className="border-t border-card-border"><td className="py-2 font-medium">{c.step}</td><td className="py-2">{c.dose}</td><td className="py-2">{c.vials}</td><td className="py-2 text-right tabular-nums">{c.perShot}</td><td className="py-2 text-right tabular-nums font-semibold">{c.perYear}</td></tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted">{data.luspatercept.costNote.map((g) => <li key={g}>{g}</li>)}</ul>
+                <h3 className="mb-1.5 mt-5 text-sm font-semibold">기대 효과 (MEDALIST)</h3>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-muted">{data.luspatercept.efficacy.map((g) => <li key={g}>{g}</li>)}</ul>
+                <p className="mt-4 text-xs text-muted">출처·상세: ~/Dev/father/notes/luspatercept.md</p>
               </Card>
             </>
           )}
@@ -232,7 +311,11 @@ export default function Dashboard({ data }: { data: FatherData }) {
                   return (
                     <li key={it} className="flex gap-3 text-[15px] leading-relaxed">
                       <span className="mt-0.5 h-6 w-6 shrink-0 rounded-full bg-foreground/[0.06] text-center text-xs font-semibold leading-6 text-muted">{q.tone === "info" ? "·" : n}</span>
-                      <span className={i === 0 && q.tone === "crit" ? "font-semibold" : ""}>{it}</span>
+                      {it.startsWith("~~") ? (
+                        <span className="text-muted"><s>{it.slice(2, it.indexOf("~~", 2))}</s>{it.slice(it.indexOf("~~", 2) + 2)}</span>
+                      ) : (
+                        <span className={i === 0 && q.tone === "crit" ? "font-semibold" : ""}>{it}</span>
+                      )}
                     </li>
                   );
                 })}

@@ -14,7 +14,15 @@ export interface Lab {
 
 export interface FatherData {
   updated: string;
-  patient: { name: string; dx: string; hospital: string; doctor: string };
+  patient: { name: string; dx: string; hospital: string; doctor: string; weightKg: number; residence: string };
+  priority: { title: string; points: string[]; caveat: string };
+  family: { answered: { q: string; a: string }[]; open: string[] };
+  visitPrep: { must: { q: string; why: string }[]; ifTime: string[]; bring: string[]; memo: string };
+  luspatercept: {
+    gate: string[]; coverage: string[]; dosing: string[];
+    cost: { step: string; dose: string; vials: string; perShot: string; perYear: string }[];
+    costNote: string[]; efficacy: string[];
+  };
   dates: string[];
   events: string[];
   meds: { date: string; drug: string; how: string; note: string }[];
@@ -33,12 +41,91 @@ const L = (
 ): Lab => ({ name, unit, lo, hi, values, group, note });
 
 export const FATHER: FatherData = {
-  updated: "2026-10-29",
+  updated: "2026-10-29 (저녁)",
   patient: {
     name: "박종호",
     dx: "MDS · 골수형성이상증후군",
     hospital: "삼성서울병원 혈액종양내과",
     doctor: "정철원 교수",
+    weightKg: 68,
+    residence: "대전 거주 · 서울 진료",
+  },
+  priority: {
+    title: "“피를 만들지만 불량품” — 어떤 용혈인지, 치료 옵션은?",
+    points: [
+      "<b>10/29 아버지 확인:</b> 의사가 <b>용혈</b>이라는 단어를 썼고, “골수가 열심히 만드는데 불량품을 만든다”고 설명 → <b>무효조혈</b>(결함 있는 적혈구가 골수 안/직후 파괴). 수치 패턴(망상적혈구 7–15%, 빌리루빈↑, AST≫ALT)과 일치.",
+      "→ 질문 전환: “용혈 검사 했나요?”가 아니라 <b>“어떤 아형인가요, 레블로질(luspatercept) 쓸 수 있나요?”</b>",
+      "<b>레블로질 적격성 = 골수검사 아형</b> (ring sideroblast 유무). 네스프 경험자는 MDS-RS 아형만 허가. 골수검사 결과를 모르면 판단 불가 → 진료에서 1순위로 확인.",
+      "<b>수혈 빈도 재확인 필요:</b> bs 기억으로는 3/25·6/17에도 수혈(불확실). 맞다면 매 방문 수혈 → 네스프 효과 추정 무효, ferritin(철 과잉) 질문 중요도 상승.",
+    ],
+    caveat: "추정 — 의사 확인 필요. 외부 공격(면역·PNH)보다 MDS 자체 기전일 가능성이 높아졌지만 LDH·haptoglobin·Coombs 기록은 여전히 없음.",
+  },
+  family: {
+    answered: [
+      { q: "의사가 뭐라고 설명했나", a: "“용혈”, “피가 만들어지는데 깨진다”, “열심히 만드는데 불량품” (10/29 아버지)" },
+      { q: "다른 병원 약", a: "없음 — 혈압약·당뇨약·통풍약 없음 (10/29 bs). 공복혈당은 미치료 상태 확정, 요산 저하는 약물 원인 아님" },
+      { q: "체중", a: "68 kg (10/29)" },
+      { q: "3/25, 6/17 수혈 여부", a: "bs 기억: 받았음 (불확실) → 아버지에게 재확인 필요" },
+    ],
+    open: [
+      "실손보험 가입 여부 (레블로질 비급여 비용 보전)",
+      "골수검사 받은 적 있는지, 언제 (아형 → 레블로질 적격성)",
+      "매 방문 수혈하는지, 몇 팩(단위)씩인지",
+      "6/17–9/16 사이 다른 곳에서 네스프 맞았는지",
+      "Hb 7대일 때 증상: 피로, 숨참, 가슴 불편감, 어지러움",
+      "진단서·골수검사 결과지·초기 기록 보관 여부",
+    ],
+  },
+  visitPrep: {
+    must: [
+      { q: "골수검사 결과에 “고리철적혈모구(ring sideroblast)”가 있었나요?", why: "레블로질이라는 약을 쓸 수 있는지가 여기서 갈립니다." },
+      { q: "레블로질(루스파터셉트) 쓸 수 있는 상태인가요? 비급여면 1회 비용이 얼마인가요?", why: "지금 맞는 네스프 주사로는 수혈을 못 끊고 있어서요." },
+      { q: "수혈을 계속 받으면 몸에 철분이 쌓인다고 들었는데, 페리틴(ferritin) 검사는 하고 있나요?", why: "1년 넘게 기록에 없습니다." },
+      { q: "공복혈당이 1년 내내 120~165입니다. 당뇨 아닌가요? 어디서 봐야 하나요?", why: "당화혈색소(HbA1c)는 수혈 환자한테 안 맞는다고 들었습니다. 다른 검사가 있는지요." },
+      { q: "신장 수치(크레아티닌 1.7~2.3)가 계속 나쁩니다. 신장내과도 봐야 하나요?", why: "" },
+    ],
+    ifTime: [
+      "네스프를 더 자주 맞거나 용량을 올릴 수 있나요?",
+      "요산이 계속 낮게 나오는데(2.6~3.0) 이유가 있나요?",
+      "다나졸은 왜 끊었나요? 간 때문이었나요?",
+    ],
+    bring: [
+      "골수검사 결과지 사본 (없으면 의무기록 사본 신청)",
+      "오늘 처방 내역 사진",
+      "수혈했으면 몇 팩인지",
+    ],
+    memo: "교수님이 바쁘시면 1, 2번만이라도.",
+  },
+  luspatercept: {
+    gate: [
+      "한국 허가(ESA 경험자): MDS-RS(고리철적혈모구 동반) 또는 MDS/MPN-RS-T 아형에 한정. 아버지는 네스프 경험자 → 이 조항 적용.",
+      "2024-10 확대 허가(1차 치료)는 ESA 미경험자 대상 → 해당 없음.",
+      "골수검사 아형(ring sideroblast 여부)을 모르면 적격성 판단 불가 → 골수검사 결과가 선결 조건.",
+      "삼성서울병원 DC 통과(2024-09) → 원내 처방 가능.",
+    ],
+    coverage: [
+      "비급여. 2023-08 약평위 불발, 이후 급여 소식 없음 (2026-10 기준).",
+      "희귀질환 산정특례는 비급여 미적용. 실손보험 있으면 상당 부분 보전 가능 → 가입 여부 확인.",
+    ],
+    dosing: [
+      "1.0 mg/kg 피하, 3주 간격. 2회 후 반응 없으면 1.33 → 1.75 mg/kg.",
+      "최대 용량 3회(9주) 후 수혈 부담 감소 없으면 중단.",
+      "바이알 25mg / 75mg, 1회용(잔량 폐기).",
+    ],
+    cost: [
+      { step: "1.0 mg/kg", dose: "68mg", vials: "75 ×1", perShot: "~₩6.6M", perYear: "~₩110M" },
+      { step: "1.33 mg/kg", dose: "90mg", vials: "75+25", perShot: "~₩8.8M", perYear: "~₩150M" },
+      { step: "1.75 mg/kg", dose: "119mg", vials: "75+25+25", perShot: "~₩11M", perYear: "~₩185M" },
+    ],
+    costNote: [
+      "한국 공시가 미확인 — 캐나다 신청가(25mg C$2,189 / 75mg C$6,567) 환산, ±30% 가정. 체중 68kg 기준.",
+      "“효과 있는지 확인”까지 최소 7회 ≈ 21주 ≈ ₩55–65M. 실패하면 중단. 반응하면 무기한 → 연 ₩110–185M.",
+    ],
+    efficacy: [
+      "MEDALIST(ESA 경험·RS 환자): 8주 이상 수혈 독립 38% vs 위약 13%.",
+      "반응자 중앙 지속 ~30주. 영구 해결 아님, 수혈 간격 연장.",
+      "아버지 케이스: 반응 시 수혈 빈도 절반 이하 또는 일시 독립 기대. 비반응 확률 ~60%.",
+    ],
   },
   dates: ["2025-12-24", "2026-03-25", "2026-05-20", "2026-06-17", "2026-09-16"],
   events: [
@@ -57,9 +144,9 @@ export const FATHER: FatherData = {
   ],
   transfusions: [
     { date: "2025-12-24", hb: 8.8, premed: "미입력", read: "–", given: false },
-    { date: "2026-03-25", hb: 9.3, premed: "미입력", read: "수혈 후 값일 가능성 (전 방문 처방 확인 필요)", given: false },
+    { date: "2026-03-25", hb: 9.3, premed: "미입력", read: "처방상 불명. bs 기억으로는 수혈 받음(불확실) → 재확인", given: false },
     { date: "2026-05-20", hb: 7.2, premed: "O", read: "수혈함", given: true },
-    { date: "2026-06-17", hb: 9.1, premed: "X", read: "수혈 없음 — 5/20 수혈 + 네스프 효과", given: false },
+    { date: "2026-06-17", hb: 9.1, premed: "X", read: "처방상 전처치 없음. bs 기억으로는 수혈 받음(불확실) → 재확인", given: false },
     { date: "2026-09-16", hb: 7.4, premed: "O", read: "수혈함", given: true },
   ],
   cbc: [
@@ -98,15 +185,16 @@ export const FATHER: FatherData = {
     L("인", "mg/dL", 2.5, 4.5, [2.9, 3.3, 3.4, 3.2, 3.3]),
   ],
   status: [
-    { item: "빈혈", level: "crit", badge: "수혈 의존", why: "Hb 7.2–9.3. Hb 7대 도달 시 수혈(5/20, 9/16). 간격 약 4개월." },
-    { item: "네스프 120mcg 월 1회", level: "warn", badge: "부분 효과", why: "Hb 하락 속도 −1.1/월 → −0.56/월로 둔화. 수혈 독립은 불가." },
+    { item: "빈혈", level: "crit", badge: "수혈 의존", why: "Hb 7.2–9.3. 처방상 5/20·9/16 수혈 확정. bs 기억으로는 매 방문 수혈(불확실) → 빈도 재확인." },
+    { item: "네스프 120mcg 월 1회", level: "q", badge: "효과 불명", why: "수혈 독립은 분명히 안 됨. 하락 속도 비교는 수혈 단위 수를 모르면 계산 불가 → 이전 ‘부분 효과’ 추정 무효." },
     { item: "다나졸", level: "q", badge: "중단 (~5월)", why: "ALT 123 피크 후 중단과 함께 하강 → 간독성 추정. 혈소판 ~75 하락 동반." },
     { item: "AST 212", level: "crit", badge: "적혈구 기원 추정", why: "ALT 61과 분리 → 간이 아닌 적혈구에서 나오는 것으로 보임." },
     { item: "신장 eGFR 30–44", level: "warn", badge: "CKD 3b", why: "Hb 낮을 때 악화, 수혈 후 일부 회복. 장기 추세 불명확." },
-    { item: "공복혈당 119–165", level: "warn", badge: "당뇨 범위", why: "전 기간 상승, 치료 기록 없음. HbA1c 미확인." },
-    { item: "요산 2.6–3.0", level: "q", badge: "설명 안 됨", why: "세포 파괴가 많으면 높아야 정상인데 낮음." },
+    { item: "공복혈당 119–165", level: "warn", badge: "당뇨 범위 · 미치료", why: "당뇨약 없음 확인(10/29). HbA1c는 수혈 환자에 부정확 → 대체 검사 질문." },
+    { item: "요산 2.6–3.0", level: "q", badge: "설명 안 됨", why: "세포 파괴가 많으면 높아야 정상인데 낮음. 통풍약 없음 확인 → 약물 원인 아님." },
     { item: "급성 전환 징후", level: "ok", badge: "없음", why: "Blast 0%, 혈소판 정상." },
     { item: "감염 위험", level: "warn", badge: "경도", why: "ANC 1.5–2.0 경계, 림프구 <1.0." },
+    { item: "레블로질 (luspatercept)", level: "q", badge: "적격성 미확인", why: "골수검사 아형(RS 여부)에 달림. 비급여 연 ₩110–185M 추정. 실손 확인 필요." },
   ],
   gaps: [
     "포털 수치 전부 입력 완료 (CBC 5회 · 화학 5회 · EPO 1회 · 처방 5회).",
@@ -115,7 +203,7 @@ export const FATHER: FatherData = {
     "2025-10-01 이전(진단 당시) 기록 미확인.",
   ],
   questions: [
-    { section: "A. 빈혈의 원인 — 가장 중요", tone: "crit", items: [
+    { section: "A. 빈혈의 원인 — 10/29 이후 1·2번은 ‘검사했나’가 아니라 ‘어떤 용혈인지·치료 옵션’으로 물을 것", tone: "crit", items: [
       "망상적혈구가 7–15%로 계속 높은데, 골수가 못 만드는 게 아니라 만든 적혈구가 파괴되는 것 아닌가요? 용혈 검사 — LDH, haptoglobin, 간접 빌리루빈, Coombs(DAT) — 한 적이 있나요? 없다면 해주실 수 있나요?",
       "MDS 환자에서 PNH 클론이 같이 있는 경우가 있다고 들었는데, PNH flow cytometry 검사가 되어 있나요?",
       "AST가 212인데 ALT는 61입니다. 간이 아니라 적혈구에서 나오는 것 아닌가요?",
@@ -134,11 +222,13 @@ export const FATHER: FatherData = {
       "단핵구가 15–19%로 계속 높습니다. 진단에 반영된 부분인가요?",
     ]},
     { section: "D. 가족 확인 사항 (병원 아닌 가족에게)", tone: "info", items: [
-      "다른 병원에서 받는 약이 있는지 (혈압약, 당뇨약, 요산약 등)",
-      "3/25, 6/17에 실제로 수혈(2–4시간 수액)을 받았는지, 아니면 주사만 맞고 갔는지",
+      "실손보험 가입 여부 (레블로질 비급여 비용 보전 가능 여부 결정)",
+      "골수검사 받은 적 있는지, 언제 (아형 확인 → 레블로질 적격성)",
+      "매 방문 수혈? 몇 팩씩? (bs 기억: 3/25·6/17도 받았음, 불확실)",
       "6/17–9/16 사이 다른 곳에서 네스프를 맞은 적 있는지",
       "Hb 7대일 때 증상: 피로, 숨참, 가슴 불편감, 어지러움",
       "진단서·골수검사 결과지·초기 검사 기록 보관 여부",
+      "~~다른 병원 약~~ → 없음 (10/29 확인)",
     ]},
   ],
   glossary: [
@@ -157,6 +247,10 @@ export const FATHER: FatherData = {
     { term: "ANC / ALC / 단핵구", def: "중성구(세균 방어)·림프구(바이러스 방어)·단핵구 수. ANC <1.5 감염 주의. 단핵구 ≥10% 지속은 CMML 기준에 해당." },
     { term: "IPSS-R", def: "MDS 위험도 점수. blast %, 염색체, 혈구 수치로 산출. 치료 방향 결정의 기준." },
     { term: "Ferritin", def: "체내 철 저장량. 반복 수혈 시 철 과잉 → 간·심장 손상 가능." },
+    { term: "고리철적혈모구 (Ring sideroblast, RS)", def: "골수검사에서 철이 고리 모양으로 쌓인 미성숙 적혈구. 있으면 MDS-RS 아형 → 레블로질 허가 대상." },
+    { term: "레블로질 (Luspatercept)", def: "적혈구가 ‘완성’되도록 돕는 주사(3주 간격). 네스프 실패한 MDS-RS 환자용. 비급여, 수혈 독립률 ~38%." },
+    { term: "MEDALIST", def: "레블로질 허가 근거 임상시험. ESA 경험·RS 환자 대상." },
+    { term: "실손보험", def: "비급여 치료비를 보전하는 민간 보험. 레블로질 비용의 핵심 변수." },
   ],
 };
 
