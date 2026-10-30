@@ -113,13 +113,13 @@ export const FATHER: FatherData = {
       "바이알 25mg / 75mg, 1회용(잔량 폐기).",
     ],
     cost: [
-      { step: "1.0 mg/kg", dose: "68mg", vials: "75 ×1", perShot: "~₩6.6M", perYear: "~₩110M" },
-      { step: "1.33 mg/kg", dose: "90mg", vials: "75+25", perShot: "~₩8.8M", perYear: "~₩150M" },
-      { step: "1.75 mg/kg", dose: "119mg", vials: "75+25+25", perShot: "~₩11M", perYear: "~₩185M" },
+      { step: "1.0 mg/kg", dose: "68mg", vials: "75 ×1", perShot: "약 660만원", perYear: "약 1억 1천만원" },
+      { step: "1.33 mg/kg", dose: "90mg", vials: "75+25", perShot: "약 880만원", perYear: "약 1억 5천만원" },
+      { step: "1.75 mg/kg", dose: "119mg", vials: "75+25+25", perShot: "약 1,100만원", perYear: "약 1억 8,500만원" },
     ],
     costNote: [
-      "한국 공시가 미확인 — 캐나다 신청가(25mg C$2,189 / 75mg C$6,567) 환산, ±30% 가정. 체중 68kg 기준.",
-      "“효과 있는지 확인”까지 최소 7회 ≈ 21주 ≈ ₩55–65M. 실패하면 중단. 반응하면 무기한 → 연 ₩110–185M.",
+      "한국 공시가 미확인 — 캐나다 신청가(25mg 약 220만원 / 75mg 약 660만원) 환산, ±30% 가정. 체중 68kg 기준.",
+      "“효과 있는지 확인”까지 최소 7회 ≈ 21주 ≈ 5,500만~6,500만원. 실패하면 중단. 반응하면 무기한 → 연 1억 1천만~1억 8,500만원.",
     ],
     efficacy: [
       "MEDALIST(ESA 경험·RS 환자): 8주 이상 수혈 독립 38% vs 위약 13%.",
@@ -194,7 +194,7 @@ export const FATHER: FatherData = {
     { item: "요산 2.6–3.0", level: "q", badge: "설명 안 됨", why: "세포 파괴가 많으면 높아야 정상인데 낮음. 통풍약 없음 확인 → 약물 원인 아님." },
     { item: "급성 전환 징후", level: "ok", badge: "없음", why: "Blast 0%, 혈소판 정상." },
     { item: "감염 위험", level: "warn", badge: "경도", why: "ANC 1.5–2.0 경계, 림프구 <1.0." },
-    { item: "레블로질 (luspatercept)", level: "q", badge: "적격성 미확인", why: "골수검사 아형(RS 여부)에 달림. 비급여 연 ₩110–185M 추정. 실손 확인 필요." },
+    { item: "레블로질 (luspatercept)", level: "q", badge: "적격성 미확인", why: "골수검사 아형(RS 여부)에 달림. 비급여 연 1억 1천만~1억 8,500만원 추정. 실손 확인 필요." },
   ],
   gaps: [
     "포털 수치 전부 입력 완료 (CBC 5회 · 화학 5회 · EPO 1회 · 처방 5회).",
